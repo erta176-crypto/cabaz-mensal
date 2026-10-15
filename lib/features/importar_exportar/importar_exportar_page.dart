@@ -329,7 +329,7 @@ class ResumoImportacao extends StatelessWidget {
                 leading: marca(l.ok),
                 title: Text(l.nome),
                 subtitle: Text(
-                  '${l.nCompras} compras'
+                  '${l.nCompras} ${l.nCompras == 1 ? 'compra' : 'compras'}'
                   '${l.ok == false ? ' · esperado ${formatarCent(l.esperadoCent!)}' : ''}',
                 ),
                 trailing: Text(formatarCent(l.totalCent)),
