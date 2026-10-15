@@ -286,13 +286,14 @@ void main() {
       expect(find.textContaining('1,78'), findsWidgets); // carrinho
     });
 
-    testWidgets('o botão Adicionar artigo não tapa o Concluir compra', (
-      tester,
-    ) async {
+    testWidgets('Adicionar artigo e Concluir compra lado a lado, sem se taparem',
+        (tester) async {
       await abrir(tester);
-      final adicionar = tester.getRect(find.byType(FloatingActionButton));
+      final adicionar = tester.getRect(find.text('Adicionar artigo'));
       final concluir = tester.getRect(find.text('Concluir compra'));
       expect(adicionar.overlaps(concluir), isFalse);
+      expect(adicionar.center.dy, closeTo(concluir.center.dy, 1));
+      expect(find.byType(FloatingActionButton), findsNothing);
     });
   });
 }

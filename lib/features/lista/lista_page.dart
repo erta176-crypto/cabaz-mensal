@@ -174,13 +174,6 @@ class _ListaPageState extends ConsumerState<ListaPage> {
           onPressed: () => _partilhar(lista),
         ),
       ],
-      botao: ativas.isEmpty
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: () => _adicionar(ativas),
-              icon: const Icon(Icons.add),
-              label: const Text('Adicionar artigo'),
-            ),
       corpo: ConteudoCentrado(
         child: Column(
           children: [
@@ -218,10 +211,12 @@ class _ListaPageState extends ConsumerState<ListaPage> {
           ],
         ),
       ),
-      rodape: planear
+      rodape: ativas.isEmpty
           ? null
           : _Rodape(
               lista: lista,
+              planear: planear,
+              aoAdicionar: () => _adicionar(ativas),
               aoConcluir: lista.nComprados == 0 ? null : _concluir,
             ),
     );
@@ -592,27 +587,49 @@ class _LinhaPlanear extends ConsumerWidget {
   }
 }
 
+/// Rodapé fixo: totais numa linha e, por baixo, os dois botões lado a lado
+/// (Adicionar artigo e Concluir compra). No modo Planear só há Adicionar.
 class _Rodape extends StatelessWidget {
-  const _Rodape({required this.lista, required this.aoConcluir});
+  const _Rodape({
+    required this.lista,
+    required this.planear,
+    required this.aoAdicionar,
+    required this.aoConcluir,
+  });
 
   final ListaMontada lista;
+  final bool planear;
+  final VoidCallback aoAdicionar;
   final VoidCallback? aoConcluir;
 
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
-    Widget valor(String rotulo, int cent) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          rotulo,
-          style: tema.textTheme.labelSmall?.copyWith(
-            color: tema.colorScheme.onSurfaceVariant,
+    Widget valor(String rotulo, int cent) => Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: '$rotulo ',
+            style: TextStyle(color: tema.colorScheme.onSurfaceVariant),
           ),
-        ),
-        Text(formatarCent(cent), style: tema.textTheme.titleMedium),
-      ],
+          TextSpan(
+            text: formatarCent(cent),
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+    // Sem ícones e com pouca margem: os dois rótulos cabem numa linha
+    // mesmo num telemóvel de 360 dp; se não couberem, encolhem um pouco.
+    const estilo = ButtonStyle(
+      padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
+      minimumSize: WidgetStatePropertyAll(Size.fromHeight(44)),
+    );
+    Widget rotulo(String t) => FittedBox(fit: BoxFit.scaleDown, child: Text(t));
+    final adicionar = FilledButton.tonal(
+      style: estilo,
+      onPressed: aoAdicionar,
+      child: rotulo('Adicionar artigo'),
     );
     return Material(
       color: tema.colorScheme.surfaceContainerLow,
@@ -620,28 +637,45 @@ class _Rodape extends StatelessWidget {
         top: false,
         child: Container(
           decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: tema.colorScheme.outlineVariant)),
+            border: Border(
+              top: BorderSide(color: tema.colorScheme.outlineVariant),
+            ),
           ),
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-          child: Row(
-            children: [
-              Expanded(
-                child: Wrap(
-                  spacing: 20,
-                  runSpacing: 4,
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 960),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (!planear) ...[
+                  Wrap(
+                    spacing: 20,
+                    runSpacing: 4,
+                    children: [
+                      valor('Estimado', lista.totalEstimadoCent),
+                      valor('No carrinho', lista.totalCarrinhoCent),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                ],
+                Row(
                   children: [
-                    valor('Estimado', lista.totalEstimadoCent),
-                    valor('No carrinho', lista.totalCarrinhoCent),
+                    Expanded(child: adicionar),
+                    if (!planear) ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton(
+                          style: estilo,
+                          onPressed: aoConcluir,
+                          child: rotulo('Concluir compra'),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
-              ),
-              const SizedBox(width: 8),
-              FilledButton.icon(
-                onPressed: aoConcluir,
-                icon: const Icon(Icons.done_all),
-                label: const Text('Concluir compra'),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
