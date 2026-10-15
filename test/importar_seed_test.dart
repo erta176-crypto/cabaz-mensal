@@ -186,7 +186,7 @@ void main() {
     setUp(() {
       base = BaseEmMemoria();
       dados = FakeDadosRepository(base);
-      importador = ImportadorSeed(dados: dados, lojas: FakeLojasRepository(base));
+      importador = ImportadorSeed(dados: dados);
     });
 
     test('totais de controlo batem: ✓ em todas as lojas', () async {

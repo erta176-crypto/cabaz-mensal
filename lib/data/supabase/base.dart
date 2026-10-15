@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart';
 
 import '../repositorios.dart';
 
@@ -26,55 +23,6 @@ Future<List<Map<String, dynamic>>> buscarTudo(
     if (pagina.length < _tamanhoPagina) return todas;
     inicio += _tamanhoPagina;
   }
-}
-
-/// Stream que carrega os dados e volta a carregá-los sempre que alguma das
-/// [tabelas] muda no servidor (Supabase Realtime). Assim uma alteração feita
-/// no PC aparece no telemóvel sem reabrir o ecrã.
-Stream<T> observarComRealtime<T>(
-  SupabaseClient cliente, {
-  required List<String> tabelas,
-  required Future<T> Function() carregar,
-}) {
-  late final StreamController<T> controlador;
-  RealtimeChannel? canal;
-  Timer? atraso;
-
-  Future<void> recarregar() async {
-    try {
-      final valor = await carregar();
-      if (!controlador.isClosed) controlador.add(valor);
-    } catch (e, s) {
-      if (!controlador.isClosed) controlador.addError(traduzirErro(e), s);
-    }
-  }
-
-  controlador = StreamController<T>(
-    onListen: () {
-      recarregar();
-      var c = cliente.channel('obs-${tabelas.join('-')}-${const Uuid().v4()}');
-      for (final tabela in tabelas) {
-        c = c.onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: tabela,
-          callback: (_) {
-            // Agrupa rajadas de alterações (ex.: importação) numa só leitura.
-            atraso?.cancel();
-            atraso = Timer(const Duration(milliseconds: 400), recarregar);
-          },
-        );
-      }
-      canal = c.subscribe();
-    },
-    onCancel: () async {
-      atraso?.cancel();
-      final c = canal;
-      if (c != null) await cliente.removeChannel(c);
-      await controlador.close();
-    },
-  );
-  return controlador.stream;
 }
 
 /// Converte erros do Supabase em mensagens em pt-PT.

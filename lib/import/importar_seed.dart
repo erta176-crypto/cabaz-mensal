@@ -289,10 +289,9 @@ List<VerificacaoLoja> verificarControlo(
 /// Orquestra a importação. Recebe os repositórios para poder ser testada
 /// com versões em memória.
 class ImportadorSeed {
-  ImportadorSeed({required this.dados, required this.lojas, this.novoId});
+  ImportadorSeed({required this.dados, this.novoId});
 
   final DadosRepository dados;
-  final LojasRepository lojas;
   final String Function()? novoId;
 
   Future<ResultadoImportacao> importar(
@@ -304,7 +303,7 @@ class ImportadorSeed {
       payload.toJson(),
       substituir: substituir,
     );
-    final resumo = await lojas.resumoPorLoja();
+    final resumo = await dados.resumoPorLoja();
     return ResultadoImportacao(
       contagens: contagens,
       lojas: verificarControlo(ficheiro.controlo, resumo),

@@ -83,7 +83,6 @@ void main() {
       final dadosA = SupabaseDadosRepository(a);
       final r = await ImportadorSeed(
         dados: dadosA,
-        lojas: SupabaseLojasRepository(a),
       ).importar(seed, substituir: true);
 
       expect(r.contagens['compras'], 138);
@@ -95,9 +94,9 @@ void main() {
       }
 
       // RLS: o segundo utilizador não vê nada do primeiro.
-      expect(await SupabaseComprasRepository(b).contarCompras(), 0);
+      expect(await SupabaseConsultasCompras(b).contarCompras(), 0);
       expect(await b.from('artigos').count(), 0);
-      expect(await SupabaseLojasRepository(b).resumoPorLoja(), isEmpty);
+      expect(await SupabaseDadosRepository(b).resumoPorLoja(), isEmpty);
       expect(await SupabaseDadosRepository(b).temDados(), isFalse);
 
       await dadosA.apagarTudo();

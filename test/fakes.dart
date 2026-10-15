@@ -52,15 +52,6 @@ class FakeDadosRepository implements DadosRepository {
 
   @override
   Future<void> apagarTudo() async => base.tabelas = {};
-}
-
-class FakeLojasRepository implements LojasRepository {
-  FakeLojasRepository(this.base);
-  final BaseEmMemoria base;
-
-  @override
-  Stream<List<Loja>> observarLojas() =>
-      Stream.value(base.t('lojas').map(Loja.fromMap).toList());
 
   @override
   Future<List<ResumoLoja>> resumoPorLoja() async => [
@@ -76,6 +67,13 @@ class FakeLojasRepository implements LojasRepository {
             .fold(0, (s, c) => s + (c['total_cent'] as int)),
       ),
   ];
+
+  @override
+  Future<ResumoDados> resumoDados() async => ResumoDados(
+    nCompras: base.t('compras').length,
+    nArtigos: base.t('artigos').length,
+    lojas: await resumoPorLoja(),
+  );
 }
 
 class FakeAuthRepository implements AuthRepository {
@@ -89,6 +87,9 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   String? get email => _sessao ? 'teste@exemplo.pt' : null;
+
+  @override
+  String? get utilizadorId => _sessao ? 'utilizador-teste' : null;
 
   @override
   Stream<bool> observarSessao() => _eventos.stream;

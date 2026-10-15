@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../domain/modelos.dart';
+import '../local/repositorios_locais.dart';
 import '../repositorios.dart';
 import 'base.dart';
 
@@ -13,6 +14,9 @@ class SupabaseAuthRepository implements AuthRepository {
 
   @override
   String? get email => _c.auth.currentUser?.email;
+
+  @override
+  String? get utilizadorId => _c.auth.currentUser?.id;
 
   @override
   Stream<bool> observarSessao() =>
@@ -37,143 +41,42 @@ class SupabaseAuthRepository implements AuthRepository {
   Future<void> sair() => _c.auth.signOut();
 }
 
-class SupabaseLojasRepository implements LojasRepository {
-  SupabaseLojasRepository(this._c);
-  final SupabaseClient _c;
-
-  @override
-  Stream<List<Loja>> observarLojas() => observarComRealtime(
-    _c,
-    tabelas: ['lojas'],
-    carregar: () async => (await buscarTudo(
-      _c,
-      'lojas',
-      ordem: 'nome',
-    )).map(Loja.fromMap).toList(),
-  );
-
-  @override
-  Future<List<ResumoLoja>> resumoPorLoja() => comErrosTraduzidos(() async {
-    final r = await _c.from('resumo_por_loja').select().order('nome');
-    return r.map(ResumoLoja.fromMap).toList();
-  });
-}
-
-class SupabaseCategoriasRepository implements CategoriasRepository {
-  SupabaseCategoriasRepository(this._c);
-  final SupabaseClient _c;
-
-  @override
-  Stream<List<Categoria>> observarCategorias() => observarComRealtime(
-    _c,
-    tabelas: ['categorias'],
-    carregar: () async => (await buscarTudo(
-      _c,
-      'categorias',
-      ordem: 'ordem',
-    )).map(Categoria.fromMap).toList(),
-  );
-
-  @override
-  Future<void> criar({required String nome, required int ordem}) =>
-      comErrosTraduzidos(
-        () => _c.from('categorias').insert({'nome': nome, 'ordem': ordem}),
-      );
-
-  @override
-  Future<void> atualizar(Categoria categoria) => comErrosTraduzidos(
-    () => _c
-        .from('categorias')
-        .update({'nome': categoria.nome, 'ordem': categoria.ordem})
-        .eq('id', categoria.id),
-  );
-
-  @override
-  Future<void> eliminar(String id, {String? moverPara}) =>
-      comErrosTraduzidos(() async {
-        await _c
-            .from('artigos')
-            .update({'categoria_id': moverPara})
-            .eq('categoria_id', id);
-        await _c.from('categorias').delete().eq('id', id);
-      });
-}
-
-class SupabaseArtigosRepository implements ArtigosRepository {
-  SupabaseArtigosRepository(this._c);
-  final SupabaseClient _c;
-
-  @override
-  Stream<List<Artigo>> observarArtigos() => observarComRealtime(
-    _c,
-    tabelas: ['artigos'],
-    carregar: () async => (await buscarTudo(
-      _c,
-      'artigos',
-      ordem: 'nome',
-    )).map(Artigo.fromMap).toList(),
-  );
-
-  @override
-  Stream<List<PrecoAtual>> observarPrecosAtuais() => observarComRealtime(
-    _c,
-    tabelas: ['registos_preco'],
-    carregar: () async => (await buscarTudo(
-      _c,
-      'precos_atuais',
-      colunas: 'artigo_id, loja_id, preco_cent, data',
-      ordem: 'artigo_id',
-    )).map(PrecoAtual.fromMap).toList(),
-  );
-
-  @override
-  Future<void> guardar(
-    Artigo artigo, {
-    Map<String, int?> precosCent = const {},
-    bool novo = false,
-  }) => comErrosTraduzidos(() async {
-    final dados = artigo.toMap();
-    if (novo) {
-      await _c.from('artigos').insert(dados);
-    } else {
-      dados.remove('id');
-      await _c.from('artigos').update(dados).eq('id', artigo.id);
-    }
-
-    final atuais = {
-      for (final p in await _c
-          .from('precos_atuais')
-          .select('loja_id, preco_cent')
-          .eq('artigo_id', artigo.id))
-        p['loja_id'] as String: (p['preco_cent'] as num).toInt(),
-    };
-    final hoje = dataIso(DateTime.now());
-    final novos = [
-      for (final MapEntry(key: lojaId, value: preco) in precosCent.entries)
-        if (preco != null && atuais[lojaId] != preco)
-          {
-            'artigo_id': artigo.id,
-            'loja_id': lojaId,
-            'data': hoje,
-            'preco_cent': preco,
-            'origem': 'manual',
-          },
-    ];
-    if (novos.isNotEmpty) await _c.from('registos_preco').insert(novos);
-  });
-
-  @override
-  Future<void> eliminar(String id) =>
-      comErrosTraduzidos(() => _c.from('artigos').delete().eq('id', id));
-}
-
-class SupabaseComprasRepository implements ComprasRepository {
-  SupabaseComprasRepository(this._c);
+/// Consultas sobre compras antigas (só com rede).
+class SupabaseConsultasCompras implements ConsultasCompras {
+  SupabaseConsultasCompras(this._c);
   final SupabaseClient _c;
 
   @override
   Future<int> contarCompras() =>
-      comErrosTraduzidos(() => _c.from('compras').count());
+      _comRede(() => _c.from('compras').count());
+
+  @override
+  Future<int> comprasDaLoja(String lojaId) =>
+      _comRede(() => _c.from('compras').count().eq('loja_id', lojaId));
+
+  @override
+  Future<List<String>> locaisUsados(String lojaId) => _comRede(() async {
+    final linhas = await _c
+        .from('compras')
+        .select('local')
+        .eq('loja_id', lojaId)
+        .not('local', 'is', null);
+    final locais = {for (final l in linhas) l['local'] as String}.toList()
+      ..sort();
+    return locais;
+  });
+
+  Future<T> _comRede<T>(Future<T> Function() f) async {
+    try {
+      return await comErrosTraduzidos(f);
+    } on ErroDados {
+      rethrow;
+    } catch (_) {
+      throw const ErroDados(
+        'Sem rede: não foi possível consultar as compras no servidor.',
+      );
+    }
+  }
 }
 
 class SupabaseDadosRepository implements DadosRepository {
@@ -224,4 +127,20 @@ class SupabaseDadosRepository implements DadosRepository {
   @override
   Future<void> apagarTudo() =>
       comErrosTraduzidos(() => _c.rpc('apagar_todos_dados'));
+
+  @override
+  Future<List<ResumoLoja>> resumoPorLoja() => comErrosTraduzidos(() async {
+    final r = await _c.from('resumo_por_loja').select().order('nome');
+    return r.map(ResumoLoja.fromMap).toList();
+  });
+
+  @override
+  Future<ResumoDados> resumoDados() => comErrosTraduzidos(() async {
+    final lojas = await resumoPorLoja();
+    return ResumoDados(
+      nCompras: await _c.from('compras').count(),
+      nArtigos: await _c.from('artigos').count().isFilter('apagado_em', null),
+      lojas: lojas,
+    );
+  });
 }

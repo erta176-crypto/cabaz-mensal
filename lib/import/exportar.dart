@@ -11,7 +11,15 @@ Map<String, dynamic> montarExportacao(
   Map<String, List<Map<String, dynamic>>> tabelas, {
   DateTime? agora,
 }) {
-  List<Map<String, dynamic>> t(String nome) => tabelas[nome] ?? const [];
+  // O que está apagado (apagado_em) não entra na cópia. As linhas de compra
+  // de um artigo apagado ficam sem artigo (mantêm o texto do talão).
+  List<Map<String, dynamic>> t(String nome) => [
+    for (final l in tabelas[nome] ?? const <Map<String, dynamic>>[])
+      if (l['apagado_em'] == null) l,
+  ];
+  final artigosAtivos = {for (final a in t('artigos')) a['id']};
+  final categoriasAtivas = {for (final c in t('categorias')) c['id']};
+  Object? artigo(Object? id) => artigosAtivos.contains(id) ? id : null;
 
   // As lojas são identificadas pelo slug, como no ficheiro original.
   final slugPorLoja = {
@@ -31,7 +39,9 @@ Map<String, dynamic> montarExportacao(
   }
 
   // Os preços 'talao' são recriados a partir das linhas na importação.
-  final precos = t('registos_preco').where((p) => p['origem'] != 'talao');
+  final precos = t('registos_preco').where(
+    (p) => p['origem'] != 'talao' && artigo(p['artigo_id']) != null,
+  );
 
   return {
     'versao': 2,
@@ -56,13 +66,15 @@ Map<String, dynamic> montarExportacao(
         {
           'id': a['id'],
           'nome': a['nome'],
-          'categoria_id': a['categoria_id'],
+          'categoria_id': categoriasAtivas.contains(a['categoria_id'])
+              ? a['categoria_id']
+              : null,
           'unidade': a['unidade'],
         },
     ],
     'aliases': [
       for (final a in t('aliases'))
-        {
+        if (artigo(a['artigo_id']) != null) {
           'artigo_id': a['artigo_id'],
           'loja_id': slug(a['loja_id']),
           'texto': a['texto_talao'],
@@ -84,7 +96,7 @@ Map<String, dynamic> montarExportacao(
       for (final l in t('linhas_compra'))
         {
           'compra_id': l['compra_id'],
-          'artigo_id': l['artigo_id'],
+          'artigo_id': artigo(l['artigo_id']),
           'texto_original': l['texto_original'],
           'quantidade': l['quantidade'],
           'peso_kg': l['peso_g'] == null
@@ -97,7 +109,7 @@ Map<String, dynamic> montarExportacao(
     ],
     'listas': [
       for (final i in t('itens_lista'))
-        {
+        if (artigo(i['artigo_id']) != null) {
           'loja_id': slug(i['loja_id']),
           'artigo_id': i['artigo_id'],
           'quantidade_padrao': i['qtd_padrao'],

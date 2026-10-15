@@ -25,6 +25,7 @@ class Loja {
     this.cadeia,
     this.local,
     this.cor,
+    this.arquivada = false,
   });
 
   final String id;
@@ -34,6 +35,9 @@ class Loja {
   final String? local;
   final String? cor;
 
+  /// Loja com compras que já não se usa (não aparece na Lista).
+  final bool arquivada;
+
   factory Loja.fromMap(Map<String, dynamic> m) => Loja(
     id: m['id'] as String,
     slug: m['slug'] as String,
@@ -41,6 +45,7 @@ class Loja {
     cadeia: m['cadeia'] as String?,
     local: m['local'] as String?,
     cor: m['cor'] as String?,
+    arquivada: m['arquivada'] as bool? ?? false,
   );
 
   Map<String, dynamic> toMap() => {
@@ -50,7 +55,24 @@ class Loja {
     'cadeia': cadeia,
     'local': local,
     'cor': cor,
+    'arquivada': arquivada,
   };
+
+  Loja copyWith({
+    String? nome,
+    String? cadeia,
+    String? local,
+    String? cor,
+    bool? arquivada,
+  }) => Loja(
+    id: id,
+    slug: slug,
+    nome: nome ?? this.nome,
+    cadeia: cadeia ?? this.cadeia,
+    local: local ?? this.local,
+    cor: cor ?? this.cor,
+    arquivada: arquivada ?? this.arquivada,
+  );
 }
 
 class Categoria {
@@ -183,24 +205,71 @@ class ItemLista {
     required this.artigoId,
     required this.qtdPadrao,
     required this.incluido,
-  });
+    num? qtd,
+    this.comprado = false,
+    this.ordem = 0,
+  }) : qtd = qtd ?? qtdPadrao;
 
-  final String id;
+  /// Na cache local pode ainda não existir (linha criada sem rede): a
+  /// identidade de um item é (loja, artigo).
+  final String? id;
   final String lojaId;
   final String artigoId;
 
-  /// Unidades ou quilos (ex.: 1.3 kg); numeric(10,3) no Postgres.
+  /// Quantidade habitual: unidades ou quilos (ex.: 1.3 kg).
   final num qtdPadrao;
+
+  /// Quantidade desta compra.
+  final num qtd;
   final bool incluido;
+  final bool comprado;
+  final int ordem;
+
+  factory ItemLista.fromMap(Map<String, dynamic> m) => ItemLista(
+    id: m['id'] as String?,
+    lojaId: m['loja_id'] as String,
+    artigoId: m['artigo_id'] as String,
+    qtdPadrao: _numero(m['qtd_padrao']) ?? 1,
+    qtd: _numero(m['qtd']),
+    incluido: m['incluido'] as bool? ?? true,
+    comprado: m['comprado'] as bool? ?? false,
+    ordem: (m['ordem'] as num?)?.toInt() ?? 0,
+  );
 
   Map<String, dynamic> toMap() => {
-    'id': id,
+    'id': ?id,
     'loja_id': lojaId,
     'artigo_id': artigoId,
     'qtd_padrao': qtdPadrao,
+    'qtd': qtd,
     'incluido': incluido,
+    'comprado': comprado,
+    'ordem': ordem,
   };
+
+  ItemLista copyWith({
+    num? qtdPadrao,
+    num? qtd,
+    bool? incluido,
+    bool? comprado,
+  }) => ItemLista(
+    id: id,
+    lojaId: lojaId,
+    artigoId: artigoId,
+    qtdPadrao: qtdPadrao ?? this.qtdPadrao,
+    qtd: qtd ?? this.qtd,
+    incluido: incluido ?? this.incluido,
+    comprado: comprado ?? this.comprado,
+    ordem: ordem,
+  );
 }
+
+/// O PostgREST devolve numeric como número; a cache pode guardar texto.
+num? _numero(Object? v) => switch (v) {
+  num n => n,
+  String s => num.tryParse(s),
+  _ => null,
+};
 
 enum OrigemCompra { manual, talao, importacao }
 
