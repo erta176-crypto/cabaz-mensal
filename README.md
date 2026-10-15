@@ -20,7 +20,21 @@ supabase/migrations/   esquema da base de dados (SQL versionado)
 test/                  testes unitários e de widgets; test/integracao (opcional)
 ```
 
-Só `lib/data/` fala com o Supabase. Os ecrãs usam os repositórios via Riverpod.
+Só `lib/data/` fala com o Supabase e com a base local. Os ecrãs usam os repositórios via Riverpod.
+
+## Sem rede (Fase 1A)
+
+A app guarda uma cópia local (drift/SQLite) de lojas, categorias, artigos, aliases, lista do mês, preços e preferências. Os ecrãs leem sempre da cópia local.
+
+- **Escrever:** grava logo na cópia local e põe a alteração numa fila (`lib/data/sync/`).
+  - Criar envia a linha completa; editar envia só as colunas alteradas.
+  - Eliminar marca `apagado_em`, para a eliminação chegar aos outros dispositivos.
+- **Enviar:** a fila é enviada por ordem quando há rede, com espera crescente entre tentativas. Uma alteração recusada pelo servidor fica visível na faixa do topo e pode ser descartada.
+- **Receber:** a app puxa por `atualizado_em`, com 5 minutos de margem, e também quando o tempo real avisa de alterações. Uma linha com alterações locais por enviar não é substituída.
+- **Conflitos:** vence a última escrita a chegar ao servidor.
+- **Dados apagados no servidor:** "Apagar todos os dados" e importar a substituir apagam a sério. A coluna `preferencias.reiniciado_em` avisa os dispositivos para limparem a cópia local.
+- **Web:** usa a mesma cópia local. Os ficheiros `web/sqlite3.wasm` (do pacote sqlite3) e `web/drift_worker.js` (do drift) têm de corresponder às versões no `pubspec.lock`. Ao atualizar o drift ou o sqlite3, descarrega-os outra vez das releases desses pacotes no GitHub.
+- **Código gerado:** depois de mudar `lib/data/local/base_local.dart`, corre `dart run build_runner build`. O ficheiro `.g.dart` é commitado.
 
 ## Configurar o Supabase
 
