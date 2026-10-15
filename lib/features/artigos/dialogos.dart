@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../core/formatos.dart';
 import '../../domain/dinheiro.dart';
@@ -300,6 +301,146 @@ class _DialogoMoverArtigosState extends State<DialogoMoverArtigos> {
         FilledButton(
           onPressed: () => Navigator.pop(context, (destino: _destino)),
           child: const Text('Mover e eliminar'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Cores disponíveis para as lojas (menu de seleção).
+const coresLoja = {
+  '#2a78d6': 'Azul',
+  '#eb6834': 'Laranja',
+  '#1baf7a': 'Verde',
+  '#d64545': 'Vermelho',
+  '#7b5cd6': 'Roxo',
+  '#e0a92b': 'Amarelo',
+  '#b4532a': 'Terracota',
+  '#7a7a7a': 'Cinzento',
+};
+
+/// Criar ou editar uma loja: nome, cadeia, local e cor.
+class DialogoLoja extends StatefulWidget {
+  const DialogoLoja({super.key, this.loja});
+
+  final Loja? loja;
+
+  @override
+  State<DialogoLoja> createState() => _DialogoLojaState();
+}
+
+class _DialogoLojaState extends State<DialogoLoja> {
+  final _form = GlobalKey<FormState>();
+  late final _nome = TextEditingController(text: widget.loja?.nome);
+  late final _cadeia = TextEditingController(text: widget.loja?.cadeia);
+  late final _local = TextEditingController(text: widget.loja?.local);
+  late String _cor = widget.loja?.cor?.toLowerCase() ?? coresLoja.keys.first;
+
+  @override
+  void dispose() {
+    _nome.dispose();
+    _cadeia.dispose();
+    _local.dispose();
+    super.dispose();
+  }
+
+  String? _texto(TextEditingController c) =>
+      c.text.trim().isEmpty ? null : c.text.trim();
+
+  @override
+  Widget build(BuildContext context) {
+    final cores = {
+      ...coresLoja,
+      if (!coresLoja.containsKey(_cor)) _cor: 'Atual',
+    };
+    return AlertDialog(
+      title: Text(widget.loja == null ? 'Nova loja' : 'Editar loja'),
+      content: SizedBox(
+        width: 400,
+        child: Form(
+          key: _form,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _nome,
+                  autofocus: widget.loja == null,
+                  decoration: const InputDecoration(labelText: 'Nome'),
+                  validator: (v) =>
+                      (v ?? '').trim().isEmpty ? 'Escreve um nome.' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _cadeia,
+                  decoration: const InputDecoration(
+                    labelText: 'Cadeia',
+                    hintText: 'ex.: Lidl',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _local,
+                  decoration: const InputDecoration(
+                    labelText: 'Local',
+                    hintText: 'ex.: Entroncamento',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  initialValue: _cor,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Cor'),
+                  items: [
+                    for (final MapEntry(key: hex, value: nome) in cores.entries)
+                      DropdownMenuItem(
+                        value: hex,
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 8,
+                              backgroundColor: Color(
+                                0xFF000000 |
+                                    int.parse(hex.substring(1), radix: 16),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(nome),
+                          ],
+                        ),
+                      ),
+                  ],
+                  onChanged: (v) => setState(() => _cor = v ?? _cor),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: () {
+            if (!_form.currentState!.validate()) return;
+            final nome = _nome.text.trim();
+            final base = widget.loja;
+            Navigator.pop(
+              context,
+              Loja(
+                id: base?.id ?? const Uuid().v4(),
+                slug: base?.slug ?? '',
+                nome: nome,
+                cadeia: _texto(_cadeia) ?? nome,
+                local: _texto(_local),
+                cor: _cor,
+                arquivada: base?.arquivada ?? false,
+              ),
+            );
+          },
+          child: const Text('Guardar'),
         ),
       ],
     );

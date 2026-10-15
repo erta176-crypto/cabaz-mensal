@@ -20,3 +20,9 @@ Future<void> guardarTexto(String nome, String conteudo) async {
   a.remove();
   web.URL.revokeObjectURL(url);
 }
+
+/// Na web, descarrega um .txt. Devolve true (ficheiro descarregado).
+Future<bool> partilharTexto(String nome, String texto) async {
+  await guardarTexto('$nome.txt', texto);
+  return true;
+}

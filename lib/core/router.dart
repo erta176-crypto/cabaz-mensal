@@ -11,6 +11,8 @@ import '../features/definicoes/definicoes_page.dart';
 import '../features/em_breve/em_breve_page.dart';
 import '../features/entrada/entrada_page.dart';
 import '../features/importar_exportar/importar_exportar_page.dart';
+import '../features/lista/lista_page.dart';
+import '../features/shell/faixa_sync.dart';
 import '../features/shell/shell.dart';
 
 /// Avisa o go_router quando a sessão muda, para reavaliar o redirect.
@@ -45,13 +47,15 @@ GoRouter criarRouter(AuthRepository auth) {
       GoRoute(path: '/entrar', builder: (_, _) => const EntradaPage()),
       ShellRoute(
         builder: (context, estado, filho) =>
-            AppShell(localizacao: estado.matchedLocation, child: filho),
+            AppShell(
+              localizacao: estado.matchedLocation,
+              faixa: const FaixaSync(),
+              child: filho,
+            ),
         routes: [
           GoRoute(
             path: '/lista',
-            pageBuilder: (_, _) => const NoTransitionPage(
-              child: EmBrevePage(titulo: 'Lista do mês', fase: 1),
-            ),
+            pageBuilder: (_, _) => const NoTransitionPage(child: ListaPage()),
           ),
           GoRoute(
             path: '/painel',
@@ -62,7 +66,7 @@ GoRouter criarRouter(AuthRepository auth) {
           GoRoute(
             path: '/historico',
             pageBuilder: (_, _) => const NoTransitionPage(
-              child: EmBrevePage(titulo: 'Histórico', fase: 1),
+              child: EmBrevePage(titulo: 'Histórico', fase: 2),
             ),
           ),
           GoRoute(

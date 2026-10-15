@@ -4,7 +4,9 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/formatos.dart';
 import '../../data/providers.dart';
+import '../../data/repositorios.dart';
 import '../../domain/modelos.dart';
+import '../../domain/texto.dart';
 import '../shell/shell.dart';
 import 'dialogos.dart';
 
@@ -20,17 +22,6 @@ enum Mostrar {
 /// Valor do filtro para "artigos sem categoria".
 const _semCategoria = '__sem__';
 
-/// Minúsculas e sem acentos, para a pesquisa.
-String normalizar(String s) {
-  const de = 'áàâãäéèêëíìîïóòôõöúùûüçñ';
-  const para = 'aaaaaeeeeiiiiooooouuuucn';
-  final b = StringBuffer();
-  for (final c in s.toLowerCase().split('')) {
-    final i = de.indexOf(c);
-    b.write(i < 0 ? c : para[i]);
-  }
-  return b.toString();
-}
 
 class ArtigosPage extends ConsumerStatefulWidget {
   const ArtigosPage({super.key});
@@ -229,20 +220,24 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
 
     return Pagina(
       titulo: 'Artigos e lojas',
-      botao: !pronto || _mostrar == Mostrar.lojas
+      botao: !pronto
           ? null
           : FloatingActionButton.extended(
-              onPressed: () => _mostrar == Mostrar.artigos
-                  ? _editarArtigo(
-                      categorias: listaCategorias,
-                      lojas: listaLojas,
-                      precos: const {},
-                    )
-                  : _editarCategoria(todas: listaCategorias),
+              onPressed: () => switch (_mostrar) {
+                Mostrar.artigos => _editarArtigo(
+                  categorias: listaCategorias,
+                  lojas: [for (final l in listaLojas) if (!l.arquivada) l],
+                  precos: const {},
+                ),
+                Mostrar.categorias => _editarCategoria(todas: listaCategorias),
+                Mostrar.lojas => _editarLoja(),
+              },
               icon: const Icon(Icons.add),
-              label: Text(
-                _mostrar == Mostrar.artigos ? 'Novo artigo' : 'Nova categoria',
-              ),
+              label: Text(switch (_mostrar) {
+                Mostrar.artigos => 'Novo artigo',
+                Mostrar.categorias => 'Nova categoria',
+                Mostrar.lojas => 'Nova loja',
+              }),
             ),
       corpo: ConteudoCentrado(
         child: Column(
@@ -439,20 +434,105 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
     );
   }
 
+  Future<void> _editarLoja({Loja? loja}) async {
+    final r = await showDialog<Loja>(
+      context: context,
+      builder: (_) => DialogoLoja(loja: loja),
+    );
+    if (r == null) return;
+    try {
+      await ref.read(lojasRepositoryProvider).guardar(r, nova: loja == null);
+    } catch (e) {
+      if (mounted) _mensagem('$e');
+    }
+  }
+
+  Future<void> _eliminarLoja(Loja loja) async {
+    final repo = ref.read(lojasRepositoryProvider);
+    final int n;
+    try {
+      n = await ref.read(comprasRepositoryProvider).comprasDaLoja(loja.id);
+    } on ErroDados catch (e) {
+      if (mounted) _mensagem('$e');
+      return;
+    }
+    if (!mounted) return;
+    if (n > 0) {
+      final arquivar = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Não é possível eliminar "${loja.nome}"'),
+          content: Text(
+            'Esta loja tem $n ${n == 1 ? 'compra' : 'compras'} no histórico. '
+            'Podes arquivá-la: deixa de aparecer na Lista, mas as compras '
+            'ficam.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Arquivar'),
+            ),
+          ],
+        ),
+      );
+      if (arquivar == true) await repo.arquivar(loja.id, arquivada: true);
+      return;
+    }
+    _eliminarComAnular(
+      id: loja.id,
+      descricao: loja.nome,
+      eliminar: () => repo.eliminar(loja.id),
+    );
+  }
+
   Widget _listaLojas(List<Loja> lojas) {
-    if (lojas.isEmpty) return _vazio('Ainda não há lojas.');
+    final visiveis = [for (final l in lojas) if (!_ocultos.contains(l.id)) l];
+    if (visiveis.isEmpty) return _vazio('Ainda não há lojas.');
+    final cores = Theme.of(context).colorScheme;
     return ListView.separated(
-      itemCount: lojas.length,
+      padding: const EdgeInsets.only(bottom: 96),
+      itemCount: visiveis.length,
       separatorBuilder: (_, _) => const Divider(indent: 16, endIndent: 16),
       itemBuilder: (context, i) {
-        final l = lojas[i];
+        final l = visiveis[i];
+        final detalhes = [
+          if (l.cadeia != null && l.cadeia != l.nome) l.cadeia!,
+          ?l.local,
+          if (l.arquivada) 'Arquivada',
+        ];
         return ListTile(
           leading: CircleAvatar(
             radius: 10,
             backgroundColor: corDeHex(l.cor) ?? Colors.grey,
           ),
-          title: Text(l.nome),
-          subtitle: l.local == null ? null : Text(l.local!),
+          title: Text(
+            l.nome,
+            style: l.arquivada ? TextStyle(color: cores.onSurfaceVariant) : null,
+          ),
+          subtitle: detalhes.isEmpty ? null : Text(detalhes.join(' · ')),
+          trailing: PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            tooltip: 'Ações',
+            onSelected: (acao) => switch (acao) {
+              'editar' => _editarLoja(loja: l),
+              'arquivar' => ref
+                  .read(lojasRepositoryProvider)
+                  .arquivar(l.id, arquivada: !l.arquivada),
+              _ => _eliminarLoja(l),
+            },
+            itemBuilder: (_) => [
+              const PopupMenuItem(value: 'editar', child: Text('Editar')),
+              PopupMenuItem(
+                value: 'arquivar',
+                child: Text(l.arquivada ? 'Desarquivar' : 'Arquivar'),
+              ),
+              const PopupMenuItem(value: 'eliminar', child: Text('Eliminar')),
+            ],
+          ),
         );
       },
     );

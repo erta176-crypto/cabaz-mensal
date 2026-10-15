@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/ficheiros/guardar_ficheiro.dart';
 import '../../core/formatos.dart';
 import '../../data/providers.dart';
+import '../../data/repositorios.dart';
 import '../../domain/modelos.dart';
 import '../../import/exportar.dart';
 import '../../import/importar_seed.dart';
@@ -32,6 +34,7 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
   _Formato _formatoExportar = _Formato.json;
 
   bool _ocupado = false;
+  int _versaoResumo = 0;
   String? _estado;
   ResultadoImportacao? _resultado;
 
@@ -74,11 +77,13 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
       );
       final resultado = await ImportadorSeed(
         dados: dados,
-        lojas: ref.read(lojasRepositoryProvider),
       ).importar(seed, substituir: substituir);
+      // A cache local volta a puxar tudo o que o servidor tem agora.
+      await ref.read(syncRepositoryProvider).recarregarTudo();
       if (!mounted) return;
       setState(() {
         _resultado = resultado;
+        _versaoResumo++;
         _estado = null;
       });
     } on SeedInvalido catch (e) {
@@ -166,6 +171,8 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            ResumoDadosCard(key: ValueKey(_versaoResumo)),
+            const SizedBox(height: 16),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(20),
@@ -373,6 +380,117 @@ class _Numero extends StatelessWidget {
         ),
         Text(valor, style: tema.textTheme.headlineSmall),
       ],
+    );
+  }
+}
+
+/// Números atuais no servidor, para verificar a sincronização.
+/// Atualiza sozinho de 20 em 20 segundos enquanto está visível.
+class ResumoDadosCard extends ConsumerStatefulWidget {
+  const ResumoDadosCard({super.key});
+
+  @override
+  ConsumerState<ResumoDadosCard> createState() => _ResumoDadosCardState();
+}
+
+class _ResumoDadosCardState extends ConsumerState<ResumoDadosCard> {
+  ResumoDados? _resumo;
+  bool _semRede = false;
+  bool _aCarregar = false;
+  Timer? _relogio;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregar();
+    _relogio = Timer.periodic(const Duration(seconds: 20), (_) => _carregar());
+  }
+
+  @override
+  void dispose() {
+    _relogio?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _carregar() async {
+    if (_aCarregar) return;
+    setState(() => _aCarregar = true);
+    try {
+      final r = await ref.read(dadosRepositoryProvider).resumoDados();
+      if (mounted) {
+        setState(() {
+          _resumo = r;
+          _semRede = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _semRede = true);
+    } finally {
+      if (mounted) setState(() => _aCarregar = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final r = _resumo;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text('Resumo dos dados', style: tema.textTheme.titleLarge),
+                ),
+                IconButton(
+                  tooltip: 'Atualizar',
+                  onPressed: _aCarregar ? null : _carregar,
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
+            ),
+            if (_semRede)
+              Text(
+                r == null
+                    ? 'Sem rede: não foi possível ler os números do servidor.'
+                    : 'Sem rede: números da última leitura.',
+                style: TextStyle(color: tema.colorScheme.onSurfaceVariant),
+              ),
+            if (r == null && !_semRede)
+              const Padding(
+                padding: EdgeInsets.all(8),
+                child: LinearProgressIndicator(),
+              ),
+            if (r != null) ...[
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 24,
+                runSpacing: 12,
+                children: [
+                  _Numero('Compras', formatarInteiro(r.nCompras)),
+                  _Numero('Artigos', formatarInteiro(r.nArtigos)),
+                  _Numero('Lojas', formatarInteiro(r.lojas.length)),
+                  _Numero('Total', formatarCent(r.totalCent)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              for (final l in r.lojas)
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l.nome),
+                  subtitle: Text(
+                    '${l.nCompras} ${l.nCompras == 1 ? 'compra' : 'compras'}',
+                  ),
+                  trailing: Text(formatarCent(l.totalCent)),
+                ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

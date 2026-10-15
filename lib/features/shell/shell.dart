@@ -100,10 +100,18 @@ class ShellScope extends InheritedWidget {
 /// - < 800 px: barra inferior (4 destinos) + menu lateral modal (☰, 6 destinos).
 /// - ≥ 800 px: menu lateral fixo à esquerda (6 destinos), sem barra nem ☰.
 class AppShell extends StatefulWidget {
-  const AppShell({super.key, required this.localizacao, required this.child});
+  const AppShell({
+    super.key,
+    required this.localizacao,
+    required this.child,
+    this.faixa,
+  });
 
   final String localizacao;
   final Widget child;
+
+  /// Faixa por cima do conteúdo (estado da sincronização).
+  final Widget? faixa;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -116,6 +124,15 @@ class _AppShellState extends State<AppShell> {
     _chave.currentState?.closeDrawer();
     context.go(destinos[indice].caminho);
   }
+
+  Widget _conteudo() => widget.faixa == null
+      ? widget.child
+      : Column(
+          children: [
+            widget.faixa!,
+            Expanded(child: widget.child),
+          ],
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +187,7 @@ class _AppShellState extends State<AppShell> {
             SizedBox(width: 300, child: menu),
             const VerticalDivider(width: 1),
             Expanded(
-              child: ShellScope(abrirMenu: null, child: widget.child),
+              child: ShellScope(abrirMenu: null, child: _conteudo()),
             ),
           ],
         ),
@@ -183,7 +200,7 @@ class _AppShellState extends State<AppShell> {
       drawer: menu,
       body: ShellScope(
         abrirMenu: () => _chave.currentState?.openDrawer(),
-        child: widget.child,
+        child: _conteudo(),
       ),
       // Importar e Definições só estão no menu ☰; aí a barra fica escondida
       // porque não tem nenhum destino para marcar como selecionado.
