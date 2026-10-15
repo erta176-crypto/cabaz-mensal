@@ -85,15 +85,24 @@ int indiceDestino(String localizacao) {
 
 /// Dá às páginas acesso ao botão ☰ (só existe em ecrã estreito).
 class ShellScope extends InheritedWidget {
-  const ShellScope({super.key, required this.abrirMenu, required super.child});
+  const ShellScope({
+    super.key,
+    required this.abrirMenu,
+    this.faixa,
+    required super.child,
+  });
 
   final VoidCallback? abrirMenu;
+
+  /// Faixa mostrada por baixo do título de cada página (sincronização).
+  final Widget? faixa;
 
   static ShellScope? of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<ShellScope>();
 
   @override
-  bool updateShouldNotify(ShellScope old) => old.abrirMenu != abrirMenu;
+  bool updateShouldNotify(ShellScope old) =>
+      old.abrirMenu != abrirMenu || old.faixa != faixa;
 }
 
 /// Estrutura de navegação:
@@ -124,15 +133,6 @@ class _AppShellState extends State<AppShell> {
     _chave.currentState?.closeDrawer();
     context.go(destinos[indice].caminho);
   }
-
-  Widget _conteudo() => widget.faixa == null
-      ? widget.child
-      : Column(
-          children: [
-            widget.faixa!,
-            Expanded(child: widget.child),
-          ],
-        );
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +187,11 @@ class _AppShellState extends State<AppShell> {
             SizedBox(width: 300, child: menu),
             const VerticalDivider(width: 1),
             Expanded(
-              child: ShellScope(abrirMenu: null, child: _conteudo()),
+              child: ShellScope(
+                abrirMenu: null,
+                faixa: widget.faixa,
+                child: widget.child,
+              ),
             ),
           ],
         ),
@@ -200,7 +204,8 @@ class _AppShellState extends State<AppShell> {
       drawer: menu,
       body: ShellScope(
         abrirMenu: () => _chave.currentState?.openDrawer(),
-        child: _conteudo(),
+        faixa: widget.faixa,
+        child: widget.child,
       ),
       // Importar e Definições só estão no menu ☰; aí a barra fica escondida
       // porque não tem nenhum destino para marcar como selecionado.
@@ -240,7 +245,9 @@ class Pagina extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final abrirMenu = ShellScope.of(context)?.abrirMenu;
+    final escopo = ShellScope.of(context);
+    final abrirMenu = escopo?.abrirMenu;
+    final faixa = escopo?.faixa;
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -255,7 +262,18 @@ class Pagina extends StatelessWidget {
         actions: acoes,
       ),
       floatingActionButton: botao,
-      body: SafeArea(top: false, child: corpo),
+      // A faixa fica por baixo do título (nunca por baixo da barra de estado).
+      body: SafeArea(
+        top: false,
+        child: faixa == null
+            ? corpo
+            : Column(
+                children: [
+                  faixa,
+                  Expanded(child: corpo),
+                ],
+              ),
+      ),
     );
   }
 }
