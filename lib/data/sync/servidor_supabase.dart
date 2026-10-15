@@ -11,9 +11,12 @@ class ServidorSupabase implements ServidorSync {
 
   static const _pagina = 1000;
 
+  /// Sem resposta neste tempo, o pedido conta como falha de rede.
+  static const _limite = Duration(seconds: 20);
+
   Future<T> _executar<T>(Future<T> Function() f) async {
     try {
-      return await f();
+      return await f().timeout(_limite);
     } catch (e) {
       final erro = classificarErro(e);
       if (erro.transitorio && _jwtExpirado(e)) {

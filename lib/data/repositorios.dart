@@ -166,9 +166,16 @@ class EstadoSync {
     this.aSincronizar = false,
     this.pendentes = 0,
     this.comErro = 0,
+    this.ultimoErro,
+    this.ultimaSincronizacao,
   });
 
   final bool online;
+
+  /// Diagnóstico: último erro da sincronização e quando correu bem pela
+  /// última vez (mostrados no diálogo "Alterações por enviar").
+  final String? ultimoErro;
+  final DateTime? ultimaSincronizacao;
   final bool aSincronizar;
 
   /// Alterações à espera de serem enviadas.
@@ -182,11 +189,15 @@ class EstadoSync {
     bool? aSincronizar,
     int? pendentes,
     int? comErro,
+    String? Function()? ultimoErro,
+    DateTime? ultimaSincronizacao,
   }) => EstadoSync(
     online: online ?? this.online,
     aSincronizar: aSincronizar ?? this.aSincronizar,
     pendentes: pendentes ?? this.pendentes,
     comErro: comErro ?? this.comErro,
+    ultimoErro: ultimoErro == null ? this.ultimoErro : ultimoErro(),
+    ultimaSincronizacao: ultimaSincronizacao ?? this.ultimaSincronizacao,
   );
 }
 

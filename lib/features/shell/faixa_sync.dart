@@ -104,47 +104,62 @@ class DialogoPendentes extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lista = ref.watch(pendentesProvider).value ?? const [];
+    final estado = ref.watch(estadoSyncProvider).value ?? const EstadoSync();
     final cores = Theme.of(context).colorScheme;
+    final ultima = estado.ultimaSincronizacao;
+    final diagnostico = [
+      estado.online ? 'Ligado ao servidor' : 'Sem ligação ao servidor',
+      ultima == null
+          ? 'Ainda não sincronizou nesta sessão'
+          : 'Última sincronização: '
+                '${ultima.hour.toString().padLeft(2, '0')}:'
+                '${ultima.minute.toString().padLeft(2, '0')}:'
+                '${ultima.second.toString().padLeft(2, '0')}',
+      if (estado.ultimoErro != null) 'Último erro: ${estado.ultimoErro}',
+    ].join('\n');
     return AlertDialog(
       title: const Text('Alterações por enviar'),
       content: SizedBox(
         width: 460,
-        child: lista.isEmpty
-            ? const Text('Está tudo enviado.')
-            : ListView(
-                shrinkWrap: true,
-                children: [
-                  for (final p in lista)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(
-                        p.erro == null ? Icons.schedule : Icons.error_outline,
-                        color: p.erro == null ? null : cores.error,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SelectableText(
+              diagnostico,
+              style: TextStyle(fontSize: 12, color: cores.onSurfaceVariant),
+            ),
+            const Divider(),
+            if (lista.isEmpty) const Text('Está tudo enviado.'),
+            for (final p in lista)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(
+                  p.erro == null ? Icons.schedule : Icons.error_outline,
+                  color: p.erro == null ? null : cores.error,
+                ),
+                title: Text(p.descricao),
+                subtitle: p.erro == null
+                    ? (p.tentativas > 0
+                          ? Text('${p.tentativas} tentativas')
+                          : null)
+                    : Text(p.erro!),
+                trailing: p.erro == null
+                    ? null
+                    : PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert),
+                        tooltip: 'Ações',
+                        onSelected: (_) =>
+                            ref.read(syncRepositoryProvider).descartar(p.id),
+                        itemBuilder: (_) => const [
+                          PopupMenuItem(
+                            value: 'descartar',
+                            child: Text('Descartar e recarregar'),
+                          ),
+                        ],
                       ),
-                      title: Text(p.descricao),
-                      subtitle: p.erro == null
-                          ? (p.tentativas > 0
-                                ? Text('${p.tentativas} tentativas')
-                                : null)
-                          : Text(p.erro!),
-                      trailing: p.erro == null
-                          ? null
-                          : PopupMenuButton<String>(
-                              icon: const Icon(Icons.more_vert),
-                              tooltip: 'Ações',
-                              onSelected: (_) => ref
-                                  .read(syncRepositoryProvider)
-                                  .descartar(p.id),
-                              itemBuilder: (_) => const [
-                                PopupMenuItem(
-                                  value: 'descartar',
-                                  child: Text('Descartar e recarregar'),
-                                ),
-                              ],
-                            ),
-                    ),
-                ],
               ),
+          ],
+        ),
       ),
       actions: [
         TextButton(

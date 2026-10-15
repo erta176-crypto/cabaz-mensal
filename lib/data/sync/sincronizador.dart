@@ -122,21 +122,41 @@ class Sincronizador {
       await puxar();
       _falhasSeguidas = 0;
       _novaTentativa?.cancel();
-      _emitir(_atual.copyWith(online: true));
+      _emitir(
+        _atual.copyWith(
+          online: true,
+          ultimoErro: () => null,
+          ultimaSincronizacao: DateTime.now(),
+        ),
+      );
     } on ErroSync catch (e) {
       // Um erro permanente ao puxar não tem remédio aqui: fica para a
       // próxima volta, sem dizer que não há rede.
-      if (e.transitorio) {
-        _falhasSeguidas++;
-        _emitir(_atual.copyWith(online: false));
-      }
+      _registar('sincronizar', e);
+      _emitir(
+        _atual.copyWith(
+          online: e.transitorio ? false : null,
+          ultimoErro: () => e.mensagem,
+        ),
+      );
+      if (e.transitorio) _falhasSeguidas++;
       _agendarNovaTentativa();
-    } catch (_) {
+    } catch (e, s) {
+      // Erro de programação (não de rede): fica visível em vez de parecer
+      // "sem rede".
+      _registar('sincronizar', e, s);
       _falhasSeguidas++;
+      _emitir(_atual.copyWith(online: true, ultimoErro: () => '$e'));
       _agendarNovaTentativa();
     } finally {
       _emitir(_atual.copyWith(aSincronizar: false));
     }
+  }
+
+  void _registar(String onde, Object erro, [StackTrace? pilha]) {
+    // Visível no logcat (Android) e na consola (web), também em release.
+    // ignore: avoid_print
+    print('[Sincronizador] $onde: $erro${pilha == null ? '' : '\n$pilha'}');
   }
 
   /// Espera crescente: 2 s, 4 s, 8 s… até 60 s.
