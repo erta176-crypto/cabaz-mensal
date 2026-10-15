@@ -236,12 +236,16 @@ class Pagina extends StatelessWidget {
     required this.corpo,
     this.acoes = const [],
     this.botao,
+    this.rodape,
   });
 
   final String titulo;
   final Widget corpo;
   final List<Widget> acoes;
   final Widget? botao;
+
+  /// Rodapé fixo; o botão flutuante fica sempre por cima dele.
+  final Widget? rodape;
 
   @override
   Widget build(BuildContext context) {
@@ -262,6 +266,7 @@ class Pagina extends StatelessWidget {
         actions: acoes,
       ),
       floatingActionButton: botao,
+      bottomNavigationBar: rodape,
       // A faixa fica por baixo do título (nunca por baixo da barra de estado).
       body: SafeArea(
         top: false,

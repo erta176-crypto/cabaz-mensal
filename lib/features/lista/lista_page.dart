@@ -215,14 +215,15 @@ class _ListaPageState extends ConsumerState<ListaPage> {
                       aoVer: _verArtigo,
                     ),
             ),
-            if (!planear)
-              _Rodape(
-                lista: lista,
-                aoConcluir: lista.nComprados == 0 ? null : _concluir,
-              ),
           ],
         ),
       ),
+      rodape: planear
+          ? null
+          : _Rodape(
+              lista: lista,
+              aoConcluir: lista.nComprados == 0 ? null : _concluir,
+            ),
     );
   }
 }

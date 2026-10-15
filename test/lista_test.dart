@@ -285,6 +285,15 @@ void main() {
       expect(find.textContaining('7,83'), findsOneWidget); // estimado
       expect(find.textContaining('1,78'), findsWidgets); // carrinho
     });
+
+    testWidgets('o botão Adicionar artigo não tapa o Concluir compra', (
+      tester,
+    ) async {
+      await abrir(tester);
+      final adicionar = tester.getRect(find.byType(FloatingActionButton));
+      final concluir = tester.getRect(find.text('Concluir compra'));
+      expect(adicionar.overlaps(concluir), isFalse);
+    });
   });
 }
 
