@@ -27,13 +27,31 @@ alter table public.lojas add column arquivada boolean not null default false;
 -- Lista do mês
 -- ---------------------------------------------------------------------------
 -- qtd = quantidade desta compra. O Postgres não deixa o default apontar para
--- outra coluna: o repositório preenche-a com qtd_padrao ao incluir o artigo.
+-- outra coluna: o repositório preenche-a com qtd_padrao ao incluir o artigo, e
+-- um trigger faz o mesmo quando ela não vem (ex.: importar_seed da Fase 0).
 alter table public.itens_lista
   add column comprado boolean not null default false,
-  add column qtd numeric(10, 3) not null default 1 check (qtd > 0),
+  add column qtd numeric(10, 3) check (qtd > 0),
   add column ordem integer not null default 0;
 
 update public.itens_lista set qtd = qtd_padrao;
+alter table public.itens_lista alter column qtd set not null;
+
+create or replace function public.itens_lista_qtd_inicial()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if new.qtd is null then
+    new.qtd := new.qtd_padrao;
+  end if;
+  return new;
+end;
+$$;
+
+create trigger itens_lista_qtd_inicial before insert on public.itens_lista
+  for each row execute function public.itens_lista_qtd_inicial();
 
 -- ---------------------------------------------------------------------------
 -- Compras feitas com "Concluir compra"
