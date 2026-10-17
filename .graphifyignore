@@ -1,0 +1,11 @@
+# Ficheiros que o graphify não deve analisar.
+
+# Código compilado e binários de terceiros (drift na web).
+web/drift_worker.js
+web/sqlite3.wasm
+
+# Saídas e dados locais (o .gitignore já os exclui; fica por segurança).
+graphify-out/
+build/
+dados-privados/
+env/

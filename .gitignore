@@ -53,3 +53,6 @@ app.*.map.json
 !/env/local.example.json
 .kilo/
 /fase-*.md
+
+# Grafo do graphify (só local; reconstrói-se com "graphify update .")
+graphify-out/
