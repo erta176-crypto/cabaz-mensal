@@ -45,19 +45,18 @@ TabelaLida lerFicheiro(String nome, List<int> bytes, {String? folha}) {
 TabelaLida lerCsv(List<int> bytes) {
   var texto = utf8.decode(bytes, allowMalformed: true);
   if (texto.startsWith('﻿')) texto = texto.substring(1);
-  final primeira = texto.split(RegExp(r'\r?\n')).firstWhere(
-    (l) => l.trim().isNotEmpty,
-    orElse: () => '',
-  );
+  final primeira = texto
+      .split(RegExp(r'\r?\n'))
+      .firstWhere((l) => l.trim().isNotEmpty, orElse: () => '');
   if (primeira.isEmpty) throw const FicheiroInvalido('O ficheiro está vazio.');
   final separador =
       ';'.allMatches(primeira).length >= ','.allMatches(primeira).length
       ? ';'
       : ',';
-  final linhas = Csv(fieldDelimiter: separador, autoDetect: false)
-      .decode(texto)
-      .map((l) => [for (final c in l) '$c'.trim()])
-      .toList();
+  final linhas = Csv(
+    fieldDelimiter: separador,
+    autoDetect: false,
+  ).decode(texto).map((l) => [for (final c in l) '$c'.trim()]).toList();
   return _tabela(linhas);
 }
 
