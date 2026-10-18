@@ -32,7 +32,7 @@ Só depois destes dois passos a tarefa está terminada.
 ## Mapa do projeto
 *Manter atualizado (regra 2).*
 
-- **Estado (2026-10-17):** Fase 0 e Fase 1A concluídas e publicadas. O plano da Fase 1B (importar e exportar CSV, XLSX, PDF e TXT) está aprovado e adiado, em `~/.claude/plans/tidy-conjuring-squirrel.md`.
+- **Estado (2026-10-18):** Fase 0 e Fase 1A concluídas e publicadas. Fase 1B (importar e exportar CSV, XLSX, PDF e TXT) implementada, à espera do portão; plano em `~/.claude/plans/tidy-conjuring-squirrel.md`.
 - **`lib/domain/`:** modelos e regras puras.
   - Dinheiro sempre em cêntimos inteiros e pesos em gramas (`dinheiro.dart`).
   - Pesquisa sem acentos (`texto.dart`).
@@ -47,12 +47,16 @@ Só depois destes dois passos a tarefa está terminada.
     - `sincronizador.dart`: envio por ordem com espera crescente, e receção por `atualizado_em` com margem de 5 min.
     - `servidor_supabase.dart`: a ligação ao Supabase.
   - `supabase/`: autenticação, consultas de compras e dados (importar, exportar, apagar, resumo).
-- **`lib/import/`:** cópia completa JSON (formato v2 do `cabaz-seed.json`).
-- **`lib/features/`:** um diretório por ecrã: `shell` (navegação com corte a 800 px e faixa de sincronização), `entrada`, `lista` (Lista do mês e Concluir compra), `artigos`, `importar_exportar`, `definicoes` e `em_breve`.
-- **`supabase/migrations/`:** `fase0` (tabelas, RLS, `importar_seed`) e `fase1a` (`apagado_em`, lista do mês, `preferencias`, `concluir_compra`). As migrações são aplicadas pelo utilizador no SQL Editor; o `apply_migration` é recusado pelas permissões.
+- **`lib/import/`:** importação sem interface, testável.
+  - Cópia completa JSON (formato v2 do `cabaz-seed.json`): `seed_modelo.dart`, `importar_seed.dart`, `exportar.dart`.
+  - Ficheiros CSV e XLSX: `tabela_lida.dart` (leitura), `valores.dart` (datas, quantidades), `campos.dart` (campos e palpite pelo cabeçalho; CSV da app antiga), `analisar_artigos.dart`, `analisar_compras.dart` e `analisar_lista.dart` (estado por linha), `previsualizacao.dart` (`Catalogo`, `LoteImportacao` → RPC `importar_lote`).
+- **`lib/export/`:** `dados_export.dart` (tabelas com as colunas da ida e volta), `tabela_export.dart` (CSV `;` + BOM, XLSX), `escrever_pdf.dart` (letra em `assets/fonts/`), `texto_lista.dart` (TXT com emojis, também usado na partilha da Lista).
+- **`lib/features/`:** um diretório por ecrã: `shell` (navegação com corte a 800 px e faixa de sincronização), `entrada`, `lista` (Lista do mês e Concluir compra), `artigos`, `importar_exportar` (pré-visualização e arrastar e largar na web), `definicoes` e `em_breve`.
+- **`supabase/migrations/`:** `fase0` (tabelas, RLS, `importar_seed`), `fase1a` (`apagado_em`, lista do mês, `preferencias`, `concluir_compra`) e `fase1b` (índices únicos completos em lojas e categorias, `agora()`, `importar_lote`). As migrações são aplicadas pelo utilizador no SQL Editor; o `apply_migration` é recusado pelas permissões.
 - **Regras de sincronização:**
   - `itens_lista` e `aliases` sincronizam pela chave natural;
-  - eliminar marca `apagado_em`;
+  - eliminar marca `apagado_em`; voltar a criar algo apagado reativa a mesma linha (mesmo id), nunca uma linha nova; índices únicos sempre completos;
+  - o cursor da receção nunca fica atrás de `agora()` do servidor menos a margem;
   - `preferencias.reiniciado_em` manda limpar a cache;
   - vence a última escrita a chegar ao servidor.
 - **Testes** (`test/`): servidor falso em memória e drift em memória (`test/sync/`). Nenhum teste usa o Supabase real.
