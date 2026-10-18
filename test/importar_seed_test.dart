@@ -55,13 +55,22 @@ void main() {
     test('recusa cêntimos que não sejam inteiros', () {
       final j = json();
       (j['compras'] as List).first['total_cent'] = 0.3;
-      expect(() => SeedFicheiro.lerTexto(jsonEncode(j)), throwsA(isA<SeedInvalido>()));
+      expect(
+        () => SeedFicheiro.lerTexto(jsonEncode(j)),
+        throwsA(isA<SeedInvalido>()),
+      );
     });
 
     test('recusa versão desconhecida e JSON inválido', () {
       final j = json()..['versao'] = 1;
-      expect(() => SeedFicheiro.lerTexto(jsonEncode(j)), throwsA(isA<SeedInvalido>()));
-      expect(() => SeedFicheiro.lerTexto('{ruim'), throwsA(isA<SeedInvalido>()));
+      expect(
+        () => SeedFicheiro.lerTexto(jsonEncode(j)),
+        throwsA(isA<SeedInvalido>()),
+      );
+      expect(
+        () => SeedFicheiro.lerTexto('{ruim'),
+        throwsA(isA<SeedInvalido>()),
+      );
     });
 
     test('recusa ids repetidos e unidade inválida', () {
@@ -107,7 +116,9 @@ void main() {
       expect(p.compras.every((c) => lojas.contains(c.lojaId)), isTrue);
       expect(p.aliases.every((a) => lojas.contains(a.lojaId)), isTrue);
       final maca = p.artigos.firstWhere((a) => a.nome == 'Maçã Fuji');
-      final frutas = p.categorias.firstWhere((c) => c.nome == 'Frutas e legumes');
+      final frutas = p.categorias.firstWhere(
+        (c) => c.nome == 'Frutas e legumes',
+      );
       expect(maca.categoriaId, frutas.id);
       expect(maca.unidade, Unidade.kg);
     });
@@ -148,10 +159,19 @@ void main() {
 
     test('JSON enviado à RPC', () {
       final j = jsonDecode(jsonEncode(p.toJson())) as Map<String, dynamic>;
-      expect(j.keys, containsAll([
-        'lojas', 'categorias', 'artigos', 'aliases', 'compras',
-        'linhas_compra', 'registos_preco', 'itens_lista',
-      ]));
+      expect(
+        j.keys,
+        containsAll([
+          'lojas',
+          'categorias',
+          'artigos',
+          'aliases',
+          'compras',
+          'linhas_compra',
+          'registos_preco',
+          'itens_lista',
+        ]),
+      );
       final compra = (j['compras'] as List).first as Map;
       expect(compra['data'], '2026-01-10');
       expect(compra['total_cent'], 30);
@@ -197,10 +217,10 @@ void main() {
       expect(r.totalCent, 553);
       expect(r.totalOk, isTrue);
       expect(r.comprasRever, 1);
-      expect({for (final l in r.lojas) l.slug: l.ok}, {
-        'lidl': true,
-        'pingo-doce': true,
-      });
+      expect(
+        {for (final l in r.lojas) l.slug: l.ok},
+        {'lidl': true, 'pingo-doce': true},
+      );
       expect(r.tudoOk, isTrue);
     });
 
@@ -233,21 +253,30 @@ void main() {
 
     test('sem controlo no ficheiro, não marca ✓ nem ✗', () {
       final v = verificarControlo(null, const [
-        ResumoLoja(lojaId: 'x', slug: 'lidl', nome: 'Lidl', nCompras: 1, totalCent: 5),
+        ResumoLoja(
+          lojaId: 'x',
+          slug: 'lidl',
+          nome: 'Lidl',
+          nCompras: 1,
+          totalCent: 5,
+        ),
       ]);
       expect(v.single.ok, isNull);
     });
 
-    test('com dados existentes, só importa se substituir (sem duplicar)', () async {
-      await importador.importar(seed, substituir: false);
-      expect(await dados.temDados(), isTrue);
-      expect(
-        () => importador.importar(seed, substituir: false),
-        throwsA(isA<ErroDados>()),
-      );
-      final r = await importador.importar(seed, substituir: true);
-      expect(r.contagens['compras'], 3, reason: 'substitui, não duplica');
-    });
+    test(
+      'com dados existentes, só importa se substituir (sem duplicar)',
+      () async {
+        await importador.importar(seed, substituir: false);
+        expect(await dados.temDados(), isTrue);
+        expect(
+          () => importador.importar(seed, substituir: false),
+          throwsA(isA<ErroDados>()),
+        );
+        final r = await importador.importar(seed, substituir: true);
+        expect(r.contagens['compras'], 3, reason: 'substitui, não duplica');
+      },
+    );
 
     test('exportar e voltar a importar dá os mesmos números', () async {
       await importador.importar(seed, substituir: false);
@@ -258,9 +287,16 @@ void main() {
       final relido = SeedFicheiro.lerTexto(exportado);
       expect(relido.compras, hasLength(3));
       expect(relido.linhas, hasLength(5));
-      expect(relido.precos, hasLength(1), reason: 'preços do talão são recriados');
+      expect(
+        relido.precos,
+        hasLength(1),
+        reason: 'preços do talão são recriados',
+      );
       expect(relido.controlo!.totalCent, 553);
-      expect(relido.controlo!.totalPorLojaCent, {'lidl': 180, 'pingo-doce': 373});
+      expect(relido.controlo!.totalPorLojaCent, {
+        'lidl': 180,
+        'pingo-doce': 373,
+      });
       expect(relido.linhas[2].pesoKg, 0.794);
 
       final r = await importador.importar(relido, substituir: true);

@@ -35,7 +35,9 @@ class FakeDadosRepository implements DadosRepository {
     ultimoPayload = payload;
     base.tabelas = {
       for (final MapEntry(:key, :value) in payload.entries)
-        key: [for (final m in value as List) Map<String, dynamic>.from(m as Map)],
+        key: [
+          for (final m in value as List) Map<String, dynamic>.from(m as Map),
+        ],
     };
     final compras = base.t('compras');
     return ContagensImportacao({
@@ -60,7 +62,10 @@ class FakeDadosRepository implements DadosRepository {
         lojaId: l['id'] as String,
         slug: l['slug'] as String,
         nome: l['nome'] as String,
-        nCompras: base.t('compras').where((c) => c['loja_id'] == l['id']).length,
+        nCompras: base
+            .t('compras')
+            .where((c) => c['loja_id'] == l['id'])
+            .length,
         totalCent: base
             .t('compras')
             .where((c) => c['loja_id'] == l['id'])
@@ -69,8 +74,10 @@ class FakeDadosRepository implements DadosRepository {
   ];
 
   @override
-  Future<Map<String, int>> importarLote(Map<String, dynamic> payload) async =>
-      {for (final MapEntry(:key, :value) in payload.entries) key: (value as List).length};
+  Future<Map<String, int>> importarLote(Map<String, dynamic> payload) async => {
+    for (final MapEntry(:key, :value) in payload.entries)
+      key: (value as List).length,
+  };
 
   @override
   Future<List<({String lojaId, String data, String? local, int totalCent})>>

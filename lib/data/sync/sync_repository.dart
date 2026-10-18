@@ -74,9 +74,7 @@ String descreverOperacao(Pendente p) {
   final payload = jsonDecode(p.payload) as Map;
   final campos = (payload['campos'] as Map?) ?? const {};
   if (p.operacao == 'atualizar' && campos.containsKey('apagado_em')) {
-    return campos['apagado_em'] == null
-        ? 'Repor $alvo'
-        : 'Eliminar $alvo';
+    return campos['apagado_em'] == null ? 'Repor $alvo' : 'Eliminar $alvo';
   }
   final linha = (payload['linha'] as Map?) ?? const {};
   final nome = linha['nome'];

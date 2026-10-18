@@ -52,8 +52,7 @@ class Preferencias {
   /// Grupos fechados na Lista (chave "loja|categoria").
   final Set<String> gruposFechados;
 
-  bool get gestosRepetidos =>
-      direita == esquerda && direita != AcaoGesto.nada;
+  bool get gestosRepetidos => direita == esquerda && direita != AcaoGesto.nada;
 
   factory Preferencias.fromJson(Map<String, dynamic> j) {
     T enumDe<T extends Enum>(List<T> valores, Object? nome, T omissao) =>

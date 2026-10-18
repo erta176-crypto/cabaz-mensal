@@ -43,10 +43,14 @@ Future<Uint8List> pdfLista({
                   pw.Container(
                     width: 10,
                     height: 10,
-                    decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.8)),
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border.all(width: 0.8),
+                    ),
                   ),
                   pw.SizedBox(width: 8),
-                  pw.Expanded(child: pw.Text(semEmoji(l.replaceFirst('• ', '')))),
+                  pw.Expanded(
+                    child: pw.Text(semEmoji(l.replaceFirst('• ', ''))),
+                  ),
                 ],
               ),
             ),

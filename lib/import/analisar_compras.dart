@@ -91,8 +91,7 @@ Previsualizacao analisarCompras(
         : (x.pesoG != null
               ? (x.pesoG! * precoUnit / 1000).round()
               : x.quantidade! * precoUnit);
-    final pagoFinal =
-        pago ?? (bruto != null ? bruto - x.desconto : calculado);
+    final pagoFinal = pago ?? (bruto != null ? bruto - x.desconto : calculado);
     if (pagoFinal == null) erro ??= 'Falta o valor pago';
 
     if (erro != null) {
@@ -107,7 +106,9 @@ Previsualizacao analisarCompras(
     x
       ..loja = loja!
       ..data = data!
-      ..local = col.valor(l, Campo.local).isEmpty ? null : col.valor(l, Campo.local)
+      ..local = col.valor(l, Campo.local).isEmpty
+          ? null
+          : col.valor(l, Campo.local)
       ..pago = pagoFinal!
       ..bruto = bruto ?? pagoFinal + x.desconto;
     x.precoUnit =
@@ -129,8 +130,7 @@ Previsualizacao analisarCompras(
   for (final x in validas) {
     (grupos[x.grupo] ??= []).add(x);
   }
-  final semChaveForte =
-      !col.tem(Campo.compra) && !col.tem(Campo.totalCompra);
+  final semChaveForte = !col.tem(Campo.compra) && !col.tem(Campo.totalCompra);
 
   for (final linhas in grupos.values) {
     final p = linhas.first;
@@ -138,9 +138,7 @@ Previsualizacao analisarCompras(
     final total = linhas.map((x) => x.total).nonNulls.firstOrNull ?? soma;
     bool mesmoDia(CompraExistente e) =>
         e.lojaId == p.loja.id && dataIso(e.data) == dataIso(p.data);
-    final existe = existentes.any(
-      (e) => mesmoDia(e) && e.totalCent == total,
-    );
+    final existe = existentes.any((e) => mesmoDia(e) && e.totalCent == total);
     final mesmosLocal = existentes
         .where((e) => mesmoDia(e) && (e.local ?? '') == (p.local ?? ''))
         .length;

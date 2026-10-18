@@ -14,11 +14,7 @@ class Dispositivo {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     base = BaseLocal(NativeDatabase.memory());
     escrita = Escrita(base);
-    sync = Sincronizador(
-      base: base,
-      servidor: servidor,
-      utilizadorId: 'u1',
-    );
+    sync = Sincronizador(base: base, servidor: servidor, utilizadorId: 'u1');
     lojas = LocalLojasRepository(base, escrita, compras: (_) async => 0);
     categorias = LocalCategoriasRepository(base, escrita);
     artigos = LocalArtigosRepository(base, escrita);

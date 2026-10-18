@@ -55,9 +55,8 @@ class ServidorSupabase implements ServidorSync {
       _executar(() => _c.rpc(nome, params: params));
 
   @override
-  Future<DateTime> agora() => _executar(
-    () async => DateTime.parse(await _c.rpc('agora') as String),
-  );
+  Future<DateTime> agora() =>
+      _executar(() async => DateTime.parse(await _c.rpc('agora') as String));
 
   @override
   Future<List<Map<String, dynamic>>> puxar(String tabela, DateTime? desde) =>
@@ -131,10 +130,7 @@ ErroSync classificarErro(Object e) {
       '23503' => 'Referência a um registo que não existe',
       _ => 'Erro do servidor',
     };
-    return ErroSync(
-      '$motivo: ${e.message}',
-      transitorio: transitorio,
-    );
+    return ErroSync('$motivo: ${e.message}', transitorio: transitorio);
   }
   if (e is AuthException) {
     return ErroSync(

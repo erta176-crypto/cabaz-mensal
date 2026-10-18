@@ -20,14 +20,30 @@ const lidl = Loja(id: 'l1', slug: 'lidl', nome: 'Lidl');
 const pingo = Loja(id: 'l2', slug: 'pingo-doce', nome: 'Pingo Doce');
 const fruta = Categoria(id: 'c1', nome: 'Fruta', ordem: 1);
 const mercearia = Categoria(id: 'c2', nome: 'Mercearia', ordem: 2);
-const banana = Artigo(id: 'a1', nome: 'Banana', categoriaId: 'c1', unidade: Unidade.kg);
-const leite = Artigo(id: 'a2', nome: 'Leite Meio Gordo', categoriaId: 'c2', unidade: Unidade.un);
+const banana = Artigo(
+  id: 'a1',
+  nome: 'Banana',
+  categoriaId: 'c1',
+  unidade: Unidade.kg,
+);
+const leite = Artigo(
+  id: 'a2',
+  nome: 'Leite Meio Gordo',
+  categoriaId: 'c2',
+  unidade: Unidade.un,
+);
 final d = DateTime(2026);
 
 Catalogo catalogo({
   List<Artigo> apagados = const [],
   List<ItemLista> itens = const [
-    ItemLista(id: 'i1', lojaId: 'l1', artigoId: 'a2', qtdPadrao: 2, incluido: true),
+    ItemLista(
+      id: 'i1',
+      lojaId: 'l1',
+      artigoId: 'a2',
+      qtdPadrao: 2,
+      incluido: true,
+    ),
   ],
 }) => Catalogo(
   lojas: const [lidl, pingo],
@@ -55,7 +71,9 @@ Previsualizacao artigos(TabelaLida t, {Catalogo? cat, bool atualizar = true}) =>
       hoje: DateTime(2026, 10, 18),
     );
 
-List<EstadoLinha> estados(Previsualizacao p) => [for (final l in p.linhas) l.estado];
+List<EstadoLinha> estados(Previsualizacao p) => [
+  for (final l in p.linhas) l.estado,
+];
 
 void main() {
   group('leitura', () {
@@ -75,9 +93,13 @@ void main() {
 
     test('XLSX: cabeçalhos em português, números e datas', () {
       final bytes = escreverXlsx([
-        TabelaExport('Folha', const ['Data', 'Preço', 'Qtd'], [
-          [DateTime(2026, 3, 5), const Cent(129), 2],
-        ]),
+        TabelaExport(
+          'Folha',
+          const ['Data', 'Preço', 'Qtd'],
+          [
+            [DateTime(2026, 3, 5), const Cent(129), 2],
+          ],
+        ),
       ]);
       final t = lerXlsx(bytes);
       expect(t.cabecalhos, ['Data', 'Preço', 'Qtd']);
@@ -110,23 +132,33 @@ void main() {
 
   test('adivinhar colunas pelo cabeçalho', () {
     expect(
-      adivinharColunas(['PVP', 'Secção', 'Produto', 'xyz'], TipoImportacao.artigos),
+      adivinharColunas([
+        'PVP',
+        'Secção',
+        'Produto',
+        'xyz',
+      ], TipoImportacao.artigos),
       [Campo.preco, Campo.categoria, Campo.artigo, Campo.ignorar],
     );
     expect(adivinharCampo('Preço', TipoImportacao.compras), Campo.precoUnit);
-    expect(adivinharCampo('Total da compra', TipoImportacao.compras), Campo.totalCompra);
+    expect(
+      adivinharCampo('Total da compra', TipoImportacao.compras),
+      Campo.totalCompra,
+    );
   });
 
   group('artigos e preços', () {
     test('novo, atualiza, já existe e erros', () {
-      final p = artigos(csv(
-        'Artigo;Categoria;Unidade;Loja;Preço\n'
-        'Banana;Fruta;kg;Lidl;1,19\n' // igual
-        'Leite meio gordo;Mercearia;un;Lidl;0,79\n' // preço mudou
-        'Kiwi;Fruta;kg;Lidl;3,49\n' // novo
-        ';Fruta;kg;Lidl;1\n' // artigo vazio
-        'Pera;Fruta;kg;Lidl;abc\n', // preço inválido
-      ));
+      final p = artigos(
+        csv(
+          'Artigo;Categoria;Unidade;Loja;Preço\n'
+          'Banana;Fruta;kg;Lidl;1,19\n' // igual
+          'Leite meio gordo;Mercearia;un;Lidl;0,79\n' // preço mudou
+          'Kiwi;Fruta;kg;Lidl;3,49\n' // novo
+          ';Fruta;kg;Lidl;1\n' // artigo vazio
+          'Pera;Fruta;kg;Lidl;abc\n', // preço inválido
+        ),
+      );
       expect(estados(p), [
         EstadoLinha.jaExiste,
         EstadoLinha.atualiza,
@@ -136,7 +168,10 @@ void main() {
       ]);
       expect(p.linhas[3].motivo, 'Artigo vazio');
       expect(p.linhas[4].motivo, contains('Preço inválido'));
-      expect(p.resumo, '5 linhas: 1 novas, 1 atualizam, 1 já existem, 2 com erro');
+      expect(
+        p.resumo,
+        '5 linhas: 1 novas, 1 atualizam, 1 já existem, 2 com erro',
+      );
       expect(p.aImportar, 2);
       expect(p.lote.precos.map((x) => x['preco_cent']), [79, 349]);
       expect(p.lote.precos.every((x) => x['origem'] == 'manual'), isTrue);
@@ -159,12 +194,19 @@ void main() {
     test('categoria nova é criada', () {
       final p = artigos(csv('Artigo;Categoria\nSabão;Limpeza\n'));
       expect(p.lote.categorias.values.single['nome'], 'Limpeza');
-      expect(p.lote.artigos.values.single['categoria_id'],
-          p.lote.categorias.keys.single);
+      expect(
+        p.lote.artigos.values.single['categoria_id'],
+        p.lote.categorias.keys.single,
+      );
     });
 
     test('artigo apagado volta com o mesmo id', () {
-      const kiwi = Artigo(id: 'a9', nome: 'Kiwi', categoriaId: null, unidade: Unidade.kg);
+      const kiwi = Artigo(
+        id: 'a9',
+        nome: 'Kiwi',
+        categoriaId: null,
+        unidade: Unidade.kg,
+      );
       final p = artigos(
         csv('Artigo;Loja;Preço\nKIWI;Lidl;3,49\n'),
         cat: catalogo(apagados: [kiwi]),
@@ -177,8 +219,18 @@ void main() {
   group('compras', () {
     // Dois talões no mesmo dia e local, com totais diferentes (como no seed).
     final existentes = [
-      CompraExistente(lojaId: 'l1', data: DateTime(2026, 2, 1), local: 'Lidl X', totalCent: 300),
-      CompraExistente(lojaId: 'l1', data: DateTime(2026, 2, 1), local: 'Lidl X', totalCent: 120),
+      CompraExistente(
+        lojaId: 'l1',
+        data: DateTime(2026, 2, 1),
+        local: 'Lidl X',
+        totalCent: 300,
+      ),
+      CompraExistente(
+        lojaId: 'l1',
+        data: DateTime(2026, 2, 1),
+        local: 'Lidl X',
+        totalCent: 120,
+      ),
     ];
 
     Previsualizacao compras(String texto) {
@@ -309,10 +361,25 @@ void main() {
     });
 
     test('lista do mês', () {
-      final cat2 = catalogo(itens: const [
-        ItemLista(id: 'i1', lojaId: 'l1', artigoId: 'a1', qtdPadrao: 1.3, incluido: true),
-        ItemLista(id: 'i2', lojaId: 'l2', artigoId: 'a2', qtdPadrao: 2, incluido: true, comprado: true),
-      ]);
+      final cat2 = catalogo(
+        itens: const [
+          ItemLista(
+            id: 'i1',
+            lojaId: 'l1',
+            artigoId: 'a1',
+            qtdPadrao: 1.3,
+            incluido: true,
+          ),
+          ItemLista(
+            id: 'i2',
+            lojaId: 'l2',
+            artigoId: 'a2',
+            qtdPadrao: 2,
+            incluido: true,
+            comprado: true,
+          ),
+        ],
+      );
       final t = tabelaLista(
         itens: cat2.itens,
         artigos: cat2.artigos,
@@ -346,7 +413,11 @@ void main() {
         catalogo(),
         lojaPorOmissao: pingo,
       );
-      expect(estados(p), [EstadoLinha.novo, EstadoLinha.ignorada, EstadoLinha.novo]);
+      expect(estados(p), [
+        EstadoLinha.novo,
+        EstadoLinha.ignorada,
+        EstadoLinha.novo,
+      ]);
       expect(p.linhas[1].motivo, motivoSemQuantidade);
       final banana = p.lote.itens['l1|a1']!;
       expect(banana['qtd'], 1.5);
@@ -362,7 +433,11 @@ void main() {
         catalogo(),
         incluirSemQuantidade: true,
       );
-      expect(estados(p), [EstadoLinha.novo, EstadoLinha.novo, EstadoLinha.erro]);
+      expect(estados(p), [
+        EstadoLinha.novo,
+        EstadoLinha.novo,
+        EstadoLinha.erro,
+      ]);
       // A linha do Arroz está em erro (sem loja), por isso só a Maçã é criada.
       expect(p.lote.artigos.values.map((a) => a['nome']), ['Maçã']);
     });
@@ -381,8 +456,18 @@ void main() {
 
     test('texto pronto para o WhatsApp', () {
       final linhas = [
-        const LinhaParaTexto(loja: 'Lidl', categoria: fruta, artigo: 'Banana', quantidade: '2 kg'),
-        const LinhaParaTexto(loja: 'Lidl', categoria: null, artigo: 'Pilhas', quantidade: '1 un'),
+        const LinhaParaTexto(
+          loja: 'Lidl',
+          categoria: fruta,
+          artigo: 'Banana',
+          quantidade: '2 kg',
+        ),
+        const LinhaParaTexto(
+          loja: 'Lidl',
+          categoria: null,
+          artigo: 'Pilhas',
+          quantidade: '1 un',
+        ),
       ];
       expect(
         textoLista(linhas, loja: 'Lidl', data: DateTime(2026, 10, 18)),
@@ -390,21 +475,30 @@ void main() {
         '🍎 Fruta\n• Banana — 2 kg\n\n'
         '🛍️ Sem categoria\n• Pilhas — 1 un',
       );
-      expect(textoLista(linhas, data: DateTime(2026, 10, 18)), contains('• Banana — 2 kg (Lidl)'));
+      expect(
+        textoLista(linhas, data: DateTime(2026, 10, 18)),
+        contains('• Banana — 2 kg (Lidl)'),
+      );
     });
 
     test('PDF gerado com € e acentos', () async {
       final letra = await File('assets/fonts/InstrumentSans.ttf').readAsBytes();
       final lista = await pdfLista(
         titulo: '🛒 Lista de compras · Lidl · 18/10/2026',
-        blocos: const [BlocoLista('🍎 Fruta', ['• Maçã — 1,5 kg'])],
+        blocos: const [
+          BlocoLista('🍎 Fruta', ['• Maçã — 1,5 kg']),
+        ],
         letra: letra,
       );
       final precos = await pdfTabela(
         titulo: 'Preços',
-        tabela: TabelaExport('Preços', const ['Artigo', 'Lidl'], [
-          ['Pão de forma', const Cent(129)],
-        ]),
+        tabela: TabelaExport(
+          'Preços',
+          const ['Artigo', 'Lidl'],
+          [
+            ['Pão de forma', const Cent(129)],
+          ],
+        ),
         letra: letra,
       );
       for (final pdf in [lista, precos]) {

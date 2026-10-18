@@ -85,10 +85,7 @@ class ServidorFalso implements ServidorSync {
   }) async {
     _verificar(tabela);
     chamadas.add('inserir $tabela');
-    final colunas = onConflict
-        .split(',')
-        .where((c) => c != 'user_id')
-        .toList();
+    final colunas = onConflict.split(',').where((c) => c != 'user_id').toList();
     final existente = t(tabela)
         .where((o) => colunas.every((c) => o[c] == linha[c]))
         .firstOrNull;
@@ -182,16 +179,17 @@ class ServidorFalso implements ServidorSync {
     DateTime? desde,
   ) async {
     if (!online) throw const ErroSync('Sem rede', transitorio: true);
-    final r = [
-      for (final o in t(tabela))
-        if (desde == null ||
-            DateTime.parse(o['atualizado_em'] as String).isAfter(desde))
-          {...o},
-    ]..sort(
-        (a, b) => (a['atualizado_em'] as String).compareTo(
-          b['atualizado_em'] as String,
-        ),
-      );
+    final r =
+        [
+          for (final o in t(tabela))
+            if (desde == null ||
+                DateTime.parse(o['atualizado_em'] as String).isAfter(desde))
+              {...o},
+        ]..sort(
+          (a, b) => (a['atualizado_em'] as String).compareTo(
+            b['atualizado_em'] as String,
+          ),
+        );
     linhasPuxadas += r.length;
     return r;
   }

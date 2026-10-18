@@ -96,9 +96,8 @@ class _DialogoArtigoState extends State<DialogoArtigo> {
                   controller: _nome,
                   autofocus: widget.artigo == null,
                   decoration: const InputDecoration(labelText: 'Nome'),
-                  validator: (v) => (v ?? '').trim().isEmpty
-                      ? 'Escreve um nome.'
-                      : null,
+                  validator: (v) =>
+                      (v ?? '').trim().isEmpty ? 'Escreve um nome.' : null,
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String?>(
@@ -208,9 +207,7 @@ class _DialogoCategoriaState extends State<DialogoCategoria> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _ordem,
-                decoration: const InputDecoration(
-                  labelText: 'Ordem na lista',
-                ),
+                decoration: const InputDecoration(labelText: 'Ordem na lista'),
                 keyboardType: TextInputType.number,
                 validator: (v) =>
                     int.tryParse(v ?? '') == null ? 'Número inteiro.' : null,
@@ -227,10 +224,10 @@ class _DialogoCategoriaState extends State<DialogoCategoria> {
         FilledButton(
           onPressed: () {
             if (!_form.currentState!.validate()) return;
-            Navigator.pop(
-              context,
-              (nome: _nome.text.trim(), ordem: int.parse(_ordem.text)),
-            );
+            Navigator.pop(context, (
+              nome: _nome.text.trim(),
+              ordem: int.parse(_ordem.text),
+            ));
           },
           child: const Text('Guardar'),
         ),

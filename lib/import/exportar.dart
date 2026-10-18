@@ -39,9 +39,8 @@ Map<String, dynamic> montarExportacao(
   }
 
   // Os preços 'talao' são recriados a partir das linhas na importação.
-  final precos = t('registos_preco').where(
-    (p) => p['origem'] != 'talao' && artigo(p['artigo_id']) != null,
-  );
+  final precos = t('registos_preco')
+      .where((p) => p['origem'] != 'talao' && artigo(p['artigo_id']) != null);
 
   return {
     'versao': 2,
@@ -74,11 +73,12 @@ Map<String, dynamic> montarExportacao(
     ],
     'aliases': [
       for (final a in t('aliases'))
-        if (artigo(a['artigo_id']) != null) {
-          'artigo_id': a['artigo_id'],
-          'loja_id': slug(a['loja_id']),
-          'texto': a['texto_talao'],
-        },
+        if (artigo(a['artigo_id']) != null)
+          {
+            'artigo_id': a['artigo_id'],
+            'loja_id': slug(a['loja_id']),
+            'texto': a['texto_talao'],
+          },
     ],
     'compras': [
       for (final c in compras)
@@ -109,12 +109,13 @@ Map<String, dynamic> montarExportacao(
     ],
     'listas': [
       for (final i in t('itens_lista'))
-        if (artigo(i['artigo_id']) != null) {
-          'loja_id': slug(i['loja_id']),
-          'artigo_id': i['artigo_id'],
-          'quantidade_padrao': i['qtd_padrao'],
-          'incluido': i['incluido'],
-        },
+        if (artigo(i['artigo_id']) != null)
+          {
+            'loja_id': slug(i['loja_id']),
+            'artigo_id': i['artigo_id'],
+            'quantidade_padrao': i['qtd_padrao'],
+            'incluido': i['incluido'],
+          },
     ],
     'precos': [
       for (final p in precos)

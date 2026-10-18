@@ -12,9 +12,10 @@ String normalizar(String s) {
 
 /// True se todas as palavras de [termo] aparecem em algum dos [textos].
 bool correspondeA(String termo, Iterable<String> textos) {
-  final palavras = normalizar(
-    termo,
-  ).split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+  final palavras = normalizar(termo)
+      .split(RegExp(r'\s+'))
+      .where((p) => p.isNotEmpty)
+      .toList();
   if (palavras.isEmpty) return true;
   final alvo = textos.map(normalizar).join(' ');
   return palavras.every(alvo.contains);

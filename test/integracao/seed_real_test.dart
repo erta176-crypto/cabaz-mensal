@@ -81,9 +81,8 @@ void main() {
 
       final seed = SeedFicheiro.lerTexto(await _seed.readAsString());
       final dadosA = SupabaseDadosRepository(a);
-      final r = await ImportadorSeed(
-        dados: dadosA,
-      ).importar(seed, substituir: true);
+      final r = await ImportadorSeed(dados: dadosA)
+          .importar(seed, substituir: true);
 
       expect(r.contagens['compras'], 138);
       expect(r.contagens['artigos'], 693);

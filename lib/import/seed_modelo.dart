@@ -346,7 +346,12 @@ class _Leitor {
     return r;
   }
 
-  String? _id(Map<String, dynamic> m, String k, String onde, {bool opcional = false}) {
+  String? _id(
+    Map<String, dynamic> m,
+    String k,
+    String onde, {
+    bool opcional = false,
+  }) {
     final v = m[k];
     if (v == null) {
       if (opcional) return null;
@@ -358,7 +363,12 @@ class _Leitor {
     throw const _CampoEmFalta();
   }
 
-  String? _texto(Map<String, dynamic> m, String k, String onde, {bool opcional = false}) {
+  String? _texto(
+    Map<String, dynamic> m,
+    String k,
+    String onde, {
+    bool opcional = false,
+  }) {
     final v = m[k];
     if (v is String) return v;
     if (v == null && opcional) return null;
@@ -366,7 +376,12 @@ class _Leitor {
     throw const _CampoEmFalta();
   }
 
-  int? _inteiro(Map<String, dynamic> m, String k, String onde, {bool opcional = false}) {
+  int? _inteiro(
+    Map<String, dynamic> m,
+    String k,
+    String onde, {
+    bool opcional = false,
+  }) {
     final v = m[k];
     if (v is int) return v;
     if (v == null && opcional) return null;
@@ -374,7 +389,12 @@ class _Leitor {
     return null;
   }
 
-  num? _decimal(Map<String, dynamic> m, String k, String onde, {bool opcional = false}) {
+  num? _decimal(
+    Map<String, dynamic> m,
+    String k,
+    String onde, {
+    bool opcional = false,
+  }) {
     final v = m[k];
     if (v is num) return v;
     if (v == null && opcional) return null;

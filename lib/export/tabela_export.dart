@@ -62,7 +62,11 @@ List<int> escreverXlsx(List<TabelaExport> tabelas) {
             Cent(:final valor) => DoubleCellValue(valor / 100),
             int n => IntCellValue(n),
             num n => DoubleCellValue(n.toDouble()),
-            DateTime d => DateCellValue(year: d.year, month: d.month, day: d.day),
+            DateTime d => DateCellValue(
+              year: d.year,
+              month: d.month,
+              day: d.day,
+            ),
             _ => TextCellValue('$v'),
           },
       ]);

@@ -69,7 +69,8 @@ Previsualizacao analisarLista(
     final existente = r.artigoExistente(nome);
     final novoArtigo = existente == null || r.criadoAqui(existente.id);
     final artigo =
-        existente ?? r.criarArtigo(nome, categoria: categoria, unidade: unidade);
+        existente ??
+        r.criarArtigo(nome, categoria: categoria, unidade: unidade);
     final item = novoArtigo ? null : cat.item(loja.id, artigo.id);
     final qtd = q.valor ?? item?.qtdPadrao ?? 1;
     final comprado = lerSimNao(col.valor(l, Campo.comprado));

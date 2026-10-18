@@ -102,7 +102,11 @@ PayloadImportacao montarPayload(SeedFicheiro f, {String Function()? novoId}) {
   final pagoPorCompra = <String, int>{};
   final descontoPorCompra = <String, int>{};
   for (final l in f.linhas) {
-    pagoPorCompra.update(l.compraId, (v) => v + l.pagoCent, ifAbsent: () => l.pagoCent);
+    pagoPorCompra.update(
+      l.compraId,
+      (v) => v + l.pagoCent,
+      ifAbsent: () => l.pagoCent,
+    );
     descontoPorCompra.update(
       l.compraId,
       (v) => v + l.descontoCent,
@@ -246,8 +250,7 @@ class ResultadoImportacao {
   bool? get totalOk =>
       totalEsperadoCent == null ? null : totalEsperadoCent == totalCent;
 
-  bool get tudoOk =>
-      totalOk != false && lojas.every((l) => l.ok != false);
+  bool get tudoOk => totalOk != false && lojas.every((l) => l.ok != false);
 }
 
 /// Compara o resumo do servidor (view resumo_por_loja) com os totais de

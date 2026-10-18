@@ -47,8 +47,7 @@ class SupabaseConsultasCompras implements ConsultasCompras {
   final SupabaseClient _c;
 
   @override
-  Future<int> contarCompras() =>
-      _comRede(() => _c.from('compras').count());
+  Future<int> contarCompras() => _comRede(() => _c.from('compras').count());
 
   @override
   Future<int> comprasDaLoja(String lojaId) =>

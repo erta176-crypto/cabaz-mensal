@@ -22,7 +22,6 @@ enum Mostrar {
 /// Valor do filtro para "artigos sem categoria".
 const _semCategoria = '__sem__';
 
-
 class ArtigosPage extends ConsumerStatefulWidget {
   const ArtigosPage({super.key});
 
@@ -38,9 +37,9 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
   /// Ids escondidos enquanto a eliminação pode ser anulada.
   final _ocultos = <String>{};
 
-  void _mensagem(String texto) => ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: Text(texto)));
+  void _mensagem(String texto) =>
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(texto)));
 
   /// Esconde o item e só elimina depois de a SnackBar fechar sem "Anular".
   void _eliminarComAnular({
@@ -174,10 +173,12 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
     final lojas = ref.watch(lojasProvider);
     final precos = ref.watch(precosAtuaisProvider);
 
-    final erro = [artigos, categorias, lojas, precos]
-        .where((a) => a.hasError)
-        .map((a) => a.error)
-        .firstOrNull;
+    final erro = [
+      artigos,
+      categorias,
+      lojas,
+      precos,
+    ].where((a) => a.hasError).map((a) => a.error).firstOrNull;
     final pronto =
         artigos.hasValue &&
         categorias.hasValue &&
@@ -226,7 +227,10 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
               onPressed: () => switch (_mostrar) {
                 Mostrar.artigos => _editarArtigo(
                   categorias: listaCategorias,
-                  lojas: [for (final l in listaLojas) if (!l.arquivada) l],
+                  lojas: [
+                    for (final l in listaLojas)
+                      if (!l.arquivada) l,
+                  ],
                   precos: const {},
                 ),
                 Mostrar.categorias => _editarCategoria(todas: listaCategorias),
@@ -490,7 +494,10 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
   }
 
   Widget _listaLojas(List<Loja> lojas) {
-    final visiveis = [for (final l in lojas) if (!_ocultos.contains(l.id)) l];
+    final visiveis = [
+      for (final l in lojas)
+        if (!_ocultos.contains(l.id)) l,
+    ];
     if (visiveis.isEmpty) return _vazio('Ainda não há lojas.');
     final cores = Theme.of(context).colorScheme;
     return ListView.separated(
@@ -511,7 +518,9 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
           ),
           title: Text(
             l.nome,
-            style: l.arquivada ? TextStyle(color: cores.onSurfaceVariant) : null,
+            style: l.arquivada
+                ? TextStyle(color: cores.onSurfaceVariant)
+                : null,
           ),
           subtitle: detalhes.isEmpty ? null : Text(detalhes.join(' · ')),
           trailing: PopupMenuButton<String>(
@@ -519,9 +528,10 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
             tooltip: 'Ações',
             onSelected: (acao) => switch (acao) {
               'editar' => _editarLoja(loja: l),
-              'arquivar' => ref
-                  .read(lojasRepositoryProvider)
-                  .arquivar(l.id, arquivada: !l.arquivada),
+              'arquivar' =>
+                ref
+                    .read(lojasRepositoryProvider)
+                    .arquivar(l.id, arquivada: !l.arquivada),
               _ => _eliminarLoja(l),
             },
             itemBuilder: (_) => [

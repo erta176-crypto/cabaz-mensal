@@ -38,11 +38,7 @@ int? centDeTexto(String texto) {
 
 /// Preço unitário em cêntimos: por unidade (artigos 'un') ou por quilo
 /// (artigos ao peso). Devolve null se não houver quantidade nem peso.
-int? precoUnitarioCent({
-  required int brutoCent,
-  int? quantidade,
-  int? pesoG,
-}) {
+int? precoUnitarioCent({required int brutoCent, int? quantidade, int? pesoG}) {
   if (pesoG != null && pesoG > 0) return (brutoCent * 1000 / pesoG).round();
   if (quantidade != null && quantidade > 0) {
     return (brutoCent / quantidade).round();

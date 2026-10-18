@@ -144,9 +144,11 @@ class Catalogo {
   /// Pelo nome normalizado ou por alias (textos de talão).
   Artigo? artigo(String nome) => _artigoPorNome[normalizar(nome).trim()];
 
-  Artigo? artigoApagado(String nome) => _porNome(artigosApagados, nome, (a) => a.nome);
+  Artigo? artigoApagado(String nome) =>
+      _porNome(artigosApagados, nome, (a) => a.nome);
 
-  Categoria? categoria(String nome) => _porNome(categorias, nome, (c) => c.nome);
+  Categoria? categoria(String nome) =>
+      _porNome(categorias, nome, (c) => c.nome);
 
   Categoria? categoriaApagada(String nome) =>
       _porNome(categoriasApagadas, nome, (c) => c.nome);
@@ -155,7 +157,9 @@ class Catalogo {
   Loja? loja(String nome) {
     final n = normalizar(nome).trim();
     return lojas
-        .where((l) => normalizar(l.nome) == n || l.slug == n.replaceAll(' ', '-'))
+        .where(
+          (l) => normalizar(l.nome) == n || l.slug == n.replaceAll(' ', '-'),
+        )
         .firstOrNull;
   }
 

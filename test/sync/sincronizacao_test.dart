@@ -18,7 +18,11 @@ void semear(ServidorFalso s) {
     'nome': 'Lidl',
     'arquivada': false,
   });
-  s.escreverDireto('categorias', {'id': 'cat-fruta', 'nome': 'Fruta', 'ordem': 1});
+  s.escreverDireto('categorias', {
+    'id': 'cat-fruta',
+    'nome': 'Fruta',
+    'ordem': 1,
+  });
   s.escreverDireto('artigos', {
     'id': banana,
     'nome': 'Banana',
@@ -150,37 +154,42 @@ void main() {
       await pc.artigos.eliminar(leite);
       await pc.sincronizar();
       await telemovel.sincronizar();
-      final nomes = (await telemovel.artigos.observarArtigos().first)
-          .map((a) => a.nome);
+      final nomes = (await telemovel.artigos.observarArtigos().first).map(
+        (a) => a.nome,
+      );
       expect(nomes, ['Banana']);
     });
 
-    test('uma alteração local pendente não é substituída por dados antigos',
-        () async {
-      servidor.online = false;
-      final item = (await itens(telemovel)).single;
-      await telemovel.lista.alterarQtd(item, 7);
-      servidor.online = true;
-      // Puxar antes de enviar (ex.: o tempo real chegou primeiro).
-      await telemovel.sync.puxar();
-      expect((await itens(telemovel)).single.qtd, 7);
-      await telemovel.sincronizar();
-      expect((await itens(telemovel)).single.qtd, 7);
-    });
+    test(
+      'uma alteração local pendente não é substituída por dados antigos',
+      () async {
+        servidor.online = false;
+        final item = (await itens(telemovel)).single;
+        await telemovel.lista.alterarQtd(item, 7);
+        servidor.online = true;
+        // Puxar antes de enviar (ex.: o tempo real chegou primeiro).
+        await telemovel.sync.puxar();
+        expect((await itens(telemovel)).single.qtd, 7);
+        await telemovel.sincronizar();
+        expect((await itens(telemovel)).single.qtd, 7);
+      },
+    );
 
-    test('item criado sem rede fica com o id do servidor, sem duplicar',
-        () async {
-      await telemovel.lista.incluir(lojaId: lidl, artigoId: banana);
-      final provisorio = (await itens(telemovel))
-          .firstWhere((i) => i.artigoId == banana);
-      expect(provisorio.id, isNull);
-      await telemovel.sincronizar();
-      final final_ = (await itens(telemovel))
-          .where((i) => i.artigoId == banana)
-          .toList();
-      expect(final_, hasLength(1));
-      expect(final_.single.id, isNotNull);
-    });
+    test(
+      'item criado sem rede fica com o id do servidor, sem duplicar',
+      () async {
+        await telemovel.lista.incluir(lojaId: lidl, artigoId: banana);
+        final provisorio = (await itens(telemovel))
+            .firstWhere((i) => i.artigoId == banana);
+        expect(provisorio.id, isNull);
+        await telemovel.sincronizar();
+        final final_ = (await itens(telemovel))
+            .where((i) => i.artigoId == banana)
+            .toList();
+        expect(final_, hasLength(1));
+        expect(final_.single.id, isNotNull);
+      },
+    );
 
     test('reiniciado_em (Apagar todos os dados) limpa a cache', () async {
       servidor.tabelas
@@ -277,23 +286,25 @@ void main() {
       expect((await itens(telemovel)).single.qtd, 2);
     });
 
-    test('dois dispositivos sem rede juntam o mesmo artigo: uma só linha',
-        () async {
-      servidor.online = false;
-      await telemovel.lista.incluir(lojaId: lidl, artigoId: banana, qtd: 1);
-      await pc.lista.incluir(lojaId: lidl, artigoId: banana, qtd: 2);
-      servidor.online = true;
-      await telemovel.sincronizar();
-      await pc.sincronizar();
-      await telemovel.sincronizar();
+    test(
+      'dois dispositivos sem rede juntam o mesmo artigo: uma só linha',
+      () async {
+        servidor.online = false;
+        await telemovel.lista.incluir(lojaId: lidl, artigoId: banana, qtd: 1);
+        await pc.lista.incluir(lojaId: lidl, artigoId: banana, qtd: 2);
+        servidor.online = true;
+        await telemovel.sincronizar();
+        await pc.sincronizar();
+        await telemovel.sincronizar();
 
-      expect(
-        servidor.t('itens_lista').where((i) => i['artigo_id'] == banana),
-        hasLength(1),
-      );
-      expect(await telemovel.base.observarPendentes().first, isEmpty);
-      expect(await pc.base.observarPendentes().first, isEmpty);
-    });
+        expect(
+          servidor.t('itens_lista').where((i) => i['artigo_id'] == banana),
+          hasLength(1),
+        );
+        expect(await telemovel.base.observarPendentes().first, isEmpty);
+        expect(await pc.base.observarPendentes().first, isEmpty);
+      },
+    );
 
     test('criar uma categoria com o nome de uma apagada reativa-a', () async {
       await telemovel.categorias.eliminar('cat-fruta');
@@ -326,29 +337,31 @@ void main() {
       ],
     );
 
-    test('sem rede: fica na fila, limpa os comprados e é enviada depois',
-        () async {
-      final item = (await itens(telemovel)).single;
-      await telemovel.lista.marcarComprado(item, comprado: true);
-      await telemovel.sincronizar();
+    test(
+      'sem rede: fica na fila, limpa os comprados e é enviada depois',
+      () async {
+        final item = (await itens(telemovel)).single;
+        await telemovel.lista.marcarComprado(item, comprado: true);
+        await telemovel.sincronizar();
 
-      servidor.online = false;
-      await telemovel.compras.concluir(compra());
-      final local = (await itens(telemovel)).single;
-      expect(local.comprado, isFalse);
+        servidor.online = false;
+        await telemovel.compras.concluir(compra());
+        final local = (await itens(telemovel)).single;
+        expect(local.comprado, isFalse);
 
-      // Dados antigos do servidor (comprado = true) não desfazem a compra.
-      servidor.online = true;
-      await telemovel.sync.puxar();
-      expect((await itens(telemovel)).single.comprado, isFalse);
+        // Dados antigos do servidor (comprado = true) não desfazem a compra.
+        servidor.online = true;
+        await telemovel.sync.puxar();
+        expect((await itens(telemovel)).single.comprado, isFalse);
 
-      await telemovel.sincronizar();
-      expect(servidor.t('compras'), hasLength(1));
-      expect(servidor.t('compras').single['total_cent'], 178);
-      expect(servidor.t('itens_lista').single['comprado'], isFalse);
-      final precos = await telemovel.artigos.observarPrecosAtuais().first;
-      expect(precos.single.precoCent, 89);
-    });
+        await telemovel.sincronizar();
+        expect(servidor.t('compras'), hasLength(1));
+        expect(servidor.t('compras').single['total_cent'], 178);
+        expect(servidor.t('itens_lista').single['comprado'], isFalse);
+        final precos = await telemovel.artigos.observarPrecosAtuais().first;
+        expect(precos.single.precoCent, 89);
+      },
+    );
 
     test('repetir o pedido cria uma só compra (idempotente)', () async {
       await telemovel.compras.concluir(compra());
@@ -364,9 +377,7 @@ void main() {
   test('preferências sincronizam entre dispositivos', () async {
     final p = await telemovel.preferencias.observar().first;
     expect(p.direita.name, 'removerDaLista');
-    await telemovel.preferencias.guardar(
-      p.copyWith(lojaId: () => lidl),
-    );
+    await telemovel.preferencias.guardar(p.copyWith(lojaId: () => lidl));
     await telemovel.sincronizar();
     await pc.sincronizar();
     expect((await pc.preferencias.observar().first).lojaId, lidl);

@@ -177,8 +177,7 @@ class Sincronizador {
         await _executar(p);
         await base.removerPendente(p.id);
       } on ErroSync catch (e) {
-        final permanente =
-            !e.transitorio || p.tentativas + 1 >= maxTentativas;
+        final permanente = !e.transitorio || p.tentativas + 1 >= maxTentativas;
         await base.marcarTentativa(p.id, erro: permanente ? e.mensagem : null);
         if (!permanente) rethrow;
         // A cache pode ter ficado diferente do servidor: puxar outra vez

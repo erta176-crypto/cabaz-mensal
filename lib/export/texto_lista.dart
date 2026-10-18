@@ -88,8 +88,11 @@ List<BlocoLista> blocosLista(
             ? '🛍️ Sem categoria'
             : '${emojiCategoria(categoria[k]!.nome)} ${categoria[k]!.nome}',
         [
-          for (final l in porCategoria[k]!
-            ..sort((a, b) => a.artigo.toLowerCase().compareTo(b.artigo.toLowerCase())))
+          for (final l
+              in porCategoria[k]!..sort(
+                (a, b) =>
+                    a.artigo.toLowerCase().compareTo(b.artigo.toLowerCase()),
+              ))
             '• ${l.artigo} — ${l.quantidade}${mostrarLoja ? ' (${l.loja})' : ''}',
         ],
       ),

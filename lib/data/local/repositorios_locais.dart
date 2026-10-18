@@ -14,9 +14,10 @@ String _agora() => DateTime.now().toUtc().toIso8601String();
 String _novoId() => const Uuid().v4();
 
 /// Slug a partir do nome ("Pingo Doce" → "pingo-doce").
-String slugDe(String nome) => normalizar(
-  nome,
-).replaceAll(RegExp(r'[^a-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
+String slugDe(String nome) =>
+    normalizar(nome)
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+        .replaceAll(RegExp(r'^-+|-+$'), '');
 
 class LocalLojasRepository implements LojasRepository {
   LocalLojasRepository(this._base, this._escrita, {required this.compras});
@@ -28,7 +29,11 @@ class LocalLojasRepository implements LojasRepository {
   @override
   Stream<List<Loja>> observarLojas() => _base
       .observarTabela('lojas')
-      .map((l) => l.map(Loja.fromMap).toList()..sort((a, b) => a.nome.compareTo(b.nome)));
+      .map(
+        (l) =>
+            l.map(Loja.fromMap).toList()
+              ..sort((a, b) => a.nome.compareTo(b.nome)),
+      );
 
   @override
   Future<void> guardar(Loja loja, {bool nova = false}) async {

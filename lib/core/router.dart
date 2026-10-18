@@ -46,12 +46,11 @@ GoRouter criarRouter(AuthRepository auth) {
       GoRoute(path: '/', redirect: (_, _) => '/lista'),
       GoRoute(path: '/entrar', builder: (_, _) => const EntradaPage()),
       ShellRoute(
-        builder: (context, estado, filho) =>
-            AppShell(
-              localizacao: estado.matchedLocation,
-              faixa: const FaixaSync(),
-              child: filho,
-            ),
+        builder: (context, estado, filho) => AppShell(
+          localizacao: estado.matchedLocation,
+          faixa: const FaixaSync(),
+          child: filho,
+        ),
         routes: [
           GoRoute(
             path: '/lista',

@@ -14,12 +14,14 @@ class Escrita {
   /// apagado_em = null, para o upsert não falhar em colunas obrigatórias.
   Future<void> inserir(String tabela, Map<String, dynamic> linha) async {
     final temApagado = tabela != 'preferencias';
-    final paraEnviar = {
-      ...linha,
-      if (temApagado) 'apagado_em': null,
-    };
+    final paraEnviar = {...linha, if (temApagado) 'apagado_em': null};
     if (!enviaId(tabela)) paraEnviar.remove('id');
-    for (final c in ['user_id', 'atualizado_em', 'criado_em', 'reiniciado_em']) {
+    for (final c in [
+      'user_id',
+      'atualizado_em',
+      'criado_em',
+      'reiniciado_em',
+    ]) {
       paraEnviar.remove(c);
     }
     await base.transaction(() async {
@@ -64,11 +66,9 @@ class Escrita {
   }
 
   /// Eliminar = marcar apagado_em (propaga-se aos outros dispositivos).
-  Future<void> apagar(String tabela, String chave) => atualizar(
-    tabela,
-    chave,
-    {'apagado_em': DateTime.now().toUtc().toIso8601String()},
-  );
+  Future<void> apagar(String tabela, String chave) => atualizar(tabela, chave, {
+    'apagado_em': DateTime.now().toUtc().toIso8601String(),
+  });
 
   /// "Anular" uma eliminação.
   Future<void> restaurar(String tabela, String chave) =>

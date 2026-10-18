@@ -37,7 +37,9 @@ TabelaExport tabelaArtigos({
     for (final l in lojas)
       if (lojaId == null || l.id == lojaId) l,
   ]..sort((a, b) => _porNome(a, b, (l) => l.nome));
-  final preco = {for (final p in precos) '${p.artigoId}|${p.lojaId}': p.precoCent};
+  final preco = {
+    for (final p in precos) '${p.artigoId}|${p.lojaId}': p.precoCent,
+  };
   final linhas = <List<Object?>>[];
   for (final a in [...artigos]..sort((a, b) => _porNome(a, b, (x) => x.nome))) {
     final base = [a.nome, categoria[a.categoriaId] ?? '', a.unidade.codigo];
@@ -46,13 +48,21 @@ TabelaExport tabelaArtigos({
         if (preco['${a.id}|${l.id}'] != null)
           [...base, l.nome, Cent(preco['${a.id}|${l.id}']!)],
     ];
-    linhas.addAll(comPreco.isEmpty ? [[...base, '', null]] : comPreco);
+    linhas.addAll(
+      comPreco.isEmpty
+          ? [
+              [...base, '', null],
+            ]
+          : comPreco,
+    );
   }
-  return TabelaExport(
-    'Artigos',
-    const ['Artigo', 'Categoria', 'Unidade', 'Loja', 'Preço'],
-    linhas,
-  );
+  return TabelaExport('Artigos', const [
+    'Artigo',
+    'Categoria',
+    'Unidade',
+    'Loja',
+    'Preço',
+  ], linhas);
 }
 
 /// Tabela de preços (para o PDF): Artigo + uma coluna por loja.
@@ -66,16 +76,26 @@ TabelaExport tabelaPrecos({
     for (final l in lojas)
       if (!l.arquivada && (lojaId == null || l.id == lojaId)) l,
   ]..sort((a, b) => _porNome(a, b, (l) => l.nome));
-  final preco = {for (final p in precos) '${p.artigoId}|${p.lojaId}': p.precoCent};
-  return TabelaExport('Preços', ['Artigo', for (final l in ls) l.nome], [
-    for (final a in [...artigos]..sort((a, b) => _porNome(a, b, (x) => x.nome)))
-      if (ls.any((l) => preco['${a.id}|${l.id}'] != null))
-        [
-          '${a.nome}${a.unidade == Unidade.kg ? ' (/kg)' : ''}',
-          for (final l in ls)
-            preco['${a.id}|${l.id}'] == null ? '' : Cent(preco['${a.id}|${l.id}']!),
-        ],
-  ]);
+  final preco = {
+    for (final p in precos) '${p.artigoId}|${p.lojaId}': p.precoCent,
+  };
+  return TabelaExport(
+    'Preços',
+    ['Artigo', for (final l in ls) l.nome],
+    [
+      for (final a in [
+        ...artigos,
+      ]..sort((a, b) => _porNome(a, b, (x) => x.nome)))
+        if (ls.any((l) => preco['${a.id}|${l.id}'] != null))
+          [
+            '${a.nome}${a.unidade == Unidade.kg ? ' (/kg)' : ''}',
+            for (final l in ls)
+              preco['${a.id}|${l.id}'] == null
+                  ? ''
+                  : Cent(preco['${a.id}|${l.id}']!),
+          ],
+    ],
+  );
 }
 
 /// Loja · Categoria · Artigo · Quantidade · Unidade · Comprado (os artigos
@@ -139,16 +159,17 @@ List<TabelaExport> tabelasCompras(
     for (final a in t('artigos'))
       if (a['apagado_em'] == null) a['id']: a['nome'] as String,
   };
-  final compras = [
-    for (final c in t('compras'))
-      if ((lojaId == null || c['loja_id'] == lojaId) &&
-          (desde == null ||
-              !DateTime.parse(c['data'] as String).isBefore(desde)))
-        c,
-  ]..sort((a, b) {
-      final d = (a['data'] as String).compareTo(b['data'] as String);
-      return d != 0 ? d : '${a['id']}'.compareTo('${b['id']}');
-    });
+  final compras =
+      [
+        for (final c in t('compras'))
+          if ((lojaId == null || c['loja_id'] == lojaId) &&
+              (desde == null ||
+                  !DateTime.parse(c['data'] as String).isBefore(desde)))
+            c,
+      ]..sort((a, b) {
+        final d = (a['data'] as String).compareTo(b['data'] as String);
+        return d != 0 ? d : '${a['id']}'.compareTo('${b['id']}');
+      });
   final numero = {for (final (i, c) in compras.indexed) c['id']: i + 1};
   final linhasPorCompra = <Object?, List<Map<String, dynamic>>>{};
   for (final l in t('linhas_compra')) {
@@ -178,7 +199,8 @@ List<TabelaExport> tabelasCompras(
       ],
       [
         for (final c in compras)
-          for (final l in linhasPorCompra[c['id']] ?? const <Map<String, dynamic>>[])
+          for (final l
+              in linhasPorCompra[c['id']] ?? const <Map<String, dynamic>>[])
             [
               numero[c['id']],
               DateTime.parse(c['data'] as String),

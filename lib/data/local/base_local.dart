@@ -62,7 +62,8 @@ const tabelasSync = [
 /// Chave local de uma linha (id ou chave natural).
 String chaveDe(String tabela, Map<String, dynamic> linha) => switch (tabela) {
   'itens_lista' => '${linha['loja_id']}|${linha['artigo_id']}',
-  'aliases' => '${linha['loja_id']}|${linha['texto_talao']}|${linha['artigo_id']}',
+  'aliases' =>
+    '${linha['loja_id']}|${linha['texto_talao']}|${linha['artigo_id']}',
   'preferencias' => 'eu',
   _ => linha['id'] as String,
 };
@@ -105,9 +106,8 @@ class BaseLocal extends _$BaseLocal {
   // ---- Registos ----------------------------------------------------------
 
   Stream<List<Map<String, dynamic>>> observarTabela(String tabela) =>
-      (select(registos)..where(
-            (r) => r.tabela.equals(tabela) & r.apagado.equals(false),
-          ))
+      (select(registos)
+            ..where((r) => r.tabela.equals(tabela) & r.apagado.equals(false)))
           .watch()
           .map((l) => [for (final r in l) _json(r.dados)]);
 
@@ -189,19 +189,17 @@ class BaseLocal extends _$BaseLocal {
   Future<void> removerPendente(int id) =>
       (delete(pendentes)..where((p) => p.id.equals(id))).go();
 
-  Future<void> marcarTentativa(int id, {String? erro}) =>
-      customUpdate(
-        'UPDATE pendentes SET tentativas = tentativas + 1, erro = ? WHERE id = ?',
-        variables: [Variable(erro), Variable(id)],
-        updates: {pendentes},
-      );
+  Future<void> marcarTentativa(int id, {String? erro}) => customUpdate(
+    'UPDATE pendentes SET tentativas = tentativas + 1, erro = ? WHERE id = ?',
+    variables: [Variable(erro), Variable(id)],
+    updates: {pendentes},
+  );
 
   // ---- Estado ------------------------------------------------------------
 
-  Future<String?> lerEstado(String chave) async =>
-      (await (select(estado)..where((e) => e.chave.equals(chave)))
-              .getSingleOrNull())
-          ?.valor;
+  Future<String?> lerEstado(String chave) async => (await (select(
+    estado,
+  )..where((e) => e.chave.equals(chave))).getSingleOrNull())?.valor;
 
   Future<void> gravarEstado(String chave, String? valor) => into(estado)
       .insertOnConflictUpdate(
