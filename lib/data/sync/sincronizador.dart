@@ -219,6 +219,10 @@ class Sincronizador {
   /// Puxa as alterações de todas as tabelas em cache.
   Future<void> puxar() async {
     final bloqueadas = await base.chavesBloqueadas();
+    // O cursor nunca fica mais atrás do que "agora − margem" no servidor: as
+    // linhas antigas (ex.: importadas há horas) não voltam a ser puxadas a
+    // cada volta, e uma escrita lenta dentro da margem continua a ser vista.
+    final piso = (await servidor.agora()).subtract(margem);
     for (final tabela in tabelasSync) {
       if (_fechado) return;
       final cursorTxt = await base.lerEstado('cursor:$tabela');
@@ -230,7 +234,7 @@ class Sincronizador {
         return puxar();
       }
 
-      var maior = cursor;
+      DateTime? maior = cursor != null && cursor.isAfter(piso) ? cursor : piso;
       await base.transaction(() async {
         for (final linha in linhas) {
           final t = DateTime.parse(linha['atualizado_em'] as String);
@@ -240,12 +244,10 @@ class Sincronizador {
           }
           await base.gravarLinha(tabela, linha);
         }
-        if (maior != null) {
-          await base.gravarEstado(
-            'cursor:$tabela',
-            maior!.toUtc().toIso8601String(),
-          );
-        }
+        await base.gravarEstado(
+          'cursor:$tabela',
+          maior!.toUtc().toIso8601String(),
+        );
       });
     }
   }

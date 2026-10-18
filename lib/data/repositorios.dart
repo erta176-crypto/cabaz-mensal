@@ -54,6 +54,9 @@ abstract interface class CategoriasRepository {
   /// Elimina a categoria. Os artigos que tinha passam para [moverPara]
   /// (ou ficam sem categoria, se for null).
   Future<void> eliminar(String id, {String? moverPara});
+
+  /// Categorias eliminadas (para reativar a mesma linha, com o mesmo id).
+  Future<List<Categoria>> apagadas();
 }
 
 abstract interface class ArtigosRepository {
@@ -72,6 +75,9 @@ abstract interface class ArtigosRepository {
   });
 
   Future<void> eliminar(String id);
+
+  /// Artigos eliminados (para reativar a mesma linha, com o mesmo id).
+  Future<List<Artigo>> apagados();
 }
 
 abstract interface class ListaRepository {
@@ -158,6 +164,14 @@ abstract interface class DadosRepository {
   Future<List<ResumoLoja>> resumoPorLoja();
 
   Future<ResumoDados> resumoDados();
+
+  /// Grava um lote importado de ficheiro numa só transação (RPC
+  /// importar_lote). Devolve as contagens por tabela.
+  Future<Map<String, int>> importarLote(Map<String, dynamic> payload);
+
+  /// Compras já gravadas (para detetar repetidas ao importar).
+  Future<List<({String lojaId, String data, String? local, int totalCent})>>
+  comprasExistentes();
 }
 
 class EstadoSync {

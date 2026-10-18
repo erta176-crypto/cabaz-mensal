@@ -69,6 +69,22 @@ class FakeDadosRepository implements DadosRepository {
   ];
 
   @override
+  Future<Map<String, int>> importarLote(Map<String, dynamic> payload) async =>
+      {for (final MapEntry(:key, :value) in payload.entries) key: (value as List).length};
+
+  @override
+  Future<List<({String lojaId, String data, String? local, int totalCent})>>
+  comprasExistentes() async => [
+    for (final c in base.t('compras'))
+      (
+        lojaId: c['loja_id'] as String,
+        data: c['data'] as String,
+        local: c['local'] as String?,
+        totalCent: c['total_cent'] as int,
+      ),
+  ];
+
+  @override
   Future<ResumoDados> resumoDados() async => ResumoDados(
     nCompras: base.t('compras').length,
     nArtigos: base.t('artigos').length,

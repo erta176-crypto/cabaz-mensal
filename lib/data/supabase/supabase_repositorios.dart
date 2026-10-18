@@ -143,4 +143,33 @@ class SupabaseDadosRepository implements DadosRepository {
       lojas: lojas,
     );
   });
+
+  @override
+  Future<Map<String, int>> importarLote(Map<String, dynamic> payload) =>
+      comErrosTraduzidos(() async {
+        final r = await _c.rpc('importar_lote', params: {'payload': payload});
+        return {
+          for (final MapEntry(:key, :value) in (r as Map).entries)
+            '$key': (value as num).toInt(),
+        };
+      });
+
+  @override
+  Future<List<({String lojaId, String data, String? local, int totalCent})>>
+  comprasExistentes() => comErrosTraduzidos(() async {
+    final linhas = await buscarTudo(
+      _c,
+      'compras',
+      colunas: 'id, loja_id, data, local, total_cent',
+    );
+    return [
+      for (final c in linhas)
+        (
+          lojaId: c['loja_id'] as String,
+          data: c['data'] as String,
+          local: c['local'] as String?,
+          totalCent: (c['total_cent'] as num).toInt(),
+        ),
+    ];
+  });
 }

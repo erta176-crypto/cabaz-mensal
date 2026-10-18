@@ -127,6 +127,12 @@ class LocalCategoriasRepository implements CategoriasRepository {
     }
     await _escrita.apagar('categorias', id);
   }
+
+  @override
+  Future<List<Categoria>> apagadas() async => [
+    for (final c in await _base.lerTabela('categorias', incluirApagados: true))
+      if (c['apagado_em'] != null) Categoria.fromMap(c),
+  ];
 }
 
 class LocalArtigosRepository implements ArtigosRepository {
@@ -191,6 +197,12 @@ class LocalArtigosRepository implements ArtigosRepository {
 
   @override
   Future<void> eliminar(String id) => _escrita.apagar('artigos', id);
+
+  @override
+  Future<List<Artigo>> apagados() async => [
+    for (final a in await _base.lerTabela('artigos', incluirApagados: true))
+      if (a['apagado_em'] != null) Artigo.fromMap(a),
+  ];
 }
 
 /// Preço mais recente de cada artigo em cada loja (como a view precos_atuais).

@@ -21,6 +21,9 @@ class ServidorFalso implements ServidorSync {
   /// como quando a rede cai a meio do pedido.
   int perderRespostas = 0;
 
+  /// Total de linhas devolvidas por [puxar] (para medir o que é puxado).
+  int linhasPuxadas = 0;
+
   /// Registo das chamadas, pela ordem em que chegaram.
   final chamadas = <String>[];
 
@@ -28,7 +31,8 @@ class ServidorFalso implements ServidorSync {
 
   List<Map<String, dynamic>> t(String nome) => tabelas[nome] ??= [];
 
-  DateTime agora() => _relogio = _relogio.add(const Duration(milliseconds: 1));
+  /// Avança o relógio do servidor 1 ms (cada escrita tem um atualizado_em novo).
+  DateTime tique() => _relogio = _relogio.add(const Duration(milliseconds: 1));
 
   /// Avança o relógio do servidor (ex.: para testar a margem de sobreposição).
   void avancar(Duration d) => _relogio = _relogio.add(d);
@@ -93,14 +97,14 @@ class ServidorFalso implements ServidorSync {
       _unicos(tabela, novo);
       existente
         ..addAll(linha)
-        ..['atualizado_em'] = agora().toIso8601String();
+        ..['atualizado_em'] = tique().toIso8601String();
     } else {
       final nova = <String, dynamic>{
         'id': const Uuid().v4(),
         if (tabela != 'preferencias') 'apagado_em': null,
-        'criado_em': agora().toIso8601String(),
+        'criado_em': tique().toIso8601String(),
         ...linha,
-        'atualizado_em': agora().toIso8601String(),
+        'atualizado_em': tique().toIso8601String(),
       };
       if (tabela == 'itens_lista') nova['qtd'] ??= nova['qtd_padrao'];
       if (_chavesNaturais.containsKey(tabela) &&
@@ -128,7 +132,7 @@ class ServidorFalso implements ServidorSync {
         _unicos(tabela, {...o, ...campos});
         o
           ..addAll(campos)
-          ..['atualizado_em'] = agora().toIso8601String();
+          ..['atualizado_em'] = tique().toIso8601String();
       }
     }
     _depois();
@@ -154,8 +158,8 @@ class ServidorFalso implements ServidorSync {
         ...(r as Map).cast<String, dynamic>(),
         'origem': 'manual',
         'apagado_em': null,
-        'criado_em': agora().toIso8601String(),
-        'atualizado_em': agora().toIso8601String(),
+        'criado_em': tique().toIso8601String(),
+        'atualizado_em': tique().toIso8601String(),
       });
     }
     for (final i in p['itens'] as List) {
@@ -165,7 +169,7 @@ class ServidorFalso implements ServidorSync {
           o
             ..['comprado'] = false
             ..['qtd'] = o['qtd_padrao']
-            ..['atualizado_em'] = agora().toIso8601String();
+            ..['atualizado_em'] = tique().toIso8601String();
         }
       }
     }
@@ -188,7 +192,14 @@ class ServidorFalso implements ServidorSync {
           b['atualizado_em'] as String,
         ),
       );
+    linhasPuxadas += r.length;
     return r;
+  }
+
+  @override
+  Future<DateTime> agora() async {
+    if (!online) throw const ErroSync('Sem rede', transitorio: true);
+    return _relogio;
   }
 
   @override
@@ -201,13 +212,13 @@ class ServidorFalso implements ServidorSync {
         .firstOrNull;
     if (existente != null) {
       existente.addAll(linha);
-      existente['atualizado_em'] = agora().toIso8601String();
+      existente['atualizado_em'] = tique().toIso8601String();
     } else {
       t(tabela).add({
         'apagado_em': null,
-        'criado_em': agora().toIso8601String(),
+        'criado_em': tique().toIso8601String(),
         ...linha,
-        'atualizado_em': agora().toIso8601String(),
+        'atualizado_em': tique().toIso8601String(),
       });
     }
   }

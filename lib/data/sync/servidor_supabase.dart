@@ -55,6 +55,11 @@ class ServidorSupabase implements ServidorSync {
       _executar(() => _c.rpc(nome, params: params));
 
   @override
+  Future<DateTime> agora() => _executar(
+    () async => DateTime.parse(await _c.rpc('agora') as String),
+  );
+
+  @override
   Future<List<Map<String, dynamic>>> puxar(String tabela, DateTime? desde) =>
       _executar(() async {
         final desempate = tabela == 'preferencias' ? 'user_id' : 'id';

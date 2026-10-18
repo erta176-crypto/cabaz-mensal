@@ -189,7 +189,7 @@ void main() {
       servidor.escreverDireto('preferencias', {
         'user_id': 'u1',
         'dados': <String, dynamic>{},
-        'reiniciado_em': servidor.agora().toIso8601String(),
+        'reiniciado_em': servidor.tique().toIso8601String(),
       });
       await telemovel.sincronizar();
       expect(await telemovel.artigos.observarArtigos().first, isEmpty);
@@ -200,7 +200,7 @@ void main() {
     test('escrita lenta dentro da margem não se perde', () async {
       // Uma escrita com atualizado_em ligeiramente anterior ao último cursor
       // (transação longa) continua a ser apanhada graças à margem.
-      final antes = servidor.agora().subtract(const Duration(minutes: 2));
+      final antes = servidor.tique().subtract(const Duration(minutes: 2));
       await telemovel.sincronizar();
       servidor.t('artigos').add({
         'id': 'artigo-lento',
@@ -219,7 +219,28 @@ void main() {
     });
   });
 
+  test('linhas antigas não voltam a ser puxadas a cada volta', () async {
+    servidor.avancar(const Duration(hours: 1));
+    await telemovel.sincronizar();
+    final antes = servidor.linhasPuxadas;
+    await telemovel.sincronizar();
+    expect(servidor.linhasPuxadas, antes, reason: 'nada mudou no servidor');
+  });
+
   group('conflitos e reativação', () {
+    test('voltar a criar um artigo apagado reativa-o com o mesmo id', () async {
+      await telemovel.artigos.eliminar(banana);
+      await telemovel.sincronizar();
+      final apagado = (await telemovel.artigos.apagados()).single;
+      expect(apagado.id, banana);
+      await telemovel.artigos.guardar(apagado, novo: true);
+      await telemovel.sincronizar();
+      final noServidor = servidor.t('artigos').where((a) => a['id'] == banana);
+      expect(noServidor, hasLength(1));
+      expect(noServidor.single['apagado_em'], isNull);
+      expect(await telemovel.base.observarPendentes().first, isEmpty);
+    });
+
     test('a última escrita a chegar ao servidor vence', () async {
       final noTelemovel = (await itens(telemovel)).single;
       servidor.online = false;

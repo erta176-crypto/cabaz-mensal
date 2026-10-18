@@ -22,6 +22,9 @@ abstract interface class ServidorSync {
   /// Linhas (incluindo apagadas) com atualizado_em > [desde]; todas se null.
   Future<List<Map<String, dynamic>>> puxar(String tabela, DateTime? desde);
 
+  /// Hora do servidor (para o cursor da receção não ficar parado).
+  Future<DateTime> agora();
+
   /// Avisa (sem dados) quando alguma das tabelas muda no servidor.
   Stream<void> alteracoes(List<String> tabelas);
 }

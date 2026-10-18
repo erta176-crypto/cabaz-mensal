@@ -67,13 +67,18 @@ class _AdicionarArtigoSheetState extends ConsumerState<AdicionarArtigoSheet> {
     if (nome.isEmpty) return;
     setState(() => _ocupado = true);
     try {
+      // Um artigo eliminado com o mesmo nome volta na mesma linha (mesmo id).
+      final repo = ref.read(artigosRepositoryProvider);
+      final apagado = (await repo.apagados())
+          .where((a) => normalizar(a.nome) == normalizar(nome))
+          .firstOrNull;
       final artigo = Artigo(
-        id: const Uuid().v4(),
+        id: apagado?.id ?? const Uuid().v4(),
         nome: nome,
         categoriaId: _categoriaId,
         unidade: _unidade,
       );
-      await ref.read(artigosRepositoryProvider).guardar(artigo, novo: true);
+      await repo.guardar(artigo, novo: true);
       await ref
           .read(listaRepositoryProvider)
           .incluir(lojaId: loja.id, artigoId: artigo.id, qtd: 1);
