@@ -13,6 +13,8 @@ import 'adicionar_artigo.dart';
 import 'concluir_compra_page.dart';
 import 'dialogos_lista.dart';
 import 'lista_logica.dart';
+import '../../export/escrever_pdf.dart';
+import '../../export/texto_lista.dart';
 
 class ListaPage extends ConsumerStatefulWidget {
   const ListaPage({super.key});
@@ -95,17 +97,35 @@ class _ListaPageState extends ConsumerState<ListaPage> {
     return _guardarPrefs(p.copyWith(gruposFechados: fechados));
   }
 
-  Future<void> _partilhar(ListaMontada lista) async {
-    final texto = listaEmTexto(lista);
-    if (texto.isEmpty) {
-      _mensagem('A lista está vazia.');
+  Future<void> _partilhar(
+    ListaMontada lista,
+    List<Categoria> categorias, {
+    required bool pdf,
+  }) async {
+    final linhas = linhasParaTexto(lista, categorias);
+    if (linhas.isEmpty) {
+      _mensagem('Não há artigos por comprar na lista.');
       return;
     }
+    final lojaId = _prefs.lojaId;
+    final loja = lista.secoes.length == 1 && lojaId != null
+        ? lista.secoes.single.loja.nome
+        : null;
+    final hoje = DateTime.now();
+    final nome = 'cabaz-lista-${dataIso(hoje)}';
+    if (pdf) {
+      final letra = await rootBundle.load('assets/fonts/InstrumentSans.ttf');
+      final bytes = await pdfLista(
+        titulo: tituloLista(loja: loja, data: hoje),
+        blocos: blocosLista(linhas, mostrarLoja: loja == null),
+        letra: letra.buffer.asUint8List(),
+      );
+      await guardarBytes('$nome.pdf', bytes);
+      return;
+    }
+    final texto = textoLista(linhas, loja: loja, data: hoje);
     await Clipboard.setData(ClipboardData(text: texto));
-    final descarregado = await partilharTexto(
-      'lista-${DateTime.now().toIso8601String().substring(0, 10)}',
-      texto,
-    );
+    final descarregado = await partilharTexto(nome, texto);
     if (descarregado && mounted) {
       _mensagem('Lista copiada e descarregada em .txt.');
     }
@@ -168,10 +188,14 @@ class _ListaPageState extends ConsumerState<ListaPage> {
     return Pagina(
       titulo: 'Lista do mês',
       acoes: [
-        IconButton(
+        PopupMenuButton<bool>(
           tooltip: 'Partilhar lista',
           icon: const Icon(Icons.share_outlined),
-          onPressed: () => _partilhar(lista),
+          onSelected: (pdf) => _partilhar(lista, categorias.value!, pdf: pdf),
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: false, child: Text('Partilhar texto')),
+            PopupMenuItem(value: true, child: Text('Partilhar PDF')),
+          ],
         ),
       ],
       corpo: ConteudoCentrado(
@@ -325,7 +349,8 @@ class _Conteudo extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 7,
-                  backgroundColor: corDeHex(s.loja.cor) ?? tema.colorScheme.primary,
+                  backgroundColor:
+                      corDeHex(s.loja.cor) ?? tema.colorScheme.primary,
                 ),
                 const SizedBox(width: 10),
                 Text(s.loja.nome, style: tema.textTheme.titleLarge),
@@ -417,7 +442,10 @@ class _CabecalhoGrupo extends StatelessWidget {
 }
 
 String _subtitulo(LinhaLista l, {bool habitual = false}) {
-  final qtd = formatarQtd(habitual ? l.item.qtdPadrao : l.item.qtd, l.artigo.unidade);
+  final qtd = formatarQtd(
+    habitual ? l.item.qtdPadrao : l.item.qtd,
+    l.artigo.unidade,
+  );
   if (l.precoCent == null) return '$qtd · sem preço';
   final porKg = l.artigo.unidade == Unidade.kg ? '/kg' : '';
   final estimado = l.estimadoCent;
@@ -474,7 +502,10 @@ class _LinhaSupermercado extends StatelessWidget {
   Widget _fundo(BuildContext context, AcaoGesto acao, Alignment lado) {
     final cores = Theme.of(context).colorScheme;
     final (icone, cor) = switch (acao) {
-      AcaoGesto.marcarComprado => (Icons.shopping_cart_checkout, Colors.green.shade700),
+      AcaoGesto.marcarComprado => (
+        Icons.shopping_cart_checkout,
+        Colors.green.shade700,
+      ),
       AcaoGesto.removerDaLista => (Icons.remove_circle_outline, cores.error),
       AcaoGesto.alterarQuantidade => (Icons.edit_outlined, cores.primary),
       AcaoGesto.nada => (Icons.block, cores.outline),
@@ -510,7 +541,11 @@ class _LinhaSupermercado extends StatelessWidget {
       key: ValueKey('item-${l.item.lojaId}-${l.item.artigoId}'),
       direction: direcao,
       background: _fundo(context, prefs.direita, Alignment.centerLeft),
-      secondaryBackground: _fundo(context, prefs.esquerda, Alignment.centerRight),
+      secondaryBackground: _fundo(
+        context,
+        prefs.esquerda,
+        Alignment.centerRight,
+      ),
       // A ação é feita aqui e a linha fica: a cache atualiza a lista.
       confirmDismiss: (d) async {
         await aoGesto(
@@ -642,39 +677,43 @@ class _Rodape extends StatelessWidget {
             ),
           ),
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 960),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (!planear) ...[
-                  Wrap(
-                    spacing: 20,
-                    runSpacing: 4,
+          // Centrado e com a largura da lista no ecrã largo.
+          child: Align(
+            heightFactor: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 960),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (!planear) ...[
+                    Wrap(
+                      spacing: 20,
+                      runSpacing: 4,
+                      children: [
+                        valor('Estimado', lista.totalEstimadoCent),
+                        valor('No carrinho', lista.totalCarrinhoCent),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                  Row(
                     children: [
-                      valor('Estimado', lista.totalEstimadoCent),
-                      valor('No carrinho', lista.totalCarrinhoCent),
+                      Expanded(child: adicionar),
+                      if (!planear) ...[
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: FilledButton(
+                            style: estilo,
+                            onPressed: aoConcluir,
+                            child: rotulo('Concluir compra'),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
-                  const SizedBox(height: 10),
                 ],
-                Row(
-                  children: [
-                    Expanded(child: adicionar),
-                    if (!planear) ...[
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: FilledButton(
-                          style: estilo,
-                          onPressed: aoConcluir,
-                          child: rotulo('Concluir compra'),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         ),

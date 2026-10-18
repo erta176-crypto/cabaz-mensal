@@ -103,9 +103,11 @@ class DialogoVerArtigo extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lojas = ref.watch(lojasProvider).value ?? const <Loja>[];
-    final categorias = ref.watch(categoriasProvider).value ?? const <Categoria>[];
+    final categorias =
+        ref.watch(categoriasProvider).value ?? const <Categoria>[];
     final precos = {
-      for (final p in ref.watch(precosAtuaisProvider).value ?? const <PrecoAtual>[])
+      for (final p
+          in ref.watch(precosAtuaisProvider).value ?? const <PrecoAtual>[])
         if (p.artigoId == artigo.id) p.lojaId: p,
     };
     final categoria = categorias

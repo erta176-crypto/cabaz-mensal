@@ -7,6 +7,7 @@ import 'package:cabaz_mensal/domain/compra.dart';
 import 'package:cabaz_mensal/domain/modelos.dart';
 import 'package:cabaz_mensal/domain/preferencias.dart';
 import 'package:cabaz_mensal/domain/texto.dart';
+import 'package:cabaz_mensal/export/texto_lista.dart';
 import 'package:cabaz_mensal/features/lista/lista_logica.dart';
 import 'package:cabaz_mensal/features/lista/lista_page.dart';
 import 'package:flutter/material.dart';
@@ -18,24 +19,95 @@ const lidl = Loja(id: 'lidl', slug: 'lidl', nome: 'Lidl');
 const pingo = Loja(id: 'pd', slug: 'pingo-doce', nome: 'Pingo Doce');
 const fruta = Categoria(id: 'fruta', nome: 'Fruta', ordem: 1);
 const mercearia = Categoria(id: 'merc', nome: 'Mercearia', ordem: 2);
-const banana = Artigo(id: 'banana', nome: 'Banana', categoriaId: 'fruta', unidade: Unidade.kg);
-const maca = Artigo(id: 'maca', nome: 'Maçã Fuji', categoriaId: 'fruta', unidade: Unidade.kg);
-const arroz = Artigo(id: 'arroz', nome: 'Arroz', categoriaId: 'merc', unidade: Unidade.un);
-const leite = Artigo(id: 'leite', nome: 'Leite', categoriaId: null, unidade: Unidade.un);
+const banana = Artigo(
+  id: 'banana',
+  nome: 'Banana',
+  categoriaId: 'fruta',
+  unidade: Unidade.kg,
+);
+const maca = Artigo(
+  id: 'maca',
+  nome: 'Maçã Fuji',
+  categoriaId: 'fruta',
+  unidade: Unidade.kg,
+);
+const arroz = Artigo(
+  id: 'arroz',
+  nome: 'Arroz',
+  categoriaId: 'merc',
+  unidade: Unidade.un,
+);
+const leite = Artigo(
+  id: 'leite',
+  nome: 'Leite',
+  categoriaId: null,
+  unidade: Unidade.un,
+);
 
 final precos = [
-  PrecoAtual(artigoId: 'banana', lojaId: 'lidl', precoCent: 119, data: DateTime(2026)),
-  PrecoAtual(artigoId: 'arroz', lojaId: 'lidl', precoCent: 89, data: DateTime(2026)),
-  PrecoAtual(artigoId: 'leite', lojaId: 'lidl', precoCent: 75, data: DateTime(2026)),
-  PrecoAtual(artigoId: 'leite', lojaId: 'pd', precoCent: 79, data: DateTime(2026)),
+  PrecoAtual(
+    artigoId: 'banana',
+    lojaId: 'lidl',
+    precoCent: 119,
+    data: DateTime(2026),
+  ),
+  PrecoAtual(
+    artigoId: 'arroz',
+    lojaId: 'lidl',
+    precoCent: 89,
+    data: DateTime(2026),
+  ),
+  PrecoAtual(
+    artigoId: 'leite',
+    lojaId: 'lidl',
+    precoCent: 75,
+    data: DateTime(2026),
+  ),
+  PrecoAtual(
+    artigoId: 'leite',
+    lojaId: 'pd',
+    precoCent: 79,
+    data: DateTime(2026),
+  ),
 ];
 
 List<ItemLista> itensBase() => const [
-  ItemLista(id: '1', lojaId: 'lidl', artigoId: 'banana', qtdPadrao: 1.3, incluido: true),
-  ItemLista(id: '2', lojaId: 'lidl', artigoId: 'arroz', qtdPadrao: 2, incluido: true, comprado: true),
-  ItemLista(id: '3', lojaId: 'lidl', artigoId: 'leite', qtdPadrao: 6, incluido: true),
-  ItemLista(id: '4', lojaId: 'lidl', artigoId: 'maca', qtdPadrao: 1, incluido: false),
-  ItemLista(id: '5', lojaId: 'pd', artigoId: 'leite', qtdPadrao: 2, incluido: true),
+  ItemLista(
+    id: '1',
+    lojaId: 'lidl',
+    artigoId: 'banana',
+    qtdPadrao: 1.3,
+    incluido: true,
+  ),
+  ItemLista(
+    id: '2',
+    lojaId: 'lidl',
+    artigoId: 'arroz',
+    qtdPadrao: 2,
+    incluido: true,
+    comprado: true,
+  ),
+  ItemLista(
+    id: '3',
+    lojaId: 'lidl',
+    artigoId: 'leite',
+    qtdPadrao: 6,
+    incluido: true,
+  ),
+  ItemLista(
+    id: '4',
+    lojaId: 'lidl',
+    artigoId: 'maca',
+    qtdPadrao: 1,
+    incluido: false,
+  ),
+  ItemLista(
+    id: '5',
+    lojaId: 'pd',
+    artigoId: 'leite',
+    qtdPadrao: 2,
+    incluido: true,
+  ),
 ];
 
 ListaMontada montar({
@@ -52,22 +124,35 @@ ListaMontada montar({
 
 void main() {
   group('montar a lista', () {
-    test('por categoria, pela ordem das categorias, "Sem categoria" no fim', () {
-      final l = montar();
-      expect(l.secoes, hasLength(1));
-      expect(l.secoes.single.grupos.map((g) => g.titulo), [
-        'Fruta',
-        'Mercearia',
-        'Sem categoria',
-      ]);
-      // A maçã não está incluída: não aparece no supermercado.
-      expect(l.linhas.map((x) => x.artigo.nome), isNot(contains('Maçã Fuji')));
-    });
+    test(
+      'por categoria, pela ordem das categorias, "Sem categoria" no fim',
+      () {
+        final l = montar();
+        expect(l.secoes, hasLength(1));
+        expect(l.secoes.single.grupos.map((g) => g.titulo), [
+          'Fruta',
+          'Mercearia',
+          'Sem categoria',
+        ]);
+        // A maçã não está incluída: não aparece no supermercado.
+        expect(
+          l.linhas.map((x) => x.artigo.nome),
+          isNot(contains('Maçã Fuji')),
+        );
+      },
+    );
 
     test('comprados no fim do grupo e contagem comprados/total', () {
       final itens = [
         ...itensBase(),
-        const ItemLista(id: '6', lojaId: 'lidl', artigoId: 'maca', qtdPadrao: 1, incluido: true, comprado: true),
+        const ItemLista(
+          id: '6',
+          lojaId: 'lidl',
+          artigoId: 'maca',
+          qtdPadrao: 1,
+          incluido: true,
+          comprado: true,
+        ),
       ]..removeWhere((i) => i.id == '4');
       final fruta = montar(itens: itens).secoes.single.grupos.first;
       expect(fruta.linhas.map((x) => x.artigo.nome), ['Banana', 'Maçã Fuji']);
@@ -86,7 +171,10 @@ void main() {
 
     test('Planear mostra também os não incluídos', () {
       final l = montar(
-        preferencias: const Preferencias(lojaId: 'lidl', modo: ModoLista.planear),
+        preferencias: const Preferencias(
+          lojaId: 'lidl',
+          modo: ModoLista.planear,
+        ),
       );
       expect(l.linhas.map((x) => x.artigo.nome), contains('Maçã Fuji'));
     });
@@ -105,12 +193,16 @@ void main() {
       expect(l.nComprados, 1);
     });
 
-    test('lista em texto, por categoria', () {
-      final t = listaEmTexto(montar());
-      expect(t, contains('🛒 Lidl'));
-      expect(t, contains('FRUTA'));
-      expect(t, contains('☐ Banana — 1,3 kg'));
-      expect(t, contains('☑ Arroz — 2 un'));
+    test('texto da lista: por categoria e sem os comprados', () {
+      final t = textoLista(
+        linhasParaTexto(montar(), const [fruta, mercearia]),
+        loja: 'Lidl',
+        data: DateTime(2026, 10, 18),
+      );
+      expect(t, startsWith('🛒 Lista de compras · Lidl · 18/10/2026'));
+      expect(t, contains('🍎 Fruta\n• Banana — 1,3 kg'));
+      expect(t, isNot(contains('Arroz')), reason: 'já comprado');
+      expect(t, contains('🛍️ Sem categoria\n• Leite — 6 un'));
     });
   });
 
@@ -177,7 +269,10 @@ void main() {
   test('pesquisa sem acentos nem maiúsculas, e por alias', () {
     expect(correspondeA('maca', ['Maçã Fuji']), isTrue);
     expect(correspondeA('MAÇÃ fuji', ['maca fuji']), isTrue);
-    expect(correspondeA('frango vc', ['Peito de frango', 'FRANGO PEITO VC']), isTrue);
+    expect(
+      correspondeA('frango vc', ['Peito de frango', 'FRANGO PEITO VC']),
+      isTrue,
+    );
     expect(correspondeA('pera', ['Maçã Fuji']), isFalse);
   });
 
@@ -199,7 +294,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            lojasProvider.overrideWith((_) => Stream.value(const [lidl, pingo])),
+            lojasProvider.overrideWith(
+              (_) => Stream.value(const [lidl, pingo]),
+            ),
             categoriasProvider.overrideWith(
               (_) => Stream.value(const [fruta, mercearia]),
             ),
@@ -209,7 +306,9 @@ void main() {
             precosAtuaisProvider.overrideWith((_) => Stream.value(precos)),
             listaRepositoryProvider.overrideWithValue(lista),
             preferenciasRepositoryProvider.overrideWithValue(prefs),
-            estadoSyncProvider.overrideWith((_) => Stream.value(const EstadoSync())),
+            estadoSyncProvider.overrideWith(
+              (_) => Stream.value(const EstadoSync()),
+            ),
           ],
           child: MaterialApp(
             theme: construirTema(Brightness.light, fontesGoogle: false),
@@ -286,15 +385,17 @@ void main() {
       expect(find.textContaining('1,78'), findsWidgets); // carrinho
     });
 
-    testWidgets('Adicionar artigo e Concluir compra lado a lado, sem se taparem',
-        (tester) async {
-      await abrir(tester);
-      final adicionar = tester.getRect(find.text('Adicionar artigo'));
-      final concluir = tester.getRect(find.text('Concluir compra'));
-      expect(adicionar.overlaps(concluir), isFalse);
-      expect(adicionar.center.dy, closeTo(concluir.center.dy, 1));
-      expect(find.byType(FloatingActionButton), findsNothing);
-    });
+    testWidgets(
+      'Adicionar artigo e Concluir compra lado a lado, sem se taparem',
+      (tester) async {
+        await abrir(tester);
+        final adicionar = tester.getRect(find.text('Adicionar artigo'));
+        final concluir = tester.getRect(find.text('Concluir compra'));
+        expect(adicionar.overlaps(concluir), isFalse);
+        expect(adicionar.center.dy, closeTo(concluir.center.dy, 1));
+        expect(find.byType(FloatingActionButton), findsNothing);
+      },
+    );
   });
 }
 

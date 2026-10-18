@@ -5,6 +5,7 @@ library;
 import '../../domain/compra.dart';
 import '../../domain/modelos.dart';
 import '../../domain/preferencias.dart';
+import '../../export/texto_lista.dart';
 
 class LinhaLista {
   const LinhaLista({
@@ -19,7 +20,8 @@ class LinhaLista {
   /// Último preço conhecido nesta loja (por kg nos artigos ao peso).
   final int? precoCent;
 
-  int? get estimadoCent => valorEstimadoCent(artigo.unidade, item.qtd, precoCent);
+  int? get estimadoCent =>
+      valorEstimadoCent(artigo.unidade, item.qtd, precoCent);
 }
 
 class GrupoLista {
@@ -78,7 +80,9 @@ ListaMontada montarLista({
 }) {
   final artigoPorId = {for (final a in artigos) a.id: a};
   final categoriaPorId = {for (final c in categorias) c.id: c};
-  final preco = {for (final p in precos) '${p.artigoId}|${p.lojaId}': p.precoCent};
+  final preco = {
+    for (final p in precos) '${p.artigoId}|${p.lojaId}': p.precoCent,
+  };
   final planear = preferencias.modo == ModoLista.planear;
 
   final ativas = lojas.where((l) => !l.arquivada).toList();
@@ -153,28 +157,28 @@ ListaMontada montarLista({
 String formatarQtd(num qtd, Unidade unidade) {
   final texto = qtd == qtd.roundToDouble()
       ? qtd.toInt().toString()
-      : qtd.toStringAsFixed(3).replaceFirst(RegExp(r'0+$'), '').replaceAll('.', ',');
+      : qtd
+            .toStringAsFixed(3)
+            .replaceFirst(RegExp(r'0+$'), '')
+            .replaceAll('.', ',');
   return '$texto ${unidade.codigo}';
 }
 
-/// Lista em texto simples, por categoria, para partilhar.
-String listaEmTexto(ListaMontada lista) {
-  final b = StringBuffer();
-  for (final s in lista.secoes) {
-    final linhas = s.linhas.where((l) => l.item.incluido).toList();
-    if (linhas.isEmpty) continue;
-    b.writeln('🛒 ${s.loja.nome}');
-    for (final g in s.grupos) {
-      final doGrupo = g.linhas.where((l) => l.item.incluido).toList();
-      if (doGrupo.isEmpty) continue;
-      b.writeln();
-      b.writeln(g.titulo.toUpperCase());
-      for (final l in doGrupo) {
-        final marca = l.item.comprado ? '☑' : '☐';
-        b.writeln('$marca ${l.artigo.nome} — ${formatarQtd(l.item.qtd, l.artigo.unidade)}');
-      }
-    }
-    b.writeln();
-  }
-  return b.toString().trimRight();
+/// Linhas para o texto/PDF da lista: só os incluídos ainda por comprar.
+List<LinhaParaTexto> linhasParaTexto(
+  ListaMontada lista,
+  List<Categoria> categorias,
+) {
+  final categoria = {for (final c in categorias) c.id: c};
+  return [
+    for (final s in lista.secoes)
+      for (final l in s.linhas)
+        if (l.item.incluido && !l.item.comprado)
+          LinhaParaTexto(
+            loja: s.loja.nome,
+            categoria: categoria[l.artigo.categoriaId],
+            artigo: l.artigo.nome,
+            quantidade: formatarQtd(l.item.qtd, l.artigo.unidade),
+          ),
+  ];
 }

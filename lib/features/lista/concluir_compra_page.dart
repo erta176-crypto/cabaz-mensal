@@ -94,7 +94,9 @@ class _ConcluirCompraPageState extends ConsumerState<ConcluirCompraPage> {
   }
 
   Future<void> _carregarLocais(Loja loja) async {
-    final locais = await ref.read(comprasRepositoryProvider).locaisUsados(loja.id);
+    final locais = await ref
+        .read(comprasRepositoryProvider)
+        .locaisUsados(loja.id);
     if (!mounted) return;
     setState(() {
       _locais = {...locais, ?loja.local}.toList()..sort();
@@ -142,7 +144,8 @@ class _ConcluirCompraPageState extends ConsumerState<ConcluirCompraPage> {
       Navigator.pop(context);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$e')));
       }
     } finally {
       if (mounted) setState(() => _aGravar = false);
@@ -153,11 +156,13 @@ class _ConcluirCompraPageState extends ConsumerState<ConcluirCompraPage> {
   Widget build(BuildContext context) {
     final lojas = ref.watch(lojasProvider).value ?? const <Loja>[];
     final artigos = {
-      for (final a in ref.watch(artigosProvider).value ?? const <Artigo>[]) a.id: a,
+      for (final a in ref.watch(artigosProvider).value ?? const <Artigo>[])
+        a.id: a,
     };
     final itens = ref.watch(itensListaProvider).value ?? const <ItemLista>[];
     final precos = {
-      for (final p in ref.watch(precosAtuaisProvider).value ?? const <PrecoAtual>[])
+      for (final p
+          in ref.watch(precosAtuaisProvider).value ?? const <PrecoAtual>[])
         '${p.artigoId}|${p.lojaId}': p.precoCent,
     };
     final comprados = [
@@ -177,7 +182,9 @@ class _ConcluirCompraPageState extends ConsumerState<ConcluirCompraPage> {
     if (loja == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Concluir compra')),
-        body: const Center(child: Text('Não há artigos marcados como comprados.')),
+        body: const Center(
+          child: Text('Não há artigos marcados como comprados.'),
+        ),
       );
     }
     if (_locaisDe != loja.id) {
@@ -192,7 +199,11 @@ class _ConcluirCompraPageState extends ConsumerState<ConcluirCompraPage> {
       for (final i in comprados.where((i) => i.lojaId == loja.id))
         _edicoes.putIfAbsent(
           '${i.lojaId}|${i.artigoId}',
-          () => _Edicao(i, artigos[i.artigoId]!, precos['${i.artigoId}|${loja.id}']),
+          () => _Edicao(
+            i,
+            artigos[i.artigoId]!,
+            precos['${i.artigoId}|${loja.id}'],
+          ),
         ),
     ]..sort((a, b) => a.artigo.nome.compareTo(b.artigo.nome));
 
@@ -236,13 +247,16 @@ class _ConcluirCompraPageState extends ConsumerState<ConcluirCompraPage> {
                       ],
                     ),
                     DropdownMenu<String>(
-                      key: ValueKey('local-${loja.id}-${_locais.length}-$_local'),
+                      key: ValueKey(
+                        'local-${loja.id}-${_locais.length}-$_local',
+                      ),
                       label: const Text('Local'),
                       width: 260,
                       initialSelection: _local,
                       onSelected: (v) => setState(() => _local = v),
                       dropdownMenuEntries: [
-                        for (final l in _locais) DropdownMenuEntry(value: l, label: l),
+                        for (final l in _locais)
+                          DropdownMenuEntry(value: l, label: l),
                         const DropdownMenuEntry(value: _outro, label: 'Outro…'),
                       ],
                     ),
@@ -269,7 +283,8 @@ class _ConcluirCompraPageState extends ConsumerState<ConcluirCompraPage> {
                   ),
                 ],
                 const SizedBox(height: 16),
-                for (final e in edicoes) _LinhaEdicao(edicao: e, aoMudar: () => setState(() {})),
+                for (final e in edicoes)
+                  _LinhaEdicao(edicao: e, aoMudar: () => setState(() {})),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _totalTalao,
@@ -277,8 +292,11 @@ class _ConcluirCompraPageState extends ConsumerState<ConcluirCompraPage> {
                     labelText: 'Total do talão (opcional)',
                     suffixText: '€',
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  validator: (v) => (v ?? '').trim().isNotEmpty && centDeTexto(v!) == null
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  validator: (v) =>
+                      (v ?? '').trim().isNotEmpty && centDeTexto(v!) == null
                       ? 'Valor inválido (ex.: 23,45).'
                       : null,
                   onChanged: (_) => setState(() {}),
@@ -313,9 +331,13 @@ class _ConcluirCompraPageState extends ConsumerState<ConcluirCompraPage> {
                 ),
                 const SizedBox(height: 16),
                 FilledButton.icon(
-                  onPressed: _aGravar || !completas ? null : () => _gravar(loja, edicoes),
+                  onPressed: _aGravar || !completas
+                      ? null
+                      : () => _gravar(loja, edicoes),
                   icon: const Icon(Icons.save),
-                  label: Text('Gravar compra de ${formatarCent(rascunho.totalCent)}'),
+                  label: Text(
+                    'Gravar compra de ${formatarCent(rascunho.totalCent)}',
+                  ),
                 ),
               ],
             ),
@@ -363,7 +385,8 @@ class _LinhaEdicao extends StatelessWidget {
                     suffixText: kg ? 'kg' : 'un',
                   ),
                   keyboardType: TextInputType.numberWithOptions(decimal: kg),
-                  validator: (v) => lerQuantidade(v ?? '', edicao.artigo.unidade) == null
+                  validator: (v) =>
+                      lerQuantidade(v ?? '', edicao.artigo.unidade) == null
                       ? (kg ? 'Peso inválido' : 'Inteiro > 0')
                       : null,
                   onChanged: (_) => aoMudar(),
@@ -377,8 +400,11 @@ class _LinhaEdicao extends StatelessWidget {
                     labelText: kg ? 'Preço por kg' : 'Preço por unidade',
                     suffixText: kg ? '€/kg' : '€',
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  validator: (v) => centDeTexto(v ?? '') == null ? 'Preço em falta' : null,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  validator: (v) =>
+                      centDeTexto(v ?? '') == null ? 'Preço em falta' : null,
                   onChanged: (_) => aoMudar(),
                 ),
               ),

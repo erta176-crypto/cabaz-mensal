@@ -58,7 +58,10 @@ class _AdicionarArtigoSheetState extends ConsumerState<AdicionarArtigoSheet> {
         .read(listaRepositoryProvider)
         .incluir(lojaId: loja.id, artigoId: artigo.id, qtd: qtd);
     if (mounted) {
-      Navigator.pop(context, '"${artigo.nome}" juntado à lista do ${loja.nome}.');
+      Navigator.pop(
+        context,
+        '"${artigo.nome}" juntado à lista do ${loja.nome}.',
+      );
     }
   }
 
@@ -87,7 +90,8 @@ class _AdicionarArtigoSheetState extends ConsumerState<AdicionarArtigoSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$e')));
       }
     } finally {
       if (mounted) setState(() => _ocupado = false);
@@ -102,7 +106,8 @@ class _AdicionarArtigoSheetState extends ConsumerState<AdicionarArtigoSheet> {
     ];
     final artigos = ref.watch(artigosProvider).value ?? const <Artigo>[];
     final aliases = ref.watch(aliasesProvider).value ?? const {};
-    final categorias = ref.watch(categoriasProvider).value ?? const <Categoria>[];
+    final categorias =
+        ref.watch(categoriasProvider).value ?? const <Categoria>[];
     final itens = ref.watch(itensListaProvider).value ?? const <ItemLista>[];
     final loja = _loja(lojas);
     final termo = _pesquisa.text.trim();
@@ -112,7 +117,8 @@ class _AdicionarArtigoSheetState extends ConsumerState<AdicionarArtigoSheet> {
         ? const <Artigo>[]
         : [
             for (final a in artigos)
-              if (a.ativo && correspondeA(termo, [a.nome, ...?aliases[a.id]])) a,
+              if (a.ativo && correspondeA(termo, [a.nome, ...?aliases[a.id]]))
+                a,
           ];
     final naLista = {
       for (final i in itens)
@@ -161,7 +167,9 @@ class _AdicionarArtigoSheetState extends ConsumerState<AdicionarArtigoSheet> {
                   ? Center(
                       child: Text(
                         'Escreve o nome do artigo ou o texto do talão.',
-                        style: TextStyle(color: tema.colorScheme.onSurfaceVariant),
+                        style: TextStyle(
+                          color: tema.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     )
                   : resultados.isEmpty
@@ -172,7 +180,8 @@ class _AdicionarArtigoSheetState extends ConsumerState<AdicionarArtigoSheet> {
                         categoriaId: _categoriaId,
                         unidade: _unidade,
                         ocupado: _ocupado,
-                        aoMudarCategoria: (v) => setState(() => _categoriaId = v),
+                        aoMudarCategoria: (v) =>
+                            setState(() => _categoriaId = v),
                         aoMudarUnidade: (v) => setState(() => _unidade = v),
                         aoCriar: () => _criar(loja),
                       ),
@@ -242,7 +251,10 @@ class _CriarArtigo extends StatelessWidget {
               isExpanded: true,
               decoration: const InputDecoration(labelText: 'Categoria'),
               items: [
-                const DropdownMenuItem(value: null, child: Text('Sem categoria')),
+                const DropdownMenuItem(
+                  value: null,
+                  child: Text('Sem categoria'),
+                ),
                 for (final c in categorias)
                   DropdownMenuItem(value: c.id, child: Text(c.nome)),
               ],
