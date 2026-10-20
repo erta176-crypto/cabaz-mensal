@@ -56,3 +56,9 @@ app.*.map.json
 
 # Grafo do graphify (só local; reconstrói-se com "graphify update .")
 graphify-out/
+
+# Notas locais
+/PROJETO.md
+/.claude/skills/
+/.codex/
+/.vscode/

@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-guard search",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-guard read",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && M=graphify-out/.atualizado && if [ ! -f graphify-out/graph.json ] || [ ! -f \"$M\" ] || [ -n \"$(find lib test supabase/migrations -newer \"$M\" 2>/dev/null | head -n 1)\" ]; then if graphify update . --force >/dev/null 2>&1; then touch \"$M\" && echo '{\"systemMessage\":\"Grafo graphify atualizado (graphify update .)\"}'; else echo '{\"systemMessage\":\"Aviso: graphify update . falhou; corre-o à mão.\"}'; fi; fi",
+            "timeout": 300,
+            "statusMessage": "A atualizar o grafo graphify…"
+          }
+        ]
+      }
+    ]
+  }
+}
