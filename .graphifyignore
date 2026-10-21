@@ -9,3 +9,6 @@ graphify-out/
 build/
 dados-privados/
 env/
+
+# Documentação (decisão 0004): o grafo é só de código.
+docs/
