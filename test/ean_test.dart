@@ -6,12 +6,18 @@ void main() {
     test('aceita EAN-8, EAN-13 e GTIN-14 válidos', () {
       expect(normalizarEan('73513537'), '73513537');
       expect(normalizarEan('4006381333931'), '4006381333931');
-      expect(normalizarEan('00012345600012'), '00012345600012');
+      expect(normalizarEan('10012345678902'), '10012345678902');
     });
 
     test('UPC-A (12 dígitos) passa a EAN-13 com um 0 à frente', () {
       expect(normalizarEan('036000291452'), '0036000291452');
       expect(normalizarEan('036000291452'), normalizarEan('0036000291452'));
+    });
+
+    test('GTIN-14 com 0 à frente passa ao EAN-13 da embalagem', () {
+      expect(normalizarEan('07896982150054'), '7896982150054');
+      expect(normalizarEan('00036000291452'), '0036000291452');
+      expect(normalizarEan('10012345678902'), '10012345678902');
     });
 
     test('tira os espaços', () {

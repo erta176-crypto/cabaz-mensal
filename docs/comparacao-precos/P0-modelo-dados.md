@@ -82,7 +82,7 @@ alter table public.artigos add constraint artigos_ean_formato
 create index artigos_user_id_ean_idx on public.artigos (user_id, ean) where ean is not null;
 ```
 
-- Só dígitos. Guarda-se EAN-8, EAN-13 ou GTIN-14. Um UPC-A (12 dígitos) é convertido em EAN-13 com um `0` à frente antes de gravar, para o mesmo produto ter sempre o mesmo código.
+- Só dígitos. Guarda-se EAN-8, EAN-13 ou GTIN-14. Um UPC-A (12 dígitos) é convertido em EAN-13 com um `0` à frente antes de gravar, e um GTIN-14 que começa por `0` (a forma dos catálogos online) perde esse `0` (decidido a 25/10/2026, no portão): o mesmo produto tem sempre o código da embalagem.
 - O dígito de controlo é validado no Dart (função pura, com testes), não no Postgres.
 - **Sem índice único.** Dois dispositivos sem rede podiam dar o mesmo EAN a artigos diferentes, e um erro 23505 bloquearia a fila de sincronização. A app avisa "este código já está no artigo X" antes de gravar, e o índice serve para procurar depressa por EAN (no P3).
 - Os 693 artigos atuais ficam com `ean = null`. Não se altera nenhum dado.

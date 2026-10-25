@@ -5,7 +5,7 @@
 ## `lib/domain/`: modelos e regras puras
 - `dinheiro.dart`: dinheiro sempre em cêntimos inteiros e pesos em gramas.
 - `texto.dart`: pesquisa sem acentos.
-- `ean.dart`: `normalizarEan` (EAN-8/13, GTIN-14, UPC-A → EAN-13, dígito de controlo GS1).
+- `ean.dart`: `normalizarEan` (EAN-8/13, GTIN-14; UPC-A e GTIN-14 com 0 à frente → EAN-13; dígito de controlo GS1).
 - `compra.dart`: cálculos de Concluir compra.
 - `preferencias.dart`: preferências e gestos.
 
