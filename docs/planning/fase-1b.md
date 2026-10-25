@@ -1,6 +1,6 @@
 # Fase 1B · Importar e exportar
 
-**Estado:** implementada, à espera do portão.
+**Estado:** concluída e publicada (portão a 2026-10-25).
 
 # Cabaz Mensal · Fase 1B (Importar e exportar ficheiros) · Plano
 
