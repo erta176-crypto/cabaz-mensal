@@ -1,6 +1,6 @@
 # Fase 2 · Painel, estatísticas e histórico
 
-**Estado:** plano escrito a 2026-10-25, **à espera de aprovação**. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano escrito e aprovado a 2026-10-25. Aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Este plano é para ser executado tarefa a tarefa (T1 → T9), por esta ordem. Cada tarefa diz os ficheiros, o código a escrever (assinaturas exatas), os testes e o critério de "feito". O que não está aqui não se faz: vai para `docs/planning/notas.md`.
 
@@ -42,7 +42,7 @@ Editar ou apagar compras; marcar compras como revistas; orçamento; avisos de pr
 
 ---
 
-## T1 · Migração `supabase/migrations/20261026000000_fase2.sql` [ ]
+## T1 · Migração `supabase/migrations/20261026000000_fase2.sql` [x]
 
 Criar o ficheiro com **exatamente** este conteúdo:
 
@@ -158,6 +158,8 @@ Depois:
 3. `get_advisors` (security e performance): sem avisos novos (os "unused index" já existentes não contam).
 
 **Feito quando:** os três pontos acima estão confirmados e registados aqui em uma linha (sem valores reais; o repositório é público).
+
+**Verificado a 2026-10-25:** migração aplicada pelo utilizador; `painel` bate com `compras` (total, contagem e soma de `por_mes`); `historico_compras` sem filtros devolve tantas linhas como `compras`; sem utilizador o total é 0; advisors sem avisos novos (só a "Leaked Password Protection" e o índice não usado já conhecidos).
 
 ---
 
