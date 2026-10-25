@@ -6,6 +6,7 @@
 library;
 
 import '../domain/compra.dart';
+import '../domain/estatisticas.dart';
 import '../domain/modelos.dart';
 import '../domain/preferencias.dart';
 
@@ -65,6 +66,9 @@ abstract interface class ArtigosRepository {
 
   /// Textos de talão por artigo (para a pesquisa).
   Stream<Map<String, List<String>>> observarAliases();
+
+  /// Registos de preço de um artigo (não apagados), por data crescente.
+  Stream<List<RegistoPreco>> observarRegistos(String artigoId);
 
   /// Cria ou atualiza o artigo. [precosCent] tem o preço por loja (id da loja);
   /// só os preços que mudaram geram um novo registo de preço 'manual'.
@@ -243,6 +247,25 @@ abstract interface class SyncRepository {
 
   /// Apaga tudo o que está neste dispositivo (ao sair da conta).
   Future<void> limparLocal();
+}
+
+/// Painel e histórico de compras. Os totais são calculados no servidor.
+abstract interface class EstatisticasRepository {
+  /// Painel do filtro. Com rede: chama a RPC e guarda na cache. Sem rede:
+  /// devolve a cache (com `guardadoEm`) se for do mesmo intervalo; senão lança
+  /// [ErroDados]. [hoje] só existe para os testes.
+  Future<ResultadoPainel> painel(FiltroCompras filtro, {DateTime? hoje});
+
+  /// Compras do filtro (só com rede). [artigoIds] e [texto] filtram por linha.
+  Future<List<CompraResumo>> compras(
+    FiltroCompras filtro, {
+    List<String>? artigoIds,
+    String? texto,
+    DateTime? hoje,
+  });
+
+  /// Linhas de uma compra (só com rede).
+  Future<List<LinhaCompra>> linhas(String compraId);
 }
 
 /// Erro de dados com mensagem pronta a mostrar ao utilizador.

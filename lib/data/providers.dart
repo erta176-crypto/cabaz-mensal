@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../domain/estatisticas.dart';
 import '../domain/modelos.dart';
 import '../domain/preferencias.dart';
 import 'local/abrir_base.dart';
 import 'local/base_local.dart';
 import 'local/repositorios_locais.dart';
 import 'repositorios.dart';
+import 'supabase/supabase_estatisticas.dart';
 import 'supabase/supabase_repositorios.dart';
 import 'sync/escrita.dart';
 import 'sync/rede.dart';
@@ -128,6 +130,16 @@ final comprasRepositoryProvider = Provider<ComprasRepository>(
   ),
 );
 
+final estatisticasRepositoryProvider = Provider<EstatisticasRepository>((ref) {
+  final cliente = ref.watch(supabaseClientProvider);
+  return SupabaseEstatisticasRepository(
+    rpc: (nome, params) => cliente.rpc(nome, params: params),
+    lerLinhas: (id) =>
+        cliente.from('linhas_compra').select().eq('compra_id', id),
+    base: ref.watch(baseLocalProvider),
+  );
+});
+
 final dadosRepositoryProvider = Provider<DadosRepository>(
   (ref) => SupabaseDadosRepository(ref.watch(supabaseClientProvider)),
 );
@@ -153,6 +165,17 @@ final precosAtuaisProvider = StreamProvider<List<PrecoAtual>>(
 final aliasesProvider = StreamProvider<Map<String, List<String>>>(
   (ref) => ref.watch(artigosRepositoryProvider).observarAliases(),
 );
+
+final registosPrecoProvider = StreamProvider.autoDispose
+    .family<List<RegistoPreco>, String>(
+      (ref, artigoId) =>
+          ref.watch(artigosRepositoryProvider).observarRegistos(artigoId),
+    );
+
+final painelProvider = FutureProvider.autoDispose
+    .family<ResultadoPainel, FiltroCompras>(
+      (ref, filtro) => ref.watch(estatisticasRepositoryProvider).painel(filtro),
+    );
 
 final itensListaProvider = StreamProvider<List<ItemLista>>(
   (ref) => ref.watch(listaRepositoryProvider).observarItens(),

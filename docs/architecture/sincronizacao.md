@@ -15,7 +15,7 @@ A app funciona sem rede. Toda a escrita passa pela cache local (drift) e por uma
 - `itens_lista` e `aliases` sincronizam pela chave natural.
 - Eliminar marca `apagado_em`. Voltar a criar algo apagado reativa a mesma linha (mesmo id), nunca cria uma linha nova.
 - Índices únicos sempre completos.
-- `preferencias.reiniciado_em` manda limpar a cache.
+- `preferencias.reiniciado_em` manda limpar a cache (`limparCache`: registos, cursores `cursor:%` e painéis guardados `painel:%`).
 - Vence a última escrita a chegar ao servidor.
 
 ## Testes

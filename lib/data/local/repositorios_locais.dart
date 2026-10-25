@@ -170,6 +170,24 @@ class LocalArtigosRepository implements ArtigosRepository {
       });
 
   @override
+  Stream<List<RegistoPreco>> observarRegistos(String artigoId) => _base
+      .observarTabela('registos_preco')
+      .map(
+        (l) => l.where((r) => r['artigo_id'] == artigoId).toList()
+          ..sort((a, b) {
+            final porData = (a['data'] as String).compareTo(
+              b['data'] as String,
+            );
+            return porData != 0
+                ? porData
+                : ((a['criado_em'] as String?) ?? '').compareTo(
+                    (b['criado_em'] as String?) ?? '',
+                  );
+          }),
+      )
+      .map((l) => l.map(RegistoPreco.fromMap).toList());
+
+  @override
   Future<void> guardar(
     Artigo artigo, {
     Map<String, int?> precosCent = const {},

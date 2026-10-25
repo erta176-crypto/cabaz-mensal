@@ -19,6 +19,7 @@
   - `sincronizador.dart`: envio e receção.
   - `servidor_supabase.dart`: a ligação ao Supabase.
 - `supabase/`: autenticação, consultas de compras e dados (importar, exportar, apagar, resumo).
+  - `supabase_estatisticas.dart`: RPC `painel` (com cache do último resultado na tabela `estado`, chave `painel:<período>:<loja|todas>`) e `historico_compras` e linhas de uma compra (só com rede).
 
 ## `lib/import/`: importação sem interface, testável
 - Cópia completa JSON (formato v2 do `cabaz-seed.json`): `seed_modelo.dart`, `importar_seed.dart`, `exportar.dart`.

@@ -142,10 +142,13 @@ class BaseLocal extends _$BaseLocal {
     registos,
   )..where((r) => r.tabela.equals(tabela) & r.chave.equals(chave))).go();
 
-  /// Limpa a cache (não a fila nem o utilizador) e os cursores.
+  /// Limpa a cache (não a fila nem o utilizador), os cursores e os painéis
+  /// guardados (os dados foram apagados ou recarregados no servidor).
   Future<void> limparCache() => transaction(() async {
     await delete(registos).go();
-    await (delete(estado)..where((e) => e.chave.like('cursor:%'))).go();
+    await (delete(
+      estado,
+    )..where((e) => e.chave.like('cursor:%') | e.chave.like('painel:%'))).go();
   });
 
   /// Limpa tudo, incluindo a fila (outro utilizador / sair da conta).

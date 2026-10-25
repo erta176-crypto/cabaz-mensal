@@ -292,7 +292,7 @@ Em `lib/domain/modelos.dart`: acrescentar `factory RegistoPreco.fromMap(Map<Stri
 
 ---
 
-## T4 · Dados: repositório de estatísticas e histórico [ ]
+## T4 · Dados: repositório de estatísticas e histórico [x]
 
 **`lib/data/repositorios.dart`** (impacto: interface nova, nenhum implementador existente muda):
 ```dart
