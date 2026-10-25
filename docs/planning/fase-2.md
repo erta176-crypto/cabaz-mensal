@@ -163,7 +163,7 @@ Depois:
 
 ---
 
-## T2 · `fl_chart` e decisões [ ]
+## T2 · `fl_chart` e decisões [x]
 
 1. `pubspec.yaml`, em `dependencies` (ordem alfabética, entre `file_picker` e `flutter`): `fl_chart: 1.2.0` (versão exata, sem `^`).
 2. `flutter pub get`; confirmar no `pubspec.lock` que ficou `1.2.0` e que não entrou nenhum outro pacote novo além de dependências já presentes.
