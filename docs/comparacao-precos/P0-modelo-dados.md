@@ -1,6 +1,6 @@
 # Comparação de preços · P0 · Modelo de dados, EAN e origem do preço
 
-Plano escrito a 23/10/2026 e aprovado a 25/10/2026. **Estado:** código e testes feitos a 25/10/2026; migração aplicada a 25/10/2026 e pontos 1 a 3 do portão verificados; falta o teste no Android e na web (pontos 4 a 6).
+Plano escrito a 23/10/2026 e aprovado a 25/10/2026. **Estado:** concluído; portão passado a 25/10/2026.
 
 ## 1. Enquadramento
 
