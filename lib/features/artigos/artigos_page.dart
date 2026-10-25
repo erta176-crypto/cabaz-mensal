@@ -101,6 +101,7 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
               categoriaId: r.categoriaId,
               unidade: r.unidade,
               ativo: artigo?.ativo ?? true,
+              ean: r.ean,
             ),
             precosCent: r.precosCent,
             novo: artigo == null,

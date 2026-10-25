@@ -101,6 +101,7 @@ class Artigo {
     required this.categoriaId,
     required this.unidade,
     this.ativo = true,
+    this.ean,
   });
 
   final String id;
@@ -109,12 +110,16 @@ class Artigo {
   final Unidade unidade;
   final bool ativo;
 
+  /// Código de barras normalizado (ver normalizarEan), ou null.
+  final String? ean;
+
   factory Artigo.fromMap(Map<String, dynamic> m) => Artigo(
     id: m['id'] as String,
     nome: m['nome'] as String,
     categoriaId: m['categoria_id'] as String?,
     unidade: Unidade.deCodigo(m['unidade'] as String),
     ativo: m['ativo'] as bool? ?? true,
+    ean: m['ean'] as String?,
   );
 
   Map<String, dynamic> toMap() => {
@@ -123,6 +128,7 @@ class Artigo {
     'categoria_id': categoriaId,
     'unidade': unidade.codigo,
     'ativo': ativo,
+    'ean': ean,
   };
 }
 
@@ -176,6 +182,9 @@ class RegistoPreco {
   };
 }
 
+/// De onde vem o preço atual: registado por mim ou pesquisado online (P1).
+enum FontePreco { registado, online }
+
 /// Preço mais recente de um artigo numa loja (view precos_atuais).
 class PrecoAtual {
   const PrecoAtual({
@@ -183,12 +192,18 @@ class PrecoAtual {
     required this.lojaId,
     required this.precoCent,
     required this.data,
+    this.fonte = FontePreco.registado,
+    this.desatualizado = false,
   });
 
   final String artigoId;
   final String lojaId;
   final int precoCent;
   final DateTime data;
+  final FontePreco fonte;
+
+  /// Preço online fora da validade. Os registados nunca ficam desatualizados.
+  final bool desatualizado;
 
   factory PrecoAtual.fromMap(Map<String, dynamic> m) => PrecoAtual(
     artigoId: m['artigo_id'] as String,

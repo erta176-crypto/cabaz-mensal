@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/formatos.dart';
+import '../../data/providers.dart';
 import '../../domain/dinheiro.dart';
+import '../../domain/ean.dart';
 import '../../domain/modelos.dart';
 
 class ResultadoArtigo {
@@ -10,17 +13,20 @@ class ResultadoArtigo {
     required this.nome,
     required this.categoriaId,
     required this.unidade,
+    required this.ean,
     required this.precosCent,
   });
 
   final String nome;
   final String? categoriaId;
   final Unidade unidade;
+  final String? ean;
   final Map<String, int?> precosCent;
 }
 
-/// Criar ou editar um artigo: nome, categoria, unidade e preço por loja.
-class DialogoArtigo extends StatefulWidget {
+/// Criar ou editar um artigo: nome, categoria, unidade, código de barras e
+/// preço por loja.
+class DialogoArtigo extends ConsumerStatefulWidget {
   const DialogoArtigo({
     super.key,
     this.artigo,
@@ -37,12 +43,13 @@ class DialogoArtigo extends StatefulWidget {
   final Map<String, int> precosAtuais;
 
   @override
-  State<DialogoArtigo> createState() => _DialogoArtigoState();
+  ConsumerState<DialogoArtigo> createState() => _DialogoArtigoState();
 }
 
-class _DialogoArtigoState extends State<DialogoArtigo> {
+class _DialogoArtigoState extends ConsumerState<DialogoArtigo> {
   final _form = GlobalKey<FormState>();
   late final _nome = TextEditingController(text: widget.artigo?.nome);
+  late final _ean = TextEditingController(text: widget.artigo?.ean);
   late String? _categoriaId = widget.artigo?.categoriaId;
   late Unidade _unidade = widget.artigo?.unidade ?? Unidade.un;
   late final _precos = {
@@ -57,6 +64,7 @@ class _DialogoArtigoState extends State<DialogoArtigo> {
   @override
   void dispose() {
     _nome.dispose();
+    _ean.dispose();
     for (final c in _precos.values) {
       c.dispose();
     }
@@ -71,6 +79,7 @@ class _DialogoArtigoState extends State<DialogoArtigo> {
         nome: _nome.text.trim(),
         categoriaId: _categoriaId,
         unidade: _unidade,
+        ean: normalizarEan(_ean.text),
         precosCent: {
           for (final MapEntry(:key, :value) in _precos.entries)
             key: centDeTexto(value.text),
@@ -82,6 +91,13 @@ class _DialogoArtigoState extends State<DialogoArtigo> {
   @override
   Widget build(BuildContext context) {
     final sufixo = _unidade == Unidade.kg ? '€/kg' : '€';
+    // Sem índice único no servidor (sincronização sem rede): só avisa.
+    final ean = normalizarEan(_ean.text);
+    final repetido = ean == null
+        ? null
+        : (ref.watch(artigosProvider).value ?? const <Artigo>[])
+              .where((a) => a.ean == ean && a.id != widget.artigo?.id)
+              .firstOrNull;
     return AlertDialog(
       title: Text(widget.artigo == null ? 'Novo artigo' : 'Editar artigo'),
       content: SizedBox(
@@ -124,6 +140,23 @@ class _DialogoArtigoState extends State<DialogoArtigo> {
                       DropdownMenuItem(value: u, child: Text(u.rotulo)),
                   ],
                   onChanged: (v) => setState(() => _unidade = v ?? _unidade),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _ean,
+                  decoration: InputDecoration(
+                    labelText: 'Código de barras (opcional)',
+                    helperText: repetido == null
+                        ? null
+                        : 'Este código já está no artigo "${repetido.nome}".',
+                    helperMaxLines: 2,
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (_) => setState(() {}),
+                  validator: (v) =>
+                      (v ?? '').trim().isNotEmpty && normalizarEan(v!) == null
+                      ? 'Código inválido (8, 12, 13 ou 14 dígitos).'
+                      : null,
                 ),
                 for (final l in widget.lojas) ...[
                   const SizedBox(height: 16),

@@ -100,6 +100,28 @@ void main() {
         ),
       );
     });
+
+    test('código de barras: opcional, normalizado e validado', () {
+      expect(seed.artigos.map((a) => a.ean), everyElement(isNull));
+      final j = json();
+      final artigos = j['artigos'] as List;
+      artigos[0]['ean'] = '036000291452';
+      expect(
+        SeedFicheiro.lerTexto(jsonEncode(j)).artigos.first.ean,
+        '0036000291452',
+      );
+      artigos[1]['ean'] = '4006381333932';
+      expect(
+        () => SeedFicheiro.lerTexto(jsonEncode(j)),
+        throwsA(
+          isA<SeedInvalido>().having(
+            (e) => e.erros.join('\n'),
+            'erros',
+            contains('código de barras "4006381333932"'),
+          ),
+        ),
+      );
+    });
   });
 
   group('payload da RPC', () {
@@ -314,6 +336,27 @@ void main() {
       expect(r.tudoOk, isTrue);
       expect(r.contagens['registos_preco'], 6);
       expect(r.contagens['aliases'], 3);
+    });
+
+    test('exportar e voltar a importar mantém o código de barras', () async {
+      final j = jsonDecode(lerFixture()) as Map<String, dynamic>;
+      (j['artigos'] as List)[2]['ean'] = '4006381333931';
+      await importador.importar(
+        SeedFicheiro.lerTexto(jsonEncode(j)),
+        substituir: false,
+      );
+      final relido = SeedFicheiro.lerTexto(
+        exportacaoParaTexto(
+          montarExportacao(
+            await dados.lerTudo(),
+            agora: DateTime(2026, 10, 25),
+          ),
+        ),
+      );
+      expect({
+        for (final a in relido.artigos) a.nome: a.ean,
+      }, containsPair('Maçã Fuji', '4006381333931'));
+      expect(relido.artigos.where((a) => a.ean != null), hasLength(1));
     });
   });
 }

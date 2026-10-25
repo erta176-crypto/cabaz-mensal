@@ -69,6 +69,7 @@ Map<String, dynamic> montarExportacao(
               ? a['categoria_id']
               : null,
           'unidade': a['unidade'],
+          'ean': a['ean'],
         },
     ],
     'aliases': [

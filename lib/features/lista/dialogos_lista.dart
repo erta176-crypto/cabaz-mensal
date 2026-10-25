@@ -168,6 +168,7 @@ class DialogoVerArtigo extends ConsumerWidget {
                     categoriaId: r.categoriaId,
                     unidade: r.unidade,
                     ativo: artigo.ativo,
+                    ean: r.ean,
                   ),
                   precosCent: r.precosCent,
                 );

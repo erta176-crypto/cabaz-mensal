@@ -6,6 +6,8 @@ library;
 
 import 'dart:convert';
 
+import '../domain/ean.dart';
+
 class SeedLoja {
   const SeedLoja({
     required this.id,
@@ -38,11 +40,13 @@ class SeedArtigo {
     required this.nome,
     required this.categoriaId,
     required this.unidade,
+    this.ean,
   });
   final String id;
   final String nome;
   final String? categoriaId;
   final String unidade; // 'un' | 'kg'
+  final String? ean; // opcional (ficheiros antigos não o têm)
 }
 
 class SeedAlias {
@@ -232,11 +236,17 @@ class _Leitor {
       if (unidade != 'un' && unidade != 'kg') {
         _erro('$onde: unidade "$unidade" inválida (un ou kg).');
       }
+      final textoEan = _texto(m, 'ean', onde, opcional: true);
+      final ean = textoEan == null ? null : normalizarEan(textoEan);
+      if (textoEan != null && ean == null) {
+        _erro('$onde: código de barras "$textoEan" inválido.');
+      }
       return SeedArtigo(
         id: _id(m, 'id', onde)!,
         nome: _texto(m, 'nome', onde)!,
         categoriaId: _id(m, 'categoria_id', onde, opcional: true),
         unidade: unidade,
+        ean: ean,
       );
     });
     final aliases = _lista('aliases', (m, onde) {

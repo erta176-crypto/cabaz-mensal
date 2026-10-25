@@ -1,3 +1,3 @@
 # Notas · fora do âmbito
 
-Não há notas por agora.
+- `dart format --set-exit-if-changed .` falha no Windows depois de um build Android: não consegue listar um caminho longo dentro de `build/`. Contorno: `dart format --set-exit-if-changed lib test` (ou apagar `build/`).

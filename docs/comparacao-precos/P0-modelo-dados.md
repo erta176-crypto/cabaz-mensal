@@ -1,6 +1,6 @@
 # Comparação de preços · P0 · Modelo de dados, EAN e origem do preço
 
-Plano escrito a 23/10/2026. Ainda não há código nem migração: este documento só descreve o que o P0 vai fazer e precisa de aprovação antes de se executar.
+Plano escrito a 23/10/2026 e aprovado a 25/10/2026. **Estado:** código e testes feitos a 25/10/2026; falta aplicar a migração no SQL Editor e passar o portão (secção 6).
 
 ## 1. Enquadramento
 
@@ -131,14 +131,14 @@ Não cria tabelas de preços online, não cria Edge Functions, não liga `pg_cro
 
 Antes de mexer em ficheiros partilhados (`modelos.dart`, `repositorios_locais.dart`, `supabase/migrations/`), mostrar o impacto segundo o graphify, como manda o `CLAUDE.md`.
 
-1. **Pré-requisito:** a Fase 1B no `main`, ou então trazer `importar_lote` e `agora` para uma migração no repositório antes de os alterar.
-2. Escrever a migração `p0_ean.sql`: coluna, `check`, índice, `create or replace` de `importar_seed` e `importar_lote` com `ean`, e `create or replace view public.precos_atuais` com `fonte`.
-3. O utilizador aplica a migração no SQL Editor (o `apply_migration` é recusado). Depois corre-se `get_advisors` (segurança e desempenho).
-4. Criar `lib/domain/ean.dart` e os testes.
-5. Pôr o `ean` em `Artigo` e o `fonte` e o `desatualizado` em `PrecoAtual`, mais o `precosAtuaisDe`.
-6. Acrescentar o campo EAN e o aviso de duplicado ao diálogo do artigo.
-7. Acrescentar o `ean` à cópia JSON (exportar, `seed_modelo`, `importar_seed`).
-8. Correr `dart format --set-exit-if-changed .`, `flutter analyze` e `flutter test`, e depois `graphify update .`. Atualizar o **Mapa do projeto** no `CLAUDE.md`.
+1. [x] **Pré-requisito:** a Fase 1B no `main` (`20261018000000_fase1b.sql` guarda `importar_lote` e `agora`).
+2. [x] Escrever a migração `20261025000000_p0_ean.sql`: coluna, `check`, índice, `create or replace` de `importar_seed` e `importar_lote` com `ean`, e `create or replace view public.precos_atuais` com `fonte`.
+3. [ ] O utilizador aplica a migração no SQL Editor (o `apply_migration` é recusado). Depois corre-se `get_advisors` (segurança e desempenho).
+4. [x] Criar `lib/domain/ean.dart` e os testes. Ficou só `normalizarEan` (devolve null se inválido); `eanValido` seria redundante.
+5. [x] Pôr o `ean` em `Artigo` (o `Artigo` não tem `copyWith`) e o `fonte` e o `desatualizado` em `PrecoAtual`, mais o `precosAtuaisDe`.
+6. [x] Acrescentar o campo EAN e o aviso de duplicado ao diálogo do artigo.
+7. [x] Acrescentar o `ean` à cópia JSON (exportar, `seed_modelo`, `importar_seed`).
+8. [x] Correr `dart format --set-exit-if-changed .`, `flutter analyze` e `flutter test`, e depois `graphify update .`. Atualizar `docs/architecture/mapa.md`.
 
 ### Testes novos
 

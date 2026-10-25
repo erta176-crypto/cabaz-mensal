@@ -85,6 +85,7 @@ PayloadImportacao montarPayload(SeedFicheiro f, {String Function()? novoId}) {
         nome: a.nome,
         categoriaId: a.categoriaId == null ? null : idCategoria[a.categoriaId],
         unidade: Unidade.deCodigo(a.unidade),
+        ean: a.ean,
       ),
   ];
 

@@ -5,6 +5,7 @@
 ## `lib/domain/`: modelos e regras puras
 - `dinheiro.dart`: dinheiro sempre em cêntimos inteiros e pesos em gramas.
 - `texto.dart`: pesquisa sem acentos.
+- `ean.dart`: `normalizarEan` (EAN-8/13, GTIN-14, UPC-A → EAN-13, dígito de controlo GS1).
 - `compra.dart`: cálculos de Concluir compra.
 - `preferencias.dart`: preferências e gestos.
 
@@ -46,6 +47,7 @@
 - `fase0`: tabelas, RLS, `importar_seed`.
 - `fase1a`: `apagado_em`, lista do mês, `preferencias`, `concluir_compra`.
 - `fase1b`: índices únicos completos em lojas e categorias, `agora()`, `importar_lote`.
+- `p0_ean`: `artigos.ean` (opcional, `check` de formato, índice não único), `precos_atuais.fonte`, `importar_seed` e `importar_lote` com `ean` (o lote não apaga um `ean` existente).
 
 ## `test/`
 - Servidor falso em memória e drift em memória (`test/sync/`). Nenhum teste usa o Supabase real.

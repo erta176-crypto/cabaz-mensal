@@ -374,6 +374,57 @@ void main() {
     });
   });
 
+  group('código de barras', () {
+    test('um EAN criado no telemóvel aparece no pc', () async {
+      await telemovel.artigos.guardar(
+        const Artigo(
+          id: 'artigo-arroz',
+          nome: 'Arroz',
+          categoriaId: null,
+          unidade: Unidade.un,
+          ean: '4006381333931',
+        ),
+        novo: true,
+      );
+      await telemovel.sincronizar();
+      await pc.sincronizar();
+      final noPc = (await pc.artigos.observarArtigos().first).firstWhere(
+        (a) => a.id == 'artigo-arroz',
+      );
+      expect(noPc.ean, '4006381333931');
+    });
+
+    test('editar numa versão antiga (sem ean) não apaga o EAN', () async {
+      final comEan = (await telemovel.artigos.observarArtigos().first)
+          .firstWhere((a) => a.id == leite);
+      await telemovel.artigos.guardar(
+        Artigo(
+          id: leite,
+          nome: comEan.nome,
+          categoriaId: comEan.categoriaId,
+          unidade: comEan.unidade,
+          ean: '73513537',
+        ),
+      );
+      await telemovel.sincronizar();
+      await pc.sincronizar();
+      // A app antiga envia o toMap sem a chave 'ean'.
+      await pc.escrita.atualizar('artigos', leite, {
+        'nome': 'Leite meio-gordo',
+        'categoria_id': null,
+        'unidade': 'un',
+        'ativo': true,
+      });
+      await pc.sincronizar();
+      await telemovel.sincronizar();
+      final leiteServidor = servidor
+          .t('artigos')
+          .firstWhere((a) => a['id'] == leite);
+      expect(leiteServidor['nome'], 'Leite meio-gordo');
+      expect(leiteServidor['ean'], '73513537');
+    });
+  });
+
   test('preferências sincronizam entre dispositivos', () async {
     final p = await telemovel.preferencias.observar().first;
     expect(p.direita.name, 'removerDaLista');

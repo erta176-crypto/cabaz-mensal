@@ -16,8 +16,12 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições.
 - Em breve: Painel e estatísticas, Histórico.
 
+## Em curso
+- **Comparação de preços · P0 (EAN e fonte do preço):** código e testes feitos; falta aplicar `20261025000000_p0_ean.sql` no SQL Editor e o portão ([`comparacao-precos/P0-modelo-dados.md`](comparacao-precos/P0-modelo-dados.md)).
+
 ## Próximo
-1. Planear e aprovar a Fase 2 ([`planning/fase-2.md`](planning/fase-2.md)).
+1. Portão do P0.
+2. Planear e aprovar a Fase 2 ([`planning/fase-2.md`](planning/fase-2.md)).
 
 ## Pendentes sem fase
 - Ligar a "Leaked Password Protection" no Supabase (Authentication → Policies). É o único aviso que os advisors ainda dão.
