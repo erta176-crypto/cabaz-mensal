@@ -52,6 +52,17 @@ void main() {
     expect(find.text('Este código já está no artigo "Ovos".'), findsOneWidget);
   });
 
+  testWidgets('recusa gravar um código que já está noutro artigo', (
+    tester,
+  ) async {
+    await abrir(tester, leite);
+    await tester.enterText(campoEan(), '5601312509769');
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+    expect(find.byType(DialogoArtigo), findsOneWidget, reason: 'não fecha');
+    expect(find.text('Este código já está no artigo "Ovos".'), findsOneWidget);
+  });
+
   testWidgets('não avisa no próprio artigo', (tester) async {
     await abrir(tester, ovos);
     expect(find.textContaining('Este código já está'), findsNothing);

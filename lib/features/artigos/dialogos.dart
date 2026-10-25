@@ -91,15 +91,19 @@ class _DialogoArtigoState extends ConsumerState<DialogoArtigo> {
   @override
   Widget build(BuildContext context) {
     final sufixo = _unidade == Unidade.kg ? '€/kg' : '€';
-    // Sem índice único no servidor (sincronização sem rede): só avisa.
+    // Código repetido: recusado aqui; o servidor não tem índice único para um
+    // conflito entre dispositivos sem rede não bloquear a sincronização.
     // O watch é feito sempre, para os artigos já estarem cá quando se escreve.
     final artigos = ref.watch(artigosProvider).value ?? const <Artigo>[];
-    final ean = normalizarEan(_ean.text);
-    final repetido = ean == null
-        ? null
-        : artigos
-              .where((a) => a.ean == ean && a.id != widget.artigo?.id)
-              .firstOrNull;
+    Artigo? repetidoDe(String texto) {
+      final ean = normalizarEan(texto);
+      if (ean == null) return null;
+      return artigos
+          .where((a) => a.ean == ean && a.id != widget.artigo?.id)
+          .firstOrNull;
+    }
+
+    final repetido = repetidoDe(_ean.text);
     return AlertDialog(
       title: Text(widget.artigo == null ? 'Novo artigo' : 'Editar artigo'),
       content: SizedBox(
@@ -155,10 +159,16 @@ class _DialogoArtigoState extends ConsumerState<DialogoArtigo> {
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (_) => setState(() {}),
-                  validator: (v) =>
-                      (v ?? '').trim().isNotEmpty && normalizarEan(v!) == null
-                      ? 'Código inválido (8, 12, 13 ou 14 dígitos).'
-                      : null,
+                  validator: (v) {
+                    if ((v ?? '').trim().isNotEmpty &&
+                        normalizarEan(v!) == null) {
+                      return 'Código inválido (8, 12, 13 ou 14 dígitos).';
+                    }
+                    final r = repetidoDe(v ?? '');
+                    return r == null
+                        ? null
+                        : 'Este código já está no artigo "${r.nome}".';
+                  },
                 ),
                 for (final l in widget.lojas) ...[
                   const SizedBox(height: 16),
