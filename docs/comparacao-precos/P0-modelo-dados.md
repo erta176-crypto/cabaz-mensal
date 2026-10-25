@@ -96,6 +96,8 @@ create index artigos_user_id_ean_idx on public.artigos (user_id, ean) where ean 
 - O diálogo do artigo ganha o campo **"Código de barras (opcional)"**, com teclado numérico, validação e o aviso de duplicado.
 - Cópia JSON v2: `ean` opcional nos artigos (a versão continua a ser 2, porque um ficheiro antigo continua válido).
 
+- A pesquisa de Artigos encontra também pelo código de barras (acrescentado a 25/10/2026, no portão).
+
 ### 3.2 Origem do preço: "registado por mim" ou "pesquisado online"
 
 A coluna `origem` já está ocupada (talão, manual, lista), por isso o nome novo é **`fonte`**, com dois valores: `registado` e `online`.

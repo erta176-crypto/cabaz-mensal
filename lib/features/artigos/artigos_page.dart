@@ -337,7 +337,7 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
               _semCategoria => a.categoriaId == null,
               final id => a.categoriaId == id,
             } &&
-            (termo.isEmpty || normalizar(a.nome).contains(termo)))
+            artigoCorresponde(a, termo))
           a,
     ];
     if (artigos.isEmpty) {
@@ -555,3 +555,10 @@ Color? corDeHex(String? hex) {
   final v = int.tryParse(hex.replaceFirst('#', ''), radix: 16);
   return v == null ? null : Color(0xFF000000 | v);
 }
+
+/// Pesquisa de Artigos: pelo nome (sem acentos) ou pelo código de barras.
+/// [termo] já vem normalizado.
+bool artigoCorresponde(Artigo a, String termo) =>
+    termo.isEmpty ||
+    normalizar(a.nome).contains(termo) ||
+    (a.ean?.contains(termo) ?? false);

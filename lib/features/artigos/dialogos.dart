@@ -92,10 +92,12 @@ class _DialogoArtigoState extends ConsumerState<DialogoArtigo> {
   Widget build(BuildContext context) {
     final sufixo = _unidade == Unidade.kg ? '€/kg' : '€';
     // Sem índice único no servidor (sincronização sem rede): só avisa.
+    // O watch é feito sempre, para os artigos já estarem cá quando se escreve.
+    final artigos = ref.watch(artigosProvider).value ?? const <Artigo>[];
     final ean = normalizarEan(_ean.text);
     final repetido = ean == null
         ? null
-        : (ref.watch(artigosProvider).value ?? const <Artigo>[])
+        : artigos
               .where((a) => a.ean == ean && a.id != widget.artigo?.id)
               .firstOrNull;
     return AlertDialog(
