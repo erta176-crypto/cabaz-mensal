@@ -17,7 +17,7 @@
 - Em breve: Painel e estatísticas, Histórico.
 
 ## Em curso
-- **Comparação de preços · P0 (EAN e fonte do preço):** código e testes feitos; falta aplicar `20261025000000_p0_ean.sql` no SQL Editor e o portão ([`comparacao-precos/P0-modelo-dados.md`](comparacao-precos/P0-modelo-dados.md)).
+- **Comparação de preços · P0 (EAN e fonte do preço):** código, testes e migração aplicados; falta o portão no Android e na web ([`comparacao-precos/P0-modelo-dados.md`](comparacao-precos/P0-modelo-dados.md)).
 
 ## Próximo
 1. Portão do P0.

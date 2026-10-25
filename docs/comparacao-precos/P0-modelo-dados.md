@@ -1,6 +1,6 @@
 # Comparação de preços · P0 · Modelo de dados, EAN e origem do preço
 
-Plano escrito a 23/10/2026 e aprovado a 25/10/2026. **Estado:** código e testes feitos a 25/10/2026; falta aplicar a migração no SQL Editor e passar o portão (secção 6).
+Plano escrito a 23/10/2026 e aprovado a 25/10/2026. **Estado:** código e testes feitos a 25/10/2026; migração aplicada a 25/10/2026 e pontos 1 a 3 do portão verificados; falta o teste no Android e na web (pontos 4 a 6).
 
 ## 1. Enquadramento
 
@@ -133,7 +133,7 @@ Antes de mexer em ficheiros partilhados (`modelos.dart`, `repositorios_locais.da
 
 1. [x] **Pré-requisito:** a Fase 1B no `main` (`20261018000000_fase1b.sql` guarda `importar_lote` e `agora`).
 2. [x] Escrever a migração `20261025000000_p0_ean.sql`: coluna, `check`, índice, `create or replace` de `importar_seed` e `importar_lote` com `ean`, e `create or replace view public.precos_atuais` com `fonte`.
-3. [ ] O utilizador aplica a migração no SQL Editor (o `apply_migration` é recusado). Depois corre-se `get_advisors` (segurança e desempenho).
+3. [x] (25/10/2026, advisors sem avisos novos) O utilizador aplica a migração no SQL Editor (o `apply_migration` é recusado). Depois corre-se `get_advisors` (segurança e desempenho).
 4. [x] Criar `lib/domain/ean.dart` e os testes. Ficou só `normalizarEan` (devolve null se inválido); `eanValido` seria redundante.
 5. [x] Pôr o `ean` em `Artigo` (o `Artigo` não tem `copyWith`) e o `fonte` e o `desatualizado` em `PrecoAtual`, mais o `precosAtuaisDe`.
 6. [x] Acrescentar o campo EAN e o aviso de duplicado ao diálogo do artigo.
