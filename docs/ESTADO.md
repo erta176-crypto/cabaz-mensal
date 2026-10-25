@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**2 · Painel, estatísticas e histórico:** por planear ([`planning/fase-2.md`](planning/fase-2.md)).
+**2 · Painel, estatísticas e histórico:** plano escrito a 2026-10-25, à espera de aprovação ([`planning/fase-2.md`](planning/fase-2.md)).
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -18,7 +18,8 @@
 - Em breve: Painel e estatísticas, Histórico.
 
 ## Próximo
-1. Escolher: P1 da comparação de preços (primeiro conector) ou planear e aprovar a Fase 2 ([`planning/fase-2.md`](planning/fase-2.md)).
+1. Aprovar o plano da Fase 2 e executá-lo (T1 → T9).
+2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
 - Ligar a "Leaked Password Protection" no Supabase (Authentication → Policies). É o único aviso que os advisors ainda dão.
