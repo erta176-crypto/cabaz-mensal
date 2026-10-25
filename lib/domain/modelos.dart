@@ -172,6 +172,15 @@ class RegistoPreco {
   final int precoCent;
   final OrigemPreco origem;
 
+  factory RegistoPreco.fromMap(Map<String, dynamic> m) => RegistoPreco(
+    id: m['id'] as String,
+    artigoId: m['artigo_id'] as String,
+    lojaId: m['loja_id'] as String,
+    data: DateTime.parse(m['data'] as String),
+    precoCent: (m['preco_cent'] as num).toInt(),
+    origem: OrigemPreco.values.byName(m['origem'] as String),
+  );
+
   Map<String, dynamic> toMap() => {
     'id': id,
     'artigo_id': artigoId,
@@ -348,6 +357,19 @@ class LinhaCompra {
   final int brutoCent;
   final int descontoCent;
   final int pagoCent;
+
+  factory LinhaCompra.fromMap(Map<String, dynamic> m) => LinhaCompra(
+    id: m['id'] as String,
+    compraId: m['compra_id'] as String,
+    artigoId: m['artigo_id'] as String?,
+    textoOriginal: m['texto_original'] as String?,
+    quantidade: (m['quantidade'] as num?)?.toInt(),
+    pesoG: (m['peso_g'] as num?)?.toInt(),
+    precoUnitCent: (m['preco_unit_cent'] as num?)?.toInt(),
+    brutoCent: (m['bruto_cent'] as num).toInt(),
+    descontoCent: (m['desconto_cent'] as num).toInt(),
+    pagoCent: (m['pago_cent'] as num).toInt(),
+  );
 
   Map<String, dynamic> toMap() => {
     'id': id,

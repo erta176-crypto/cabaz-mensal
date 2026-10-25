@@ -174,7 +174,9 @@ Depois:
 
 ---
 
-## T3 · Domínio: `lib/domain/estatisticas.dart` [ ]
+## T3 · Domínio: `lib/domain/estatisticas.dart` [x]
+
+> **Desvio na execução:** `LinhaCompra` já existia em `lib/domain/modelos.dart` (com `compraId`, usada na importação). Em vez de a duplicar em `estatisticas.dart`, acrescentou-se `LinhaCompra.fromMap` à existente. A T4 e a T7 usam essa classe (a consulta das linhas tem de incluir `compra_id`; um `select *` já inclui).
 
 Funções puras e modelos, sem Flutter nem Supabase. Escrever primeiro os testes (`test/estatisticas_test.dart`), depois o código.
 

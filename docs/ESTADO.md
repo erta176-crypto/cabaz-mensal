@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**2 · Painel, estatísticas e histórico:** plano aprovado a 2026-10-25, em execução; T1 (migração) e T2 (`fl_chart`) feitas, próxima T3 ([`planning/fase-2.md`](planning/fase-2.md)).
+**2 · Painel, estatísticas e histórico:** plano aprovado a 2026-10-25, em execução; T1 (migração), T2 (`fl_chart`) e T3 (domínio) feitas, próxima T4 ([`planning/fase-2.md`](planning/fase-2.md)).
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -18,7 +18,7 @@
 - Em breve: Painel e estatísticas, Histórico.
 
 ## Próximo
-1. Executar a Fase 2 (T3 → T9).
+1. Executar a Fase 2 (T4 → T9).
 2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
