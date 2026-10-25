@@ -271,7 +271,7 @@ num? _numero(Object? v) => switch (v) {
   _ => null,
 };
 
-enum OrigemCompra { manual, talao, importacao }
+enum OrigemCompra { manual, talao, importacao, lista }
 
 class Compra {
   const Compra({

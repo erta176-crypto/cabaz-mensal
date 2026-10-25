@@ -61,6 +61,17 @@ void main() {
       );
     });
 
+    test('aceita compras feitas a partir da lista (origem "lista")', () {
+      final j = json();
+      (j['compras'] as List).first['origem'] = 'lista';
+      final s = SeedFicheiro.lerTexto(jsonEncode(j));
+      expect(s.compras.first.origem, 'lista');
+      final p = montarPayload(s, novoId: geradorIds());
+      expect(p.compras.first.origem.name, 'lista');
+      final compra = (p.toJson()['compras'] as List).first as Map;
+      expect(compra['origem'], 'lista');
+    });
+
     test('recusa versão desconhecida e JSON inválido', () {
       final j = json()..['versao'] = 1;
       expect(

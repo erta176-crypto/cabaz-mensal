@@ -248,7 +248,7 @@ class _Leitor {
     });
     final compras = _lista('compras', (m, onde) {
       final origem = _texto(m, 'origem', onde, opcional: true) ?? 'importacao';
-      if (!const ['manual', 'talao', 'importacao'].contains(origem)) {
+      if (!const ['manual', 'talao', 'importacao', 'lista'].contains(origem)) {
         _erro('$onde: origem "$origem" inválida.');
       }
       return SeedCompra(
