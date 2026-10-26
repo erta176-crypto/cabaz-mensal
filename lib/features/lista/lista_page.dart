@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/ficheiros/guardar_ficheiro.dart';
 import '../../core/formatos.dart';
 import '../../data/providers.dart';
+import '../../domain/estatisticas.dart';
 import '../../domain/modelos.dart';
+import '../../domain/orcamento.dart';
 import '../../domain/preferencias.dart';
 import '../artigos/artigos_page.dart' show corDeHex;
 import '../shell/shell.dart';
@@ -241,11 +243,29 @@ class _ListaPageState extends ConsumerState<ListaPage> {
           : _Rodape(
               lista: lista,
               planear: planear,
+              faltaOrcamentoCent: _faltaOrcamento(ref),
               aoAdicionar: () => _adicionar(ativas),
               aoConcluir: lista.nComprados == 0 ? null : _concluir,
             ),
     );
   }
+}
+
+/// Quanto falta do orçamento total do mês atual (negativo = passou), ou
+/// null se o mês não tem orçamento ou ainda não há o gasto do mês.
+int? _faltaOrcamento(WidgetRef ref) {
+  final hoje = DateTime.now();
+  final mes = DateTime(hoje.year, hoje.month);
+  final total = (ref.watch(orcamentosProvider).value ?? const <Orcamento>[])
+      .where((o) => o.mes == mes && o.categoriaId == null)
+      .firstOrNull;
+  if (total == null) return null;
+  final gasto = ref
+      .watch(painelProvider((periodo: Periodo.esteMes, lojaId: null)))
+      .value
+      ?.dados
+      .totalCent;
+  return gasto == null ? null : total.valorCent - gasto;
 }
 
 class _Menus extends StatelessWidget {
@@ -631,10 +651,14 @@ class _Rodape extends StatelessWidget {
     required this.planear,
     required this.aoAdicionar,
     required this.aoConcluir,
+    this.faltaOrcamentoCent,
   });
 
   final ListaMontada lista;
   final bool planear;
+
+  /// Quanto falta do orçamento do mês (null = sem orçamento).
+  final int? faltaOrcamentoCent;
   final VoidCallback aoAdicionar;
   final VoidCallback? aoConcluir;
 
@@ -698,6 +722,11 @@ class _Rodape extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                   ],
+                  ?_linhaOrcamento(
+                    tema,
+                    faltaOrcamentoCent,
+                    lista.totalEstimadoCent,
+                  ),
                   Row(
                     children: [
                       Expanded(child: adicionar),
@@ -721,6 +750,28 @@ class _Rodape extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "Orçamento: faltam X · depois da lista: Y" (Y = falta − estimado).
+Widget? _linhaOrcamento(ThemeData tema, int? falta, int estimadoCent) {
+  if (falta == null) return null;
+  final depois = falta - estimadoCent;
+  String sinal(int cent) =>
+      cent < 0 ? '−${formatarCent(-cent)}' : formatarCent(cent);
+  final texto =
+      '${falta >= 0 ? 'Orçamento: faltam ${formatarCent(falta)}' : 'Orçamento: passou ${formatarCent(-falta)}'}'
+      ' · depois da lista: ${sinal(depois)}';
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Text(
+      texto,
+      style: TextStyle(
+        color: depois < 0
+            ? tema.colorScheme.error
+            : tema.colorScheme.onSurfaceVariant,
+      ),
+    ),
+  );
 }
 
 class _Vazio extends StatelessWidget {

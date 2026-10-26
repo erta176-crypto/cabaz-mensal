@@ -148,7 +148,9 @@ Testes (`test/painel_orcamento_test.dart`): sem orçamento mostra os botões; "C
 
 ---
 
-## T5 · Lista: rodapé com o orçamento [ ]
+## T5 · Lista: rodapé com o orçamento [x]
+
+> Feito a 2026-10-26. A linha aparece nos dois modos (Planear e No supermercado): ajuda também a planear.
 
 Em `lib/features/lista/lista_page.dart`, no rodapé, por baixo de "Estimado · No carrinho", se o mês atual tiver orçamento total: "Orçamento: faltam X · depois da lista Y" (`Y = faltam − estimado`). Gasto do mês = `painelProvider((periodo: esteMes, lojaId: null))` (com cache sem rede); sem dados do painel, a linha não aparece. "passou" em `colorScheme.error`.
 

@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:cabaz_mensal/core/tema.dart';
 import 'package:cabaz_mensal/data/providers.dart';
 import 'package:cabaz_mensal/data/repositorios.dart';
+import 'package:cabaz_mensal/core/formatos.dart';
 import 'package:cabaz_mensal/domain/compra.dart';
+import 'package:cabaz_mensal/domain/estatisticas.dart';
 import 'package:cabaz_mensal/domain/modelos.dart';
+import 'package:cabaz_mensal/domain/orcamento.dart';
 import 'package:cabaz_mensal/domain/preferencias.dart';
 import 'package:cabaz_mensal/domain/texto.dart';
 import 'package:cabaz_mensal/export/texto_lista.dart';
@@ -287,7 +290,11 @@ void main() {
       prefs = _PreferenciasFalsas(const Preferencias(lojaId: 'lidl'));
     });
 
-    Future<void> abrir(WidgetTester tester) async {
+    Future<void> abrir(
+      WidgetTester tester, {
+      List<Orcamento> orcamentos = const [],
+      int gastoMesCent = 0,
+    }) async {
       tester.view.physicalSize = const Size(500, 1400);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -308,6 +315,20 @@ void main() {
             preferenciasRepositoryProvider.overrideWithValue(prefs),
             estadoSyncProvider.overrideWith(
               (_) => Stream.value(const EstadoSync()),
+            ),
+            orcamentosProvider.overrideWith((_) => Stream.value(orcamentos)),
+            painelProvider.overrideWith(
+              (_, _) async => ResultadoPainel(
+                DadosPainel(
+                  totalCent: gastoMesCent,
+                  nCompras: 1,
+                  poupancaCent: 0,
+                  porMes: const [],
+                  porLoja: const [],
+                  porCategoria: const [],
+                  artigos: const [],
+                ),
+              ),
             ),
           ],
           child: MaterialApp(
@@ -396,6 +417,47 @@ void main() {
         expect(find.byType(FloatingActionButton), findsNothing);
       },
     );
+
+    group('orçamento no rodapé', () {
+      final agora = DateTime.now();
+      final mes = DateTime(agora.year, agora.month);
+      Orcamento total(int cent) =>
+          Orcamento(id: 'o1', mes: mes, valorCent: cent);
+
+      testWidgets('mostra quanto falta e quanto fica depois da lista', (
+        tester,
+      ) async {
+        // Estimado da lista: 7,83 €.
+        await abrir(tester, orcamentos: [total(50000)], gastoMesCent: 42000);
+        expect(
+          find.text(
+            'Orçamento: faltam ${formatarCent(8000)} · '
+            'depois da lista: ${formatarCent(8000 - 783)}',
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('sem orçamento não mostra a linha', (tester) async {
+        await abrir(tester, gastoMesCent: 42000);
+        expect(find.textContaining('Orçamento:'), findsNothing);
+      });
+
+      testWidgets('a lista passa o que falta: negativo e em erro', (
+        tester,
+      ) async {
+        await abrir(tester, orcamentos: [total(42500)], gastoMesCent: 42000);
+        final texto =
+            'Orçamento: faltam ${formatarCent(500)} · '
+            'depois da lista: −${formatarCent(283)}';
+        expect(find.text(texto), findsOneWidget);
+        final cor = tester.widget<Text>(find.text(texto)).style?.color;
+        expect(
+          cor,
+          Theme.of(tester.element(find.text(texto))).colorScheme.error,
+        );
+      });
+    });
   });
 }
 
