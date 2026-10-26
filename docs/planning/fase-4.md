@@ -136,7 +136,7 @@ Testes (`test/sync/` com `Dispositivo` e `ServidorFalso`): definir sem rede e si
 
 ---
 
-## T4 · Painel: cartão "Orçamento" [ ]
+## T4 · Painel: cartão "Orçamento" [x]
 
 Em `lib/features/painel/painel_page.dart`, só com `Periodo.esteMes` (com ou sem loja: o orçamento é do mês inteiro; com loja escolhida, o cartão não aparece):
 - Depois dos 4 números. Título "Orçamento" e ⋮ → "Editar orçamento".

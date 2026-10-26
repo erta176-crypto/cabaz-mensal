@@ -11,6 +11,7 @@ import '../estatisticas/cores.dart';
 import '../estatisticas/grafico_meses.dart';
 import '../artigos/ver_artigo.dart';
 import '../shell/shell.dart';
+import 'orcamento_cartao.dart';
 
 final _hora = DateFormat('HH:mm', 'pt_PT');
 
@@ -132,6 +133,11 @@ class _PainelPageState extends ConsumerState<PainelPage> {
         if (guardadoEm != null) _avisoCache(guardadoEm),
         _numeros(d),
         const SizedBox(height: 16),
+        // O orçamento é do mês inteiro: só com "Este mês" e todas as lojas.
+        if (_periodo == Periodo.esteMes && _lojaId == null) ...[
+          OrcamentoCartao(gasto: d, hoje: DateTime.now()),
+          const SizedBox(height: 16),
+        ],
         if (d.nCompras == 0)
           const Padding(
             padding: EdgeInsets.all(24),
