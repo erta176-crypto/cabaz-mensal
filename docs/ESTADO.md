@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-26. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**4 · Orçamento mensal:** T1–T6 feitas; **em portão** ([`planning/fase-4.md`](planning/fase-4.md)). Falta aplicar `20261027000100_fase4_orcamentos_tempo_real.sql`, a verificação manual e a confirmação; só depois o push. Depois: Fase 5 talões em PDF, Fase 6 talões por fotografia.
+**4 · Orçamento mensal:** T1–T6 feitas; **em portão** ([`planning/fase-4.md`](planning/fase-4.md)). Falta a verificação manual e a confirmação; só depois o push. Depois: Fase 5 talões em PDF, Fase 6 talões por fotografia.
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
