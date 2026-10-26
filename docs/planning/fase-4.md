@@ -1,6 +1,6 @@
 # Fase 4 · Orçamento mensal
 
-**Estado:** plano escrito a 2026-10-26, **à espera de aprovação**. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano aprovado a 2026-10-26. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Executar tarefa a tarefa (T1 → T6). O que não está aqui não se faz: vai para `docs/planning/notas.md`.
 
@@ -39,7 +39,9 @@ Orçamento por loja; avisos fora da app (notificações); incluir o orçamento n
 
 ---
 
-## T1 · Migração `supabase/migrations/20261027000000_fase4_orcamentos.sql` [ ]
+## T1 · Migração `supabase/migrations/20261027000000_fase4_orcamentos.sql` [x]
+
+> **Verificado a 2026-10-26:** aplicada pelo utilizador; RLS ativo com 4 políticas; colunas certas; `apagar_todos_dados` inclui `orcamentos`; como utilizador simulado (com `rollback`) entram um total e uma categoria do mesmo mês e um segundo total é recusado por `orcamentos_unico`; nada ficou gravado; advisors sem avisos novos (só o índice novo `orcamentos_categoria_id_idx` por usar, esperado).
 
 ```sql
 -- Cabaz Mensal · Fase 4 · orçamento mensal (total e por categoria)
