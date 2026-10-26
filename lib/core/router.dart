@@ -12,6 +12,7 @@ import '../features/em_breve/em_breve_page.dart';
 import '../features/entrada/entrada_page.dart';
 import '../features/importar_exportar/importar_exportar_page.dart';
 import '../features/lista/lista_page.dart';
+import '../features/painel/painel_page.dart';
 import '../features/shell/faixa_sync.dart';
 import '../features/shell/shell.dart';
 
@@ -58,9 +59,7 @@ GoRouter criarRouter(AuthRepository auth) {
           ),
           GoRoute(
             path: '/painel',
-            pageBuilder: (_, _) => const NoTransitionPage(
-              child: EmBrevePage(titulo: 'Painel e estatísticas', fase: 2),
-            ),
+            pageBuilder: (_, _) => const NoTransitionPage(child: PainelPage()),
           ),
           GoRoute(
             path: '/historico',

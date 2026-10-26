@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**2 · Painel, estatísticas e histórico:** plano aprovado a 2026-10-25, em execução; T1 a T5 feitas (migração, `fl_chart`, domínio, dados, gráficos), próxima T6 ([`planning/fase-2.md`](planning/fase-2.md)).
+**2 · Painel, estatísticas e histórico:** plano aprovado a 2026-10-25, em execução; T1 a T5 feitas; T6 (ecrã Painel) com código e testes, falta a verificação visual; depois T7 ([`planning/fase-2.md`](planning/fase-2.md)).
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -15,7 +15,8 @@
 
 ## Ecrãs
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições.
-- Em breve: Painel e estatísticas, Histórico.
+- Painel e estatísticas: feito, falta verificação visual (T6).
+- Em breve: Histórico.
 
 ## Próximo
 1. Executar a Fase 2 (T6 → T9).

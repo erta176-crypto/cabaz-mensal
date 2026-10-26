@@ -43,6 +43,7 @@
 - `artigos`
 - `importar_exportar`: pré-visualização e arrastar e largar na web.
 - `definicoes`
+- `painel`: Painel e estatísticas (filtros de período e loja, números, gráficos; aviso quando os dados vêm da cache).
 - `em_breve`
 - `estatisticas`: componentes de gráficos partilhados pelo Painel e pelo Ver artigo (`corDaLoja`, `BarrasHorizontais` sem `fl_chart`, `GraficoMeses` e `GraficoPreco` com `fl_chart`).
 
