@@ -83,7 +83,7 @@ class GraficoMeses extends StatelessWidget {
                     barRods: [
                       BarChartRodData(
                         toY: meses[i].totalCent / 100,
-                        color: esquema.primary,
+                        color: esquema.secondary,
                         width: 14,
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(4),

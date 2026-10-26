@@ -1,42 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Cores quentes e sóbrias (ver prompt da Fase 0).
+/// Paleta violeta, azul e castanho claro sobre creme (decisão 0008).
 abstract final class Cores {
-  static const fundo = Color(0xFFFAF6F0);
+  static const fundo = Color(0xFFF8F6F2);
   static const superficie = Color(0xFFFFFFFF);
-  static const texto = Color(0xFF2A211C);
-  static const textoSecundario = Color(0xFF6B5D53);
-  static const linhas = Color(0xFFE8DDD2);
-  static const terracota = Color(0xFFB4532A);
-  static const tomSuave = Color(0xFFF6E3D6);
-  static const textoTomSuave = Color(0xFF8A3A18);
+  static const texto = Color(0xFF26222E);
+  static const textoSecundario = Color(0xFF625B6E);
+  static const linhas = Color(0xFFE4DFE8);
+  static const violeta = Color(0xFF5B4B9A);
+  static const lavanda = Color(0xFFE9E4F7);
+  static const textoLavanda = Color(0xFF2E2463);
+  static const azul = Color(0xFF3A6EA5);
+  static const azulSuave = Color(0xFFDCE8F5);
+  static const textoAzulSuave = Color(0xFF173A5E);
+  static const castanho = Color(0xFF8A6A4F);
+  static const areia = Color(0xFFF1E6DA);
+  static const textoAreia = Color(0xFF4A3424);
 
-  // Equivalentes escuros, com os mesmos tons aquecidos.
-  static const fundoEscuro = Color(0xFF1C1714);
-  static const superficieEscura = Color(0xFF262019);
-  static const textoEscuro = Color(0xFFF3EBE3);
-  static const textoSecundarioEscuro = Color(0xFFBCAD9F);
-  static const linhasEscuras = Color(0xFF3D332B);
-  static const terracotaEscura = Color(0xFFE08A60);
-  static const tomSuaveEscuro = Color(0xFF4A2A1B);
-  static const textoTomSuaveEscuro = Color(0xFFF6D3BE);
+  // Equivalentes escuros.
+  static const fundoEscuro = Color(0xFF17151C);
+  static const superficieEscura = Color(0xFF211E28);
+  static const textoEscuro = Color(0xFFEDE9F3);
+  static const textoSecundarioEscuro = Color(0xFFB7AFC4);
+  static const linhasEscuras = Color(0xFF38333F);
+  static const violetaEscura = Color(0xFFB8A9F0);
+  static const lavandaEscura = Color(0xFF3D3270);
+  static const textoLavandaEscura = Color(0xFFE6E0FA);
+  static const azulEscuro = Color(0xFF9EC3EA);
+  static const azulSuaveEscuro = Color(0xFF1F3F60);
+  static const textoAzulSuaveEscuro = Color(0xFFD6E6F6);
+  static const castanhoEscuro = Color(0xFFD9BFA4);
+  static const areiaEscura = Color(0xFF4A3A2C);
+  static const textoAreiaEscura = Color(0xFFF3E4D4);
 }
 
 ColorScheme _esquema(Brightness b) {
   final claro = b == Brightness.light;
   return ColorScheme(
     brightness: b,
-    primary: claro ? Cores.terracota : Cores.terracotaEscura,
-    onPrimary: claro ? Colors.white : const Color(0xFF2A1408),
-    primaryContainer: claro ? Cores.tomSuave : Cores.tomSuaveEscuro,
-    onPrimaryContainer: claro ? Cores.textoTomSuave : Cores.textoTomSuaveEscuro,
-    secondary: claro ? Cores.textoSecundario : Cores.textoSecundarioEscuro,
-    onSecondary: claro ? Colors.white : Cores.fundoEscuro,
-    secondaryContainer: claro ? Cores.tomSuave : Cores.tomSuaveEscuro,
+    primary: claro ? Cores.violeta : Cores.violetaEscura,
+    onPrimary: claro ? Colors.white : const Color(0xFF271C55),
+    primaryContainer: claro ? Cores.lavanda : Cores.lavandaEscura,
+    onPrimaryContainer: claro ? Cores.textoLavanda : Cores.textoLavandaEscura,
+    secondary: claro ? Cores.azul : Cores.azulEscuro,
+    onSecondary: claro ? Colors.white : const Color(0xFF0E2F4F),
+    secondaryContainer: claro ? Cores.azulSuave : Cores.azulSuaveEscuro,
     onSecondaryContainer: claro
-        ? Cores.textoTomSuave
-        : Cores.textoTomSuaveEscuro,
+        ? Cores.textoAzulSuave
+        : Cores.textoAzulSuaveEscuro,
+    tertiary: claro ? Cores.castanho : Cores.castanhoEscuro,
+    onTertiary: claro ? Colors.white : const Color(0xFF3B2A1C),
+    tertiaryContainer: claro ? Cores.areia : Cores.areiaEscura,
+    onTertiaryContainer: claro ? Cores.textoAreia : Cores.textoAreiaEscura,
     error: claro ? const Color(0xFFB3261E) : const Color(0xFFF2B8B5),
     onError: claro ? Colors.white : const Color(0xFF601410),
     surface: claro ? Cores.fundo : Cores.fundoEscuro,
@@ -46,14 +62,14 @@ ColorScheme _esquema(Brightness b) {
         : Cores.textoSecundarioEscuro,
     surfaceContainerLowest: claro ? Cores.superficie : Cores.fundoEscuro,
     surfaceContainerLow: claro ? Cores.superficie : Cores.superficieEscura,
-    surfaceContainer: claro ? const Color(0xFFF5EFE7) : Cores.superficieEscura,
+    surfaceContainer: claro ? const Color(0xFFF3F0EC) : const Color(0xFF26222D),
     surfaceContainerHigh: claro
-        ? const Color(0xFFF1E9DF)
-        : const Color(0xFF2E2620),
+        ? const Color(0xFFEEEAE5)
+        : const Color(0xFF2D2935),
     surfaceContainerHighest: claro
-        ? const Color(0xFFECE2D7)
-        : const Color(0xFF362D26),
-    outline: claro ? const Color(0xFFB9A99A) : const Color(0xFF6E6054),
+        ? const Color(0xFFE8E3DD)
+        : const Color(0xFF35303E),
+    outline: claro ? const Color(0xFFADA4B8) : const Color(0xFF6F6779),
     outlineVariant: claro ? Cores.linhas : Cores.linhasEscuras,
   );
 }

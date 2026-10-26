@@ -1,6 +1,6 @@
 # Fase 3 · Tema: paleta violeta/azul/castanho claro e modo escuro
 
-**Estado:** plano escrito a 2026-10-26, **à espera de aprovação**. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano aprovado a 2026-10-26. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Executar tarefa a tarefa (T1 → T4). O que não está aqui não se faz: vai para `docs/planning/notas.md`.
 
@@ -33,7 +33,9 @@ Mudar letras, tamanhos ou formas dos componentes; menu lateral escuro no tema cl
 
 ---
 
-## T1 · Paleta nova em `lib/core/tema.dart` [ ]
+## T1 · Paleta nova em `lib/core/tema.dart` [x]
+
+> Feito a 2026-10-26: todos os pares passaram o contraste com os valores da tabela, sem ajustes.
 
 Substituir os valores de `Cores` (e os nomes que deixam de fazer sentido, ex.: `terracota` → `violeta`) e completar `_esquema` com `tertiary`, `onTertiary`, `tertiaryContainer`, `onTertiaryContainer`, `secondaryContainer`/`onSecondaryContainer` em azul.
 
