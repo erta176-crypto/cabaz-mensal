@@ -25,11 +25,16 @@ class SupabaseEstatisticasRepository implements EstatisticasRepository {
     required this._rpc,
     required this._lerLinhas,
     required this._base,
+    this.limite = const Duration(seconds: 10),
   });
 
   final ChamarRpc _rpc;
   final LerLinhas _lerLinhas;
   final BaseLocal _base;
+
+  /// Tempo máximo de cada pedido. Esgotado, conta como "sem rede" (o
+  /// Android pode demorar muito a desistir quando não há ligação).
+  final Duration limite;
 
   @override
   Future<ResultadoPainel> painel(FiltroCompras filtro, {DateTime? hoje}) async {
@@ -40,8 +45,11 @@ class SupabaseEstatisticasRepository implements EstatisticasRepository {
     final dynamic resposta;
     try {
       resposta = await comErrosTraduzidos(
-        () =>
-            _rpc('painel', {'p_de': de, 'p_ate': ate, 'p_loja': filtro.lojaId}),
+        () => _rpc('painel', {
+          'p_de': de,
+          'p_ate': ate,
+          'p_loja': filtro.lojaId,
+        }).timeout(limite),
       );
     } on ErroDados {
       rethrow;
@@ -109,7 +117,7 @@ class SupabaseEstatisticasRepository implements EstatisticasRepository {
 
   Future<T> _comRede<T>(Future<T> Function() f) async {
     try {
-      return await comErrosTraduzidos(f);
+      return await comErrosTraduzidos(() => f().timeout(limite));
     } on ErroDados {
       rethrow;
     } catch (_) {

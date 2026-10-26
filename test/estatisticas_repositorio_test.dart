@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -114,6 +115,34 @@ void main() {
           isA<ErroDados>().having((e) => e.mensagem, 'mensagem', 'Erro SQL'),
         ),
       );
+    });
+  });
+
+  group('pedido sem resposta (limite de tempo)', () {
+    Future<dynamic> nunca(String _, Map<String, dynamic> _) =>
+        Completer<dynamic>().future;
+
+    SupabaseEstatisticasRepository lento() => SupabaseEstatisticasRepository(
+      rpc: (n, p) => comRede(n, p),
+      lerLinhas: (_) => Completer<List<Map<String, dynamic>>>().future,
+      base: base,
+      limite: const Duration(milliseconds: 50),
+    );
+
+    test('painel: usa a cache', () async {
+      await repo.painel(_filtro, hoje: DateTime(2026, 10, 25));
+      comRede = nunca;
+      final r = await lento().painel(_filtro, hoje: DateTime(2026, 10, 25));
+      expect(r.guardadoEm, isNotNull);
+    });
+
+    test('compras e linhas: mensagem sem rede', () async {
+      comRede = nunca;
+      await expectLater(
+        lento().compras(_filtro, hoje: DateTime(2026, 10, 25)),
+        throwsA(isA<ErroDados>()),
+      );
+      await expectLater(lento().linhas('c1'), throwsA(isA<ErroDados>()));
     });
   });
 
