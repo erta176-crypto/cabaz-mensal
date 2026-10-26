@@ -1,6 +1,6 @@
 # Fase 3 · Tema: paleta violeta/azul/castanho claro e modo escuro
 
-**Estado:** plano aprovado a 2026-10-26. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano aprovado a 2026-10-26; T1–T4 feitas; **em portão**. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Executar tarefa a tarefa (T1 → T4). O que não está aqui não se faz: vai para `docs/planning/notas.md`.
 
@@ -92,7 +92,9 @@ Substituir os valores de `Cores` (e os nomes que deixam de fazer sentido, ex.: `
 
 ---
 
-## T4 · Verificação visual e documentação [ ]
+## T4 · Verificação visual e documentação [x]
+
+> Docs feitos a 2026-10-26. A verificação visual faz-se no ponto 3 do portão.
 
 - `docs/architecture/mapa.md`: `ModoTema`, `temaProvider`, chave `tema` na tabela `estado`.
 - `docs/architecture/sincronizacao.md`: "A chave `tema` em `estado` é do aparelho: não sincroniza e `limparTudo` mantém-na."

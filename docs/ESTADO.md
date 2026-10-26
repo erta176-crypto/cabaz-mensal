@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-26. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**3 · Tema (paleta violeta/azul/castanho claro e modo escuro):** plano aprovado a 2026-10-26; T1 a T3 feitas (paleta, preferência, controlos), próxima T4 ([`planning/fase-3.md`](planning/fase-3.md)).
+**3 · Tema (paleta violeta/azul/castanho claro e modo escuro):** T1–T4 feitas; **em portão** (falta a verificação visual em claro e escuro e a confirmação; só depois o push) ([`planning/fase-3.md`](planning/fase-3.md)).
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -15,10 +15,11 @@
 - **Repositório público:** entram `.claude/settings.json` e `AGENTS.md`; ficam só locais `.claude/skills/`, `.codex/` e `.vscode/`.
 
 ## Ecrãs
+- Tema violeta/azul/castanho claro com escolha Sistema/Claro/Escuro (Definições e botão sol/lua no menu lateral).
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Executar a Fase 3 (T4 e portão).
+1. Portão da Fase 3 (verificação visual em claro e escuro); depois push.
 2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase

@@ -7,12 +7,12 @@
 - `texto.dart`: pesquisa sem acentos.
 - `ean.dart`: `normalizarEan` (EAN-8/13, GTIN-14; UPC-A e GTIN-14 com 0 à frente → EAN-13; dígito de controlo GS1).
 - `compra.dart`: cálculos de Concluir compra.
-- `preferencias.dart`: preferências e gestos.
+- `preferencias.dart`: preferências e gestos; `ModoTema` (Sistema/Claro/Escuro).
 - `estatisticas.dart`: períodos e filtros do Painel, `DadosPainel` (resultado da RPC `painel`), `CompraResumo` (RPC `historico_compras`), `mesesCompletos`, `categoriasTopo`, `porMes`.
 
 ## `lib/data/`: a única pasta que fala com o Supabase e com o drift
 - `repositorios.dart`: as interfaces.
-- `providers.dart`: os providers Riverpod.
+- `providers.dart`: os providers Riverpod; `temaProvider` (tema deste aparelho, chave `tema` na tabela `estado`).
 - `local/`: base drift genérica (tabela `registos` com JSON por linha, fila `pendentes`, `estado`) e os repositórios locais.
 - `sync/`: a sincronização ([`sincronizacao.md`](sincronizacao.md)).
   - `escrita.dart`: grava na cache e põe na fila.
@@ -37,7 +37,7 @@
 - `texto_lista.dart`: TXT com emojis, também usado na partilha da Lista.
 
 ## `lib/features/`: um diretório por ecrã
-- `shell`: navegação com corte a 800 px e faixa de sincronização.
+- `shell`: navegação com corte a 800 px e faixa de sincronização; `tema_controlos.dart` (botão sol/lua no menu lateral e menu Tema das Definições).
 - `entrada`
 - `lista`: Lista do mês e Concluir compra.
 - `artigos`: Artigos, categorias e lojas; `ver_artigo.dart` (Ver artigo com preços por loja e evolução do preço, aberto a partir de Artigos, Lista, Painel e detalhe da compra).
