@@ -89,7 +89,7 @@ Depois: o utilizador aplica no SQL Editor; verificar com `list_tables` (colunas,
 
 ---
 
-## T2 · Domínio: `lib/domain/orcamento.dart` [ ]
+## T2 · Domínio: `lib/domain/orcamento.dart` [x]
 
 Funções puras, testes primeiro (`test/orcamento_test.dart`).
 
