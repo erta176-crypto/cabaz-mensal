@@ -114,6 +114,7 @@ class AppShell extends StatefulWidget {
     required this.localizacao,
     required this.child,
     this.faixa,
+    this.acaoMenu,
   });
 
   final String localizacao;
@@ -121,6 +122,9 @@ class AppShell extends StatefulWidget {
 
   /// Faixa por cima do conteúdo (estado da sincronização).
   final Widget? faixa;
+
+  /// Ação à direita do nome no topo do menu lateral (botão do tema).
+  final Widget? acaoMenu;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -152,13 +156,14 @@ class _AppShellState extends State<AppShell> {
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(width: 12),
-              Flexible(
+              Expanded(
                 child: Text(
                   'Cabaz Mensal',
                   style: Theme.of(context).textTheme.titleLarge,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              ?widget.acaoMenu,
             ],
           ),
         ),

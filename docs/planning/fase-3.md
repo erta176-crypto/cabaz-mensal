@@ -79,7 +79,9 @@ Substituir os valores de `Cores` (e os nomes que deixam de fazer sentido, ex.: `
 
 ---
 
-## T3 · Controlos: Definições e botão sol/lua [ ]
+## T3 · Controlos: Definições e botão sol/lua [x]
+
+> Feito a 2026-10-26. `BotaoTema` e `MenuTema` em `lib/features/shell/tema_controlos.dart`; o botão entra no menu lateral pelo parâmetro `acaoMenu` do `AppShell` (como a `faixa`), para o `AppShell` não depender do Riverpod. A acessibilidade do botão vem do `tooltip` (lido pelo TalkBack como rótulo).
 
 - **Definições** (`lib/features/definicoes/definicoes_page.dart`): novo `Card` "Aparência", antes de "Gestos na Lista", com `DropdownButtonFormField<ModoTema>` rotulado "Tema" (Sistema / Claro / Escuro).
 - **Menu lateral** (`lib/features/shell/shell.dart`, cabeçalho "Cabaz Mensal"): `IconButton` à direita do nome. Ícone `Icons.dark_mode` quando o tema visível é claro, `Icons.light_mode` quando é escuro; `tooltip`: "Mudar para modo escuro" / "Mudar para modo claro". Tocar escolhe `escuro` ou `claro` (deixa de seguir o sistema). Área de toque ≥ 48 px. Aparece no menu fixo (≥ 800 px) e no ☰ (< 800 px).

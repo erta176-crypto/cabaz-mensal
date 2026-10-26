@@ -6,6 +6,7 @@ import '../../data/repositorios.dart';
 import '../../domain/preferencias.dart';
 import '../shell/faixa_sync.dart';
 import '../shell/shell.dart';
+import '../shell/tema_controlos.dart';
 
 const palavraConfirmacao = 'APAGAR';
 
@@ -136,6 +137,20 @@ class DefinicoesPage extends ConsumerWidget {
                     onTap: () => _sair(context, ref),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('Aparência', style: tema.textTheme.titleMedium),
+                    const SizedBox(height: 16),
+                    const MenuTema(),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),

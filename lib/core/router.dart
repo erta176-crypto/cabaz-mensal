@@ -15,6 +15,7 @@ import '../features/lista/lista_page.dart';
 import '../features/painel/painel_page.dart';
 import '../features/shell/faixa_sync.dart';
 import '../features/shell/shell.dart';
+import '../features/shell/tema_controlos.dart';
 
 /// Avisa o go_router quando a sessão muda, para reavaliar o redirect.
 class _OuvinteSessao extends ChangeNotifier {
@@ -50,6 +51,7 @@ GoRouter criarRouter(AuthRepository auth) {
         builder: (context, estado, filho) => AppShell(
           localizacao: estado.matchedLocation,
           faixa: const FaixaSync(),
+          acaoMenu: const BotaoTema(),
           child: filho,
         ),
         routes: [
