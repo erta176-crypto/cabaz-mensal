@@ -50,7 +50,7 @@ void main() {
     expect(find.byTooltip('Mudar para modo escuro'), findsOneWidget);
     expect(
       t.getSemantics(find.byType(IconButton)),
-      containsSemantics(tooltip: 'Mudar para modo escuro', isButton: true),
+      isSemantics(tooltip: 'Mudar para modo escuro', isButton: true),
     );
 
     await t.tap(find.byType(BotaoTema));
