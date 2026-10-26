@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-26. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Entre fases.** Próximas possibilidades em [`planning/fase-2.md`](planning/fase-2.md) ("Depois da Fase 2") e em [`planning/notas.md`](planning/notas.md).
+**4 · Orçamento mensal:** plano escrito a 2026-10-26, à espera de aprovação ([`planning/fase-4.md`](planning/fase-4.md)). Depois: Fase 5 talões em PDF, Fase 6 talões por fotografia.
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -20,12 +20,13 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Escolher a próxima fase.
+1. Aprovar o plano da Fase 4 e executá-lo (T1 → T6).
 2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
 - Ligar a "Leaked Password Protection" no Supabase (Authentication → Policies). É o único aviso que os advisors ainda dão.
 - Fazer uma cópia JSON mensal para `dados-privados/`.
+- Talões de exemplo (reais) em `dados-privados/talões/` (fora do git); os testes usam talões fictícios.
 
 ## Decisões em aberto
 - Plugins Flutter do Claude Code: reduzir os três (`flutter`, `dart-flutter`, `flutter-skills`) a quais? O `dart-flutter` traz o MCP Dart.
