@@ -8,6 +8,7 @@ library;
 import '../domain/compra.dart';
 import '../domain/estatisticas.dart';
 import '../domain/modelos.dart';
+import '../domain/orcamento.dart';
 import '../domain/preferencias.dart';
 
 abstract interface class AuthRepository {
@@ -82,6 +83,19 @@ abstract interface class ArtigosRepository {
 
   /// Artigos eliminados (para reativar a mesma linha, com o mesmo id).
   Future<List<Artigo>> apagados();
+}
+
+/// Orçamento mensal (total e por categoria), sincronizado.
+abstract interface class OrcamentosRepository {
+  /// Todos os orçamentos não apagados (de todos os meses).
+  Stream<List<Orcamento>> observar();
+
+  /// Define o orçamento de [categoriaId] (null = total) no mês de [mes];
+  /// [valorCent] null apaga-o.
+  Future<void> definir(DateTime mes, String? categoriaId, int? valorCent);
+
+  /// Copia para o mês [para] os orçamentos do mês [de].
+  Future<void> copiar(DateTime de, DateTime para);
 }
 
 abstract interface class ListaRepository {

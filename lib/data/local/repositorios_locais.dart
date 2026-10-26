@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../domain/compra.dart';
 import '../../domain/modelos.dart';
+import '../../domain/orcamento.dart';
 import '../../domain/preferencias.dart';
 import '../../domain/texto.dart';
 import '../repositorios.dart';
@@ -244,6 +245,54 @@ bool _maisRecente(Map<String, dynamic> a, Map<String, dynamic> b) {
   final d = (a['data'] as String).compareTo(b['data'] as String);
   if (d != 0) return d > 0;
   return ('${a['criado_em'] ?? ''}').compareTo('${b['criado_em'] ?? ''}') > 0;
+}
+
+class LocalOrcamentosRepository implements OrcamentosRepository {
+  LocalOrcamentosRepository(this._base, this._escrita, this._utilizadorId);
+
+  final BaseLocal _base;
+  final Escrita _escrita;
+  final String _utilizadorId;
+
+  @override
+  Stream<List<Orcamento>> observar() => _base
+      .observarTabela('orcamentos')
+      .map((l) => l.map(Orcamento.fromMap).toList());
+
+  @override
+  Future<void> definir(
+    DateTime mes,
+    String? categoriaId,
+    int? valorCent,
+  ) async {
+    final id = idOrcamento(_utilizadorId, mes, categoriaId);
+    if (valorCent == null) {
+      final atual = await _base.lerLinha('orcamentos', id);
+      if (atual != null && atual['apagado_em'] == null) {
+        await _escrita.apagar('orcamentos', id);
+      }
+      return;
+    }
+    await _escrita.inserir(
+      'orcamentos',
+      Orcamento(
+        id: id,
+        mes: DateTime(mes.year, mes.month),
+        categoriaId: categoriaId,
+        valorCent: valorCent,
+      ).toMap(),
+    );
+  }
+
+  @override
+  Future<void> copiar(DateTime de, DateTime para) async {
+    final mes = dataIso(DateTime(de.year, de.month));
+    for (final o in await _base.lerTabela('orcamentos')) {
+      if (o['mes'] != mes) continue;
+      final orc = Orcamento.fromMap(o);
+      await definir(para, orc.categoriaId, orc.valorCent);
+    }
+  }
 }
 
 class LocalListaRepository implements ListaRepository {

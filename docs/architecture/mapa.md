@@ -54,6 +54,7 @@
 - `fase1b`: índices únicos completos em lojas e categorias, `agora()`, `importar_lote`.
 - `p0_ean`: `artigos.ean` (opcional, `check` de formato, índice não único), `precos_atuais.fonte`, `importar_seed` e `importar_lote` com `ean` (o lote não apaga um `ean` existente).
 - `fase2`: RPC `painel` e `historico_compras` (só leitura, `security invoker`).
+- `fase4_orcamentos`: tabela `orcamentos` (mês, categoria ou total, valor; único por utilizador/mês/categoria) e `apagar_todos_dados` com orçamentos; `fase4_orcamentos_tempo_real`: tabela na publicação de tempo real.
 
 ## `test/`
 - Servidor falso em memória e drift em memória (`test/sync/`). Nenhum teste usa o Supabase real.

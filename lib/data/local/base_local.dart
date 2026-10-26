@@ -53,6 +53,7 @@ const tabelasSync = [
   'preferencias',
   'lojas',
   'categorias',
+  'orcamentos',
   'artigos',
   'aliases',
   'itens_lista',

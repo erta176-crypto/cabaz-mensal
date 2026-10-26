@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../domain/estatisticas.dart';
 import '../domain/modelos.dart';
+import '../domain/orcamento.dart';
 import '../domain/preferencias.dart';
 import 'local/abrir_base.dart';
 import 'local/base_local.dart';
@@ -135,6 +136,14 @@ final artigosRepositoryProvider = Provider<ArtigosRepository>(
   ),
 );
 
+final orcamentosRepositoryProvider = Provider<OrcamentosRepository>(
+  (ref) => LocalOrcamentosRepository(
+    ref.watch(baseLocalProvider),
+    ref.watch(escritaProvider),
+    ref.watch(utilizadorIdProvider) ?? '',
+  ),
+);
+
 final listaRepositoryProvider = Provider<ListaRepository>(
   (ref) => LocalListaRepository(
     ref.watch(baseLocalProvider),
@@ -210,6 +219,10 @@ final linhasCompraProvider = FutureProvider.autoDispose
       (ref, compraId) =>
           ref.watch(estatisticasRepositoryProvider).linhas(compraId),
     );
+
+final orcamentosProvider = StreamProvider<List<Orcamento>>(
+  (ref) => ref.watch(orcamentosRepositoryProvider).observar(),
+);
 
 final itensListaProvider = StreamProvider<List<ItemLista>>(
   (ref) => ref.watch(listaRepositoryProvider).observarItens(),

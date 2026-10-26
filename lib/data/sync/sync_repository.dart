@@ -65,6 +65,7 @@ String descreverOperacao(Pendente p) {
     'aliases': 'alias',
     'itens_lista': 'item da lista',
     'registos_preco': 'preço',
+    'orcamentos': 'orçamento',
     'preferencias': 'preferências',
   };
   if (p.operacao == 'rpc') {

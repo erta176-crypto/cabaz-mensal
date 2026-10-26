@@ -21,6 +21,7 @@ class Dispositivo {
     lista = LocalListaRepository(base, escrita);
     preferencias = LocalPreferenciasRepository(base, escrita);
     compras = LocalComprasRepository(base, escrita, _ConsultasFalsas());
+    orcamentos = LocalOrcamentosRepository(base, escrita, 'u1');
   }
 
   final ServidorFalso servidor;
@@ -33,6 +34,7 @@ class Dispositivo {
   late final LocalListaRepository lista;
   late final LocalPreferenciasRepository preferencias;
   late final LocalComprasRepository compras;
+  late final LocalOrcamentosRepository orcamentos;
 
   /// Envia a fila e puxa, como faria o sincronizador quando há rede.
   Future<void> sincronizar() async {

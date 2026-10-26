@@ -122,7 +122,9 @@ Testes: `idOrcamento` igual para os mesmos dados e diferente para mês ou catego
 
 ---
 
-## T3 · Dados: sincronização e repositório [ ]
+## T3 · Dados: sincronização e repositório [x]
+
+> Feito a 2026-10-26. Faltava a tabela na publicação de tempo real (todas as tabelas sincronizadas lá estão): migração extra `20261027000100_fase4_orcamentos_tempo_real.sql`, para o utilizador aplicar. O servidor real e o falso não precisaram de código novo.
 
 - `lib/data/local/base_local.dart`: `'orcamentos'` em `tabelasSync` (depois de `categorias`). Chave = `id` (caminho por omissão; nada a mudar em `chaveDe`/`onConflictDe`/`filtroDe`/`enviaId`).
 - `lib/data/sync/servidor_supabase.dart` e o `ServidorFalso` dos testes: confirmar que tratam uma tabela nova sem código extra (se houver lista de tabelas, acrescentar).

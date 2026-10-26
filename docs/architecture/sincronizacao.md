@@ -13,6 +13,7 @@ A app funciona sem rede. Toda a escrita passa pela cache local (drift) e por uma
 
 ## Regras
 - `itens_lista` e `aliases` sincronizam pela chave natural.
+- `orcamentos` sincroniza pelo `id`, que é determinístico (uuid v5 de utilizador, mês e categoria; decisão 0009): dois aparelhos que criam o mesmo orçamento sem rede geram o mesmo id e o upsert junta-os.
 - Eliminar marca `apagado_em`. Voltar a criar algo apagado reativa a mesma linha (mesmo id), nunca cria uma linha nova.
 - Índices únicos sempre completos.
 - `preferencias.reiniciado_em` manda limpar a cache (`limparCache`: registos, cursores `cursor:%` e painéis guardados `painel:%`).
