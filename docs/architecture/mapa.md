@@ -44,12 +44,14 @@
 - `importar_exportar`: pré-visualização e arrastar e largar na web.
 - `definicoes`
 - `em_breve`
+- `estatisticas`: componentes de gráficos partilhados pelo Painel e pelo Ver artigo (`corDaLoja`, `BarrasHorizontais` sem `fl_chart`, `GraficoMeses` e `GraficoPreco` com `fl_chart`).
 
 ## `supabase/migrations/`
 - `fase0`: tabelas, RLS, `importar_seed`.
 - `fase1a`: `apagado_em`, lista do mês, `preferencias`, `concluir_compra`.
 - `fase1b`: índices únicos completos em lojas e categorias, `agora()`, `importar_lote`.
 - `p0_ean`: `artigos.ean` (opcional, `check` de formato, índice não único), `precos_atuais.fonte`, `importar_seed` e `importar_lote` com `ean` (o lote não apaga um `ean` existente).
+- `fase2`: RPC `painel` e `historico_compras` (só leitura, `security invoker`).
 
 ## `test/`
 - Servidor falso em memória e drift em memória (`test/sync/`). Nenhum teste usa o Supabase real.

@@ -365,7 +365,7 @@ Stream<List<RegistoPreco>> observarRegistos(String artigoId);
 
 ---
 
-## T5 · Componentes comuns de gráficos: `lib/features/estatisticas/` [ ]
+## T5 · Componentes comuns de gráficos: `lib/features/estatisticas/` [x]
 
 Pasta nova `lib/features/estatisticas/` (usada pelo Painel e pelo Ver artigo).
 
