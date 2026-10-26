@@ -92,6 +92,22 @@ void main() {
     expect(find.textContaining('sem rede'), findsNothing);
   });
 
+  testWidgets('a 400 px os 4 cartões têm a mesma largura', (t) async {
+    await abrir(
+      t,
+      _EstatisticasFalsas(() async => ResultadoPainel(_dados())),
+      largura: 400,
+    );
+    double largura(String titulo) => t
+        .getSize(
+          find.ancestor(of: find.text(titulo), matching: find.byType(Card)),
+        )
+        .width;
+    expect(largura('Total gasto'), largura('Média por compra'));
+    expect(largura('Compras'), largura('Poupança'));
+    expect(largura('Total gasto'), largura('Compras'));
+  });
+
   testWidgets('com guardadoEm mostra o aviso sem rede', (t) async {
     await abrir(
       t,

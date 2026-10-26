@@ -139,6 +139,13 @@ void main() {
         ),
       );
       expect(find.byType(LineChart), findsOneWidget);
+      final dados = t.widget<LineChart>(find.byType(LineChart)).data;
+      // Sem rótulos soltos no mínimo e no máximo do eixo.
+      expect(dados.titlesData.leftTitles.sideTitles.minIncluded, isFalse);
+      expect(dados.titlesData.leftTitles.sideTitles.maxIncluded, isFalse);
+      // Margem para os pontos das pontas não ficarem cortados.
+      expect(dados.minX, lessThan(0));
+      expect(dados.maxX, greaterThan(30)); // último registo: 30 dias
       expect(find.text('Continente'), findsOneWidget);
       expect(find.text('Lidl'), findsOneWidget);
     });

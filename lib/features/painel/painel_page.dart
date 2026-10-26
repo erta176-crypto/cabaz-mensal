@@ -164,33 +164,40 @@ class _PainelPageState extends ConsumerState<PainelPage> {
 
   Widget _numeros(DadosPainel d) {
     final tema = Theme.of(context);
-    Widget cartao(String titulo, String valor) => ConstrainedBox(
-      constraints: const BoxConstraints(minWidth: 160),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(titulo, style: tema.textTheme.bodyMedium),
-              const SizedBox(height: 4),
-              Text(valor, style: tema.textTheme.headlineSmall),
-            ],
+    return LayoutBuilder(
+      builder: (context, c) {
+        // 4 colunas se couberem com 160 px cada; senão 2, todas iguais.
+        final colunas = c.maxWidth >= 4 * 160 + 3 * 8 ? 4 : 2;
+        final largura = (c.maxWidth - (colunas - 1) * 8) / colunas;
+        Widget cartao(String titulo, String valor) => SizedBox(
+          width: largura,
+          child: Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(titulo, style: tema.textTheme.bodyMedium),
+                  const SizedBox(height: 4),
+                  Text(valor, style: tema.textTheme.headlineSmall),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-    );
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        cartao('Total gasto', formatarCent(d.totalCent)),
-        cartao('Compras', formatarInteiro(d.nCompras)),
-        cartao('Média por compra', formatarCent(d.mediaCent)),
-        cartao('Poupança', formatarCent(d.poupancaCent)),
-      ],
+        );
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            cartao('Total gasto', formatarCent(d.totalCent)),
+            cartao('Compras', formatarInteiro(d.nCompras)),
+            cartao('Média por compra', formatarCent(d.mediaCent)),
+            cartao('Poupança', formatarCent(d.poupancaCent)),
+          ],
+        );
+      },
     );
   }
 

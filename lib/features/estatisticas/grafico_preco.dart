@@ -40,6 +40,9 @@ class GraficoPreco extends StatelessWidget {
     final menor = precos.reduce(min);
     final maior = precos.reduce(max);
     final folga = max((maior - menor) * 0.2, 10) / 100;
+    final dias = x(registos.last);
+    // Margem nas pontas para os pontos não ficarem cortados.
+    final margemX = max(1, dias * 0.04).toDouble();
 
     final descricao = [
       for (final id in ids)
@@ -57,6 +60,8 @@ class GraficoPreco extends StatelessWidget {
               height: 200,
               child: LineChart(
                 LineChartData(
+                  minX: -margemX,
+                  maxX: dias + margemX,
                   minY: max(0, menor / 100 - folga),
                   maxY: maior / 100 + folga,
                   gridData: const FlGridData(drawVerticalLine: false),
@@ -69,6 +74,9 @@ class GraficoPreco extends StatelessWidget {
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 64,
+                        // Só os rótulos do intervalo, sem o mínimo e o máximo.
+                        minIncluded: false,
+                        maxIncluded: false,
                         getTitlesWidget: (valor, meta) => SideTitleWidget(
                           meta: meta,
                           child: Text(
