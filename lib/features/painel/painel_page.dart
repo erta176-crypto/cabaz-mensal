@@ -9,7 +9,7 @@ import '../../domain/modelos.dart';
 import '../estatisticas/barras_horizontais.dart';
 import '../estatisticas/cores.dart';
 import '../estatisticas/grafico_meses.dart';
-import '../lista/dialogos_lista.dart' show DialogoVerArtigo;
+import '../artigos/ver_artigo.dart';
 import '../shell/shell.dart';
 
 final _hora = DateFormat('HH:mm', 'pt_PT');

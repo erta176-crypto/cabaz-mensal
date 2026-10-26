@@ -9,6 +9,7 @@ import '../../domain/modelos.dart';
 import '../../domain/texto.dart';
 import '../shell/shell.dart';
 import 'dialogos.dart';
+import 'ver_artigo.dart';
 
 enum Mostrar {
   artigos('Artigos'),
@@ -380,7 +381,12 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
             icon: const Icon(Icons.more_vert),
             tooltip: 'Ações',
             onSelected: (acao) {
-              if (acao == 'editar') {
+              if (acao == 'ver') {
+                showDialog<void>(
+                  context: context,
+                  builder: (_) => DialogoVerArtigo(artigo: a),
+                );
+              } else if (acao == 'editar') {
                 _editarArtigo(
                   artigo: a,
                   categorias: categorias,
@@ -397,6 +403,7 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
               }
             },
             itemBuilder: (_) => const [
+              PopupMenuItem(value: 'ver', child: Text('Ver')),
               PopupMenuItem(value: 'editar', child: Text('Editar')),
               PopupMenuItem(value: 'eliminar', child: Text('Eliminar')),
             ],

@@ -6,7 +6,7 @@ import '../../core/formatos.dart';
 import '../../data/providers.dart';
 import '../../domain/estatisticas.dart';
 import '../../domain/modelos.dart';
-import '../lista/dialogos_lista.dart' show DialogoVerArtigo;
+import '../artigos/ver_artigo.dart';
 
 final _kg = NumberFormat('0.000', 'pt_PT');
 

@@ -11,6 +11,7 @@ import '../artigos/artigos_page.dart' show corDeHex;
 import '../shell/shell.dart';
 import 'adicionar_artigo.dart';
 import 'concluir_compra_page.dart';
+import '../artigos/ver_artigo.dart';
 import 'dialogos_lista.dart';
 import 'lista_logica.dart';
 import '../../export/escrever_pdf.dart';

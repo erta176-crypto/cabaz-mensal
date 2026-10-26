@@ -40,7 +40,7 @@
 - `shell`: navegação com corte a 800 px e faixa de sincronização.
 - `entrada`
 - `lista`: Lista do mês e Concluir compra.
-- `artigos`
+- `artigos`: Artigos, categorias e lojas; `ver_artigo.dart` (Ver artigo com preços por loja e evolução do preço, aberto a partir de Artigos, Lista, Painel e detalhe da compra).
 - `importar_exportar`: pré-visualização e arrastar e largar na web.
 - `definicoes`
 - `painel`: Painel e estatísticas (filtros de período e loja, números, gráficos; aviso quando os dados vêm da cache).
