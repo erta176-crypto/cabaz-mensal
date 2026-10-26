@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-26. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Entre fases:** a seguir, plano do novo tema (paleta violeta/azul/castanho claro e botão de modo escuro), à espera de aprovação.
+**3 · Tema (paleta violeta/azul/castanho claro e modo escuro):** plano escrito a 2026-10-26, à espera de aprovação ([`planning/fase-3.md`](planning/fase-3.md)).
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -18,7 +18,7 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Plano do novo tema (paleta e modo escuro).
+1. Aprovar o plano da Fase 3 e executá-lo (T1 → T4).
 2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
