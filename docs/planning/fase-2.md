@@ -1,6 +1,6 @@
 # Fase 2 · Painel, estatísticas e histórico
 
-**Estado:** plano aprovado a 2026-10-25; T1–T9 feitas a 2026-10-26; **em portão**. Aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano aprovado a 2026-10-25; T1–T9 feitas a 2026-10-26; **portão confirmado pelo utilizador a 2026-10-26** (sem a verificação do tema escuro) e publicada. Aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Este plano é para ser executado tarefa a tarefa (T1 → T9), por esta ordem. Cada tarefa diz os ficheiros, o código a escrever (assinaturas exatas), os testes e o critério de "feito". O que não está aqui não se faz: vai para `docs/planning/notas.md`.
 

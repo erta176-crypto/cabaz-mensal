@@ -3,12 +3,13 @@
 *Atualizado em 2026-10-26. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**2 · Painel, estatísticas e histórico:** T1–T9 feitas; **em portão** ([`planning/fase-2.md`](planning/fase-2.md), secção "Portão da Fase 2"). Falta a verificação manual (números com SQL de controlo, sem rede, visual) e a confirmação do utilizador; só depois o push.
+**Entre fases:** a seguir, plano do novo tema (paleta violeta/azul/castanho claro e botão de modo escuro), à espera de aprovação.
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
 - **Fase 1A · Lista e offline:** concluída e publicada ([`planning/fase-1a.md`](planning/fase-1a.md)).
 - **Comparação de preços · P0 · EAN e fonte do preço:** concluído (portão a 2026-10-25; [`comparacao-precos/P0-modelo-dados.md`](comparacao-precos/P0-modelo-dados.md)). No portão: GTIN-14 com 0 à frente passa a EAN-13, código repetido é recusado e a pesquisa de Artigos procura também pelo código.
+- **Fase 2 · Painel, estatísticas e histórico:** concluída e publicada (portão a 2026-10-26; [`planning/fase-2.md`](planning/fase-2.md)). No portão: limite de 10 s por pedido (no Android, sem rede, o pedido ficava preso), cartões do Painel com largura igual, eixo do gráfico do preço sem rótulos soltos. O tema escuro não foi verificado (a app não tem opção de tema; segue o sistema).
 - **Fase 1B · Importar e exportar:** concluída e publicada (portão a 2026-10-25; [`planning/fase-1b.md`](planning/fase-1b.md)). No portão, a cópia JSON recusava compras com origem `lista`; corrigido com teste.
 - **Regras e documentação:** regras unificadas em `AGENTS.md` e documentação em `docs/` (2026-10-21).
 - **Repositório público:** entram `.claude/settings.json` e `AGENTS.md`; ficam só locais `.claude/skills/`, `.codex/` e `.vscode/`.
@@ -17,7 +18,7 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Portão da Fase 2 (verificação manual e confirmação); depois push.
+1. Plano do novo tema (paleta e modo escuro).
 2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
