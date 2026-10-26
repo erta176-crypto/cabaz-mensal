@@ -1,6 +1,6 @@
 # Fase 2 · Painel, estatísticas e histórico
 
-**Estado:** plano escrito e aprovado a 2026-10-25. Aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano aprovado a 2026-10-25; T1–T9 feitas a 2026-10-26; **em portão**. Aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Este plano é para ser executado tarefa a tarefa (T1 → T9), por esta ordem. Cada tarefa diz os ficheiros, o código a escrever (assinaturas exatas), os testes e o critério de "feito". O que não está aqui não se faz: vai para `docs/planning/notas.md`.
 
@@ -384,7 +384,9 @@ Pasta nova `lib/features/estatisticas/` (usada pelo Painel e pelo Ver artigo).
 
 ---
 
-## T6 · Ecrã Painel: `lib/features/painel/painel_page.dart` [ ]
+## T6 · Ecrã Painel: `lib/features/painel/painel_page.dart` [x]
+
+> **Código e testes feitos a 2026-10-26.** A verificação visual (claro/escuro, < e > 800 px) passa para o ponto 6 do portão.
 
 Router (`lib/core/router.dart`, impacto: só a rota `/painel`): trocar `EmBrevePage(titulo: 'Painel e estatísticas', fase: 2)` por `PainelPage()`.
 
@@ -419,7 +421,9 @@ Router (`lib/core/router.dart`, impacto: só a rota `/painel`): trocar `EmBreveP
 
 ---
 
-## T7 · Ecrã Histórico: `lib/features/historico/` [ ]
+## T7 · Ecrã Histórico: `lib/features/historico/` [x]
+
+> **Código e testes feitos a 2026-10-26.** A verificação visual (claro/escuro, < e > 800 px) passa para o ponto 6 do portão.
 
 Router: trocar `EmBrevePage(titulo: 'Histórico', fase: 2)` por `HistoricoPage()`. Depois desta tarefa, se `EmBrevePage` deixar de ser usada, apagá-la (`lib/features/em_breve/`) e o import no router.
 
@@ -457,7 +461,9 @@ Router: trocar `EmBrevePage(titulo: 'Histórico', fase: 2)` por `HistoricoPage()
 
 ---
 
-## T8 · "Ver artigo" com evolução do preço [ ]
+## T8 · "Ver artigo" com evolução do preço [x]
+
+> **Código e testes feitos a 2026-10-26.** A verificação visual (claro/escuro, < e > 800 px; o "Ver" em Artigos no telemóvel) passa para o ponto 6 do portão.
 
 1. Mover `DialogoVerArtigo` de `lib/features/lista/dialogos_lista.dart` para **`lib/features/artigos/ver_artigo.dart`** (sem mudar o comportamento atual) e atualizar os imports (`lista_page.dart`). Confirmar com `rg DialogoVerArtigo` que não fica nenhuma referência antiga.
 2. No diálogo, depois dos preços por loja e antes das ações: secção "Evolução do preço" (`titleSmall`) com `GraficoPreco(registos: ref.watch(registosPrecoProvider(artigo.id)).value ?? const [], lojas: lojas)`. O conteúdo do diálogo passa a estar num `SingleChildScrollView` (para caber no telemóvel), com largura 480 px.
@@ -470,7 +476,7 @@ Router: trocar `EmBrevePage(titulo: 'Histórico', fase: 2)` por `HistoricoPage()
 
 ---
 
-## T9 · Documentação e fecho [ ]
+## T9 · Documentação e fecho [x]
 
 - `docs/architecture/mapa.md`: `lib/domain/estatisticas.dart`, `lib/data/supabase/supabase_estatisticas.dart`, `lib/features/estatisticas/`, `lib/features/painel/`, `lib/features/historico/`, `lib/features/artigos/ver_artigo.dart`, migração `fase2` (`painel`, `historico_compras`); retirar `em_breve` se foi apagada.
 - `docs/architecture/sincronizacao.md`: "A cache do Painel (`estado`, chaves `painel:%`) não sincroniza; é apagada por `limparCache` (reinício) e por `limparTudo` (sair)."

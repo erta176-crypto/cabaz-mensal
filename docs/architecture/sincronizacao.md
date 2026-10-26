@@ -17,6 +17,7 @@ A app funciona sem rede. Toda a escrita passa pela cache local (drift) e por uma
 - Índices únicos sempre completos.
 - `preferencias.reiniciado_em` manda limpar a cache (`limparCache`: registos, cursores `cursor:%` e painéis guardados `painel:%`).
 - Vence a última escrita a chegar ao servidor.
+- A cache do Painel (`estado`, chaves `painel:%`) não sincroniza; é apagada por `limparCache` (reinício) e por `limparTudo` (sair).
 
 ## Testes
 `test/sync/`: servidor falso em memória e drift em memória.

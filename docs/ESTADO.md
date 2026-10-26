@@ -1,9 +1,9 @@
 # Estado do projeto
 
-*Atualizado em 2026-10-25. Manter curto; o detalhe está nos ficheiros ligados.*
+*Atualizado em 2026-10-26. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**2 · Painel, estatísticas e histórico:** plano aprovado a 2026-10-25, em execução; T1 a T5 feitas; T6 (Painel), T7 (Histórico) e T8 (Ver artigo) com código e testes, falta a verificação visual e no telemóvel; depois T9 ([`planning/fase-2.md`](planning/fase-2.md)).
+**2 · Painel, estatísticas e histórico:** T1–T9 feitas; **em portão** ([`planning/fase-2.md`](planning/fase-2.md), secção "Portão da Fase 2"). Falta a verificação manual (números com SQL de controlo, sem rede, visual) e a confirmação do utilizador; só depois o push.
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -14,11 +14,10 @@
 - **Repositório público:** entram `.claude/settings.json` e `AGENTS.md`; ficam só locais `.claude/skills/`, `.codex/` e `.vscode/`.
 
 ## Ecrãs
-- Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições.
-- Painel e estatísticas, Histórico: feitos, falta verificação visual (T6, T7).
+- Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Executar a Fase 2 (verificação visual de T6 a T8; T9).
+1. Portão da Fase 2 (verificação manual e confirmação); depois push.
 2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
