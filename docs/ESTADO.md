@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**2 · Painel, estatísticas e histórico:** plano aprovado a 2026-10-25, em execução; T1 a T5 feitas; T6 (ecrã Painel) com código e testes, falta a verificação visual; depois T7 ([`planning/fase-2.md`](planning/fase-2.md)).
+**2 · Painel, estatísticas e histórico:** plano aprovado a 2026-10-25, em execução; T1 a T5 feitas; T6 (Painel) e T7 (Histórico) com código e testes, falta a verificação visual; depois T8 ([`planning/fase-2.md`](planning/fase-2.md)).
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -15,11 +15,10 @@
 
 ## Ecrãs
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições.
-- Painel e estatísticas: feito, falta verificação visual (T6).
-- Em breve: Histórico.
+- Painel e estatísticas, Histórico: feitos, falta verificação visual (T6, T7).
 
 ## Próximo
-1. Executar a Fase 2 (T6 → T9).
+1. Executar a Fase 2 (verificação visual de T6 e T7; T8 → T9).
 2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase

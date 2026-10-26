@@ -177,6 +177,13 @@ final painelProvider = FutureProvider.autoDispose
       (ref, filtro) => ref.watch(estatisticasRepositoryProvider).painel(filtro),
     );
 
+/// Linhas de uma compra (só com rede).
+final linhasCompraProvider = FutureProvider.autoDispose
+    .family<List<LinhaCompra>, String>(
+      (ref, compraId) =>
+          ref.watch(estatisticasRepositoryProvider).linhas(compraId),
+    );
+
 final itensListaProvider = StreamProvider<List<ItemLista>>(
   (ref) => ref.watch(listaRepositoryProvider).observarItens(),
 );

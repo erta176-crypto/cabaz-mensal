@@ -44,7 +44,7 @@
 - `importar_exportar`: pré-visualização e arrastar e largar na web.
 - `definicoes`
 - `painel`: Painel e estatísticas (filtros de período e loja, números, gráficos; aviso quando os dados vêm da cache).
-- `em_breve`
+- `historico`: Histórico só de consulta (filtros, pesquisa por artigo, alias, EAN ou texto do talão, lista por mês) e detalhe da compra (ao lado a partir de 800 px).
 - `estatisticas`: componentes de gráficos partilhados pelo Painel e pelo Ver artigo (`corDaLoja`, `BarrasHorizontais` sem `fl_chart`, `GraficoMeses` e `GraficoPreco` com `fl_chart`).
 
 ## `supabase/migrations/`

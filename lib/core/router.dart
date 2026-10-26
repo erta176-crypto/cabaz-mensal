@@ -8,8 +8,8 @@ import '../data/providers.dart';
 import '../data/repositorios.dart';
 import '../features/artigos/artigos_page.dart';
 import '../features/definicoes/definicoes_page.dart';
-import '../features/em_breve/em_breve_page.dart';
 import '../features/entrada/entrada_page.dart';
+import '../features/historico/historico_page.dart';
 import '../features/importar_exportar/importar_exportar_page.dart';
 import '../features/lista/lista_page.dart';
 import '../features/painel/painel_page.dart';
@@ -63,9 +63,8 @@ GoRouter criarRouter(AuthRepository auth) {
           ),
           GoRoute(
             path: '/historico',
-            pageBuilder: (_, _) => const NoTransitionPage(
-              child: EmBrevePage(titulo: 'Histórico', fase: 2),
-            ),
+            pageBuilder: (_, _) =>
+                const NoTransitionPage(child: HistoricoPage()),
           ),
           GoRoute(
             path: '/artigos',
