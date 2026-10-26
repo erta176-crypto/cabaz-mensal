@@ -151,11 +151,12 @@ class BaseLocal extends _$BaseLocal {
     )..where((e) => e.chave.like('cursor:%') | e.chave.like('painel:%'))).go();
   });
 
-  /// Limpa tudo, incluindo a fila (outro utilizador / sair da conta).
+  /// Limpa tudo, incluindo a fila (outro utilizador / sair da conta). O tema
+  /// é do aparelho, não da conta: fica.
   Future<void> limparTudo() => transaction(() async {
     await delete(registos).go();
     await delete(pendentes).go();
-    await delete(estado).go();
+    await (delete(estado)..where((e) => e.chave.equals('tema').not())).go();
   });
 
   // ---- Fila --------------------------------------------------------------

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router.dart';
 import 'core/tema.dart';
+import 'data/providers.dart';
+import 'domain/preferencias.dart';
 
 class CabazMensalApp extends ConsumerWidget {
   const CabazMensalApp({super.key});
@@ -15,6 +17,11 @@ class CabazMensalApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: construirTema(Brightness.light),
       darkTheme: construirTema(Brightness.dark),
+      themeMode: switch (ref.watch(temaProvider)) {
+        ModoTema.sistema => ThemeMode.system,
+        ModoTema.claro => ThemeMode.light,
+        ModoTema.escuro => ThemeMode.dark,
+      },
       locale: const Locale('pt', 'PT'),
       supportedLocales: const [Locale('pt', 'PT')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,

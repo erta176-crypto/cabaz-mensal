@@ -80,6 +80,33 @@ final syncRepositoryProvider = Provider<SyncRepository>(
   ),
 );
 
+// ---- Tema (só neste aparelho) ---------------------------------------------
+
+final temaProvider = NotifierProvider<TemaNotifier, ModoTema>(TemaNotifier.new);
+
+/// Tema escolhido neste aparelho, guardado na tabela `estado` (chave `tema`).
+class TemaNotifier extends Notifier<ModoTema> {
+  /// Uma escolha feita antes de a leitura inicial acabar prevalece.
+  bool _escolhido = false;
+
+  @override
+  ModoTema build() {
+    ref.read(baseLocalProvider).lerEstado('tema').then((v) {
+      if (!ref.mounted || _escolhido) return;
+      state =
+          ModoTema.values.where((m) => m.name == v).firstOrNull ??
+          ModoTema.sistema;
+    });
+    return ModoTema.sistema;
+  }
+
+  Future<void> escolher(ModoTema m) async {
+    _escolhido = true;
+    state = m;
+    await ref.read(baseLocalProvider).gravarEstado('tema', m.name);
+  }
+}
+
 // ---- Repositórios ---------------------------------------------------------
 
 final consultasComprasProvider = Provider<ConsultasCompras>(

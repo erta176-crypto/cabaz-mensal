@@ -2,6 +2,16 @@
 /// dispositivos: gestos da Lista e as últimas escolhas no ecrã Lista.
 library;
 
+/// Tema da app neste aparelho (não sincroniza).
+enum ModoTema {
+  sistema('Sistema'),
+  claro('Claro'),
+  escuro('Escuro');
+
+  const ModoTema(this.rotulo);
+  final String rotulo;
+}
+
 enum AcaoGesto {
   marcarComprado('Marcar comprado'),
   removerDaLista('Remover da lista'),

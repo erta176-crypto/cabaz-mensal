@@ -64,7 +64,9 @@ Substituir os valores de `Cores` (e os nomes que deixam de fazer sentido, ex.: `
 
 ---
 
-## T2 · Preferência do tema (dados) [ ]
+## T2 · Preferência do tema (dados) [x]
+
+> Feito a 2026-10-26. O teste apanhou uma corrida: a leitura inicial podia apagar uma escolha feita logo no arranque; a escolha passa a prevalecer.
 
 - `lib/domain/preferencias.dart`: `enum ModoTema { sistema('Sistema'), claro('Claro'), escuro('Escuro') }` com `rotulo`.
 - `lib/data/local/base_local.dart` (impacto: `limparTudo` é chamado ao sair e ao mudar de utilizador): `limparTudo()` mantém a chave `tema` (é do aparelho, não da conta).
