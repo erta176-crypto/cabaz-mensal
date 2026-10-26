@@ -1,6 +1,6 @@
 # Fase 3 · Tema: paleta violeta/azul/castanho claro e modo escuro
 
-**Estado:** plano aprovado a 2026-10-26; T1–T4 feitas; **em portão**. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano aprovado a 2026-10-26; T1–T4 feitas; **portão confirmado pelo utilizador a 2026-10-26** e publicada. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Executar tarefa a tarefa (T1 → T4). O que não está aqui não se faz: vai para `docs/planning/notas.md`.
 
