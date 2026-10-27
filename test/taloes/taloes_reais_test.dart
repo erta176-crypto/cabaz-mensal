@@ -3,6 +3,8 @@
 // nenhum texto de talão real sai daqui.
 import 'dart:io';
 
+import 'package:cabaz_mensal/import/taloes/leclerc.dart';
+import 'package:cabaz_mensal/import/taloes/lidl.dart';
 import 'package:cabaz_mensal/import/taloes/pingo_doce.dart';
 import 'package:cabaz_mensal/import/taloes/talao.dart';
 import 'package:cabaz_mensal/import/taloes/texto_pdf.dart';
@@ -42,9 +44,16 @@ void main() {
     expect(falhas, isEmpty, reason: 'Não batem: ${falhas.length}');
   }
 
-  test(
-    'Pingo Doce: todos os talões reais batem',
-    () => verificar('Faturas Pingo Doce', lerPingoDoce),
-    skip: !_pasta.existsSync() ? 'sem dados-privados/talões' : false,
-  );
+  final saltar = !_pasta.existsSync() ? 'sem dados-privados/talões' : false;
+  for (final (subpasta, ler) in [
+    ('Faturas Pingo Doce', lerPingoDoce),
+    ('Lidl_', lerLidl),
+    ('E.Leclerc', lerLeclerc),
+  ]) {
+    test(
+      '$subpasta: todos os talões reais batem',
+      () => verificar(subpasta, ler),
+      skip: saltar,
+    );
+  }
 }

@@ -172,7 +172,9 @@ Testes (um caso por regra):
 - uma linha estranha → `naoReconhecidas` e `bate` falso se a soma não fechar;
 - texto de outra loja → null.
 
-## T3 · Leitores do Lidl e do E.Leclerc e reconhecimento da loja [ ]
+## T3 · Leitores do Lidl e do E.Leclerc e reconhecimento da loja [x]
+
+> **Feito a 2026-10-27.** Talões reais: **Pingo Doce 24/24, Lidl 66/66, E.Leclerc 1/1 batem.** Limitação do E.Leclerc: o cabeçalho tem as letras espaçadas e perdem-se os espaços entre palavras, por isso só uma localidade de uma palavra fica certa (a real, "Entroncamento", fica).
 - `lib/import/taloes/lidl.dart` (`lerLidl`) e `leclerc.dart` (`lerLeclerc`), com as regras da secção 0.3.
 - `lib/import/taloes/ler_talao.dart`: `TalaoLido? lerTalao(String texto)` → tenta os três; null se nenhum reconhece.
 - Testes com fixtures fictícias, uma por forma da tabela da secção 0.3:
