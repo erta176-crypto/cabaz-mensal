@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show ProviderListenable;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../domain/estatisticas.dart';
@@ -239,3 +240,28 @@ final estadoSyncProvider = StreamProvider<EstadoSync>(
 final pendentesProvider = StreamProvider<List<AlteracaoPendente>>(
   (ref) => ref.watch(syncRepositoryProvider).observarPendentes(),
 );
+
+/// Os providers de que o catálogo de uma importação precisa. O ecrã que
+/// importa tem de os ouvir no build: sem ninguém a ouvir, um provider ainda
+/// não tem valor (e no Riverpod 3 é descartado enquanto carrega), e a análise
+/// corria com os aliases ou os artigos vazios.
+final providersDoCatalogo = <ProviderListenable<AsyncValue<Object>>>[
+  lojasProvider,
+  categoriasProvider,
+  artigosProvider,
+  aliasesProvider,
+  precosAtuaisProvider,
+  itensListaProvider,
+];
+
+/// Espera que os dados do catálogo (cache local) tenham valor. Os providers
+/// têm de estar a ser ouvidos ([providersDoCatalogo]).
+Future<void> carregarCatalogo(T Function<T>(ProviderListenable<T>) ler) =>
+    Future.wait([
+      ler(lojasProvider.future),
+      ler(categoriasProvider.future),
+      ler(artigosProvider.future),
+      ler(aliasesProvider.future),
+      ler(precosAtuaisProvider.future),
+      ler(itensListaProvider.future),
+    ]);

@@ -231,6 +231,8 @@ Testes:
 ## T5 · Ecrã: "Talões (PDF)" em Importar e exportar [x]
 
 > **Código feito a 2026-10-27; falta a prova à mão (talões reais no Chrome e no Android).** Os testes ficaram em três peças em vez de um teste do ecrã inteiro (que exigiria simular o seletor de ficheiros, o servidor e uma dúzia de providers): `lerPdfs` (vários PDFs, ilegíveis à parte, progresso), `PrevisualizacaoTaloes` (resumo, estados, linhas, botões, sem rede) e a análise da T4. A `ZonaLargar` ganhou `aoLargarVarios` (vários PDFs na web). Um `.pdf` escolhido ou largado noutra opção muda para "Talões (PDF)". "Talões (PDF)" não aparece em Exportar.
+>
+> **Prova no Chrome (2026-10-27):** os PDFs leem-se e um talão já importado aparece "Já importado". Apanhou um erro anterior à Fase 5: o ecrã de importação montava o catálogo com `ref.read(aliasesProvider).value`, que vem vazio quando nenhum widget ouve o provider (no Riverpod 3 é até descartado enquanto carrega) — os aliases não eram usados (também na importação de CSV/Excel). Corrigido com teste: o ecrã ouve `providersDoCatalogo` no build e espera por eles (`carregarCatalogo`) antes de analisar.
 - `OQue.taloes('Talões (PDF)', 'taloes')`: só para importar (não aparece em exportar); `paraImportar = [Formato.pdf]`; o botão usa `FilePicker.pickFiles(allowMultiple: true, allowedExtensions: ['pdf'])`; o arrastar e largar aceita vários `.pdf`.
 - **Fluxo:**
   1. "A ler 3 de 12…";

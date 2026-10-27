@@ -199,6 +199,7 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
       _categoriasApagadas = await ref
           .read(categoriasRepositoryProvider)
           .apagadas();
+      await carregarCatalogo(ref.read);
       if (!mounted) return;
       final r = analisarTaloes(lidos.lidos, _catalogo(), existentes);
       setState(() {
@@ -278,6 +279,7 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
       final categoriasApagadas = await ref
           .read(categoriasRepositoryProvider)
           .apagadas();
+      await carregarCatalogo(ref.read);
       if (!mounted) return;
       setState(() {
         _nome = nome;
@@ -670,6 +672,11 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
 
   @override
   Widget build(BuildContext context) {
+    // O catálogo das importações vem destes providers: ouvi-los mantém-nos
+    // ativos e com valor (ver providersDoCatalogo).
+    for (final p in providersDoCatalogo) {
+      ref.watch(p);
+    }
     final tema = Theme.of(context);
     final online = ref.watch(estadoSyncProvider).value?.online ?? true;
     final largo = MediaQuery.sizeOf(context).width >= larguraEcraLargo;
