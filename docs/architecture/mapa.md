@@ -23,6 +23,7 @@
   - `supabase_estatisticas.dart`: RPC `painel` (com cache do último resultado na tabela `estado`, chave `painel:<período>:<loja|todas>`) e `historico_compras` e linhas de uma compra (só com rede). Cada pedido tem um limite de 10 s; esgotado, conta como sem rede (decidido no portão da Fase 2: no Android, sem ligação, o pedido podia ficar preso).
 
 ## `lib/import/`: importação sem interface, testável
+- `taloes/texto_pdf.dart`: `textoDoPdf` (texto de um PDF com o `pdfrx`).
 - Cópia completa JSON (formato v2 do `cabaz-seed.json`): `seed_modelo.dart`, `importar_seed.dart`, `exportar.dart`.
 - Ficheiros CSV e XLSX:
   - `tabela_lida.dart`: leitura;

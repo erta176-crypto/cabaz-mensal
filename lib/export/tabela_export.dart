@@ -6,7 +6,7 @@ library;
 import 'dart:convert';
 
 import 'package:csv/csv.dart';
-import 'package:excel/excel.dart';
+import 'package:excel_community/excel_community.dart';
 
 /// Dinheiro em cêntimos (CSV: "1,29"; XLSX: número 1.29).
 class Cent {

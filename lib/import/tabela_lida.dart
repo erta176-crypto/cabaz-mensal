@@ -5,7 +5,7 @@ library;
 import 'dart:convert';
 
 import 'package:csv/csv.dart';
-import 'package:excel/excel.dart';
+import 'package:excel_community/excel_community.dart';
 
 class TabelaLida {
   const TabelaLida({

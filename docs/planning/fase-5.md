@@ -1,6 +1,6 @@
 # Fase 5 · Talões em PDF
 
-**Estado:** plano revisto a 2026-10-27 (2.ª versão, mais detalhada), **à espera de aprovação**. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano revisto e aprovado a 2026-10-27 (com a D6). Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Executar tarefa a tarefa (T1 → T8). O que não está aqui não se faz: vai para `docs/planning/notas.md`. A seguir: Fase 6, talões por fotografia (OCR, só Android).
 
@@ -89,7 +89,7 @@ Comum: trabalhar linha a linha sobre `fullText` (linhas sem espaços nas pontas;
 | D1 | Pré-visualizar e confirmar antes de gravar; avisar se o talão já foi importado. | utilizador |
 | D2 | Em "Importar e exportar": opção "Talões (PDF)" em "O que importar"; vários PDFs de uma vez; arrastar e largar na web. | utilizador |
 | D3 | Linhas sem artigo: ligar na pré-visualização a um artigo existente (com pesquisa) ou criar novo; ao gravar, o texto do talão fica como alias dessa loja. | utilizador |
-| D4 | `pdfrx` (MIT, Android e web por WASM) para o texto do PDF; único pacote novo. Decisão `0010-pdfrx.md`. | utilizador |
+| D4 | `pdfrx` 2.6.5 (MIT, Android e web por WASM) para o texto do PDF e, para o permitir, `excel_community` 2.6.0 no lugar do `excel` (decisão `0010-pdfrx.md`, opção A). | utilizador |
 | D5 | Desconto da compra inteira repartido pelas linhas em proporção ao valor de cada uma; os cêntimos que sobram vão para as linhas de maior valor; nenhuma linha fica negativa. | convenção dos dados |
 | D6 | **Proposta (confirmar ao aprovar):** `origem` fica `'importacao'`, como os 145 talões antigos, e `ficheiro` = nome do PDF. Marcar `'talao'` obrigaria a reescrever a RPC `importar_lote` numa migração, para uma distinção que os dados antigos não têm. | revisão do plano |
 | D7 | Talões repetidos **no mesmo lote** (mesma loja e número, ex.: "… (1).pdf") contam uma vez; os outros aparecem como "Repetido neste lote". | revisão do plano |
@@ -107,7 +107,9 @@ Fotografias e OCR (Fase 6); outras lojas; editar compras já gravadas; marcar it
 
 ---
 
-## T1 · Pacote `pdfrx`, leitura de texto e decisão 0010 [ ]
+## T1 · Pacote `pdfrx`, leitura de texto e decisão 0010 [x]
+
+> **Feito a 2026-10-27.** O `pdfrx` não resolvia com o `excel` 4.0.6 (`archive` 3 vs 4) e as versões antigas do `pdfrx` não compilam; por escolha do utilizador (opção A, decisão 0010): `pdfrx: 2.6.5` e `excel_community: 2.6.0` no lugar do `excel` (só mudaram 2 `import`). API confirmada na fonte: `pdfrxFlutterInitialize`, `PdfDocument.openData`, `pages`, `loadText()` → `fullText`, `dispose`; na web o `pdfium.wasm` vem nos assets do pacote. `textoDoPdf` testado com um PDF fictício gerado no teste (o PDFium corre no `flutter test`). 247 testes verdes; web e APK compilam (APK 72,1 → 90,4 MB). A leitura de talões reais no Chrome e no Android fica para a T5, com o ecrã.
 - **Versão:** a mais recente estável do `pdfrx` com mais de 2 semanas (hoje 2.10.1 → confirmar a data no pub.dev; versão exata, sem `^`). `flutter pub get`; registar aqui a versão e os pacotes novos do `pubspec.lock`.
 - **Confirmar na fonte da versão escolhida:**
   - `pdfrxFlutterInitialize()`: onde se chama (em `main.dart`, antes do `runApp`, ou só na primeira leitura);

@@ -26,7 +26,7 @@ Registar as compras de supermercado e perceber quanto se gasta e onde. Lojas hab
 | Base local | drift (SQLite; na web por `sqlite3.wasm`) |
 | Estado e navegação | flutter_riverpod 3, go_router 18 |
 | Servidor | supabase_flutter (auth + base de dados) |
-| Ficheiros | file_picker, share_plus, excel, csv, pdf |
+| Ficheiros | file_picker, share_plus, excel_community, csv, pdf, pdfrx (texto dos talões em PDF; decisão 0010) |
 | Outros | connectivity_plus, intl, uuid, google_fonts, web |
 | Publicação | GitHub Actions (`deploy-web.yml` → GitHub Pages, `build-apk.yml` → APK) |
 
