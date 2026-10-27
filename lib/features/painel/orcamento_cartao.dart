@@ -243,6 +243,8 @@ class _DialogoOrcamentoState extends ConsumerState<DialogoOrcamento> {
       content: SizedBox(
         width: 420,
         child: SingleChildScrollView(
+          // Espaço para o rótulo do primeiro campo, que flutua acima da caixa.
+          padding: const EdgeInsets.only(top: 8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,

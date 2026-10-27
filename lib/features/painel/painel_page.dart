@@ -269,26 +269,31 @@ class _PainelPageState extends ConsumerState<PainelPage> {
         ],
       ),
     );
-    final largo = MediaQuery.sizeOf(context).width >= larguraEcraLargo;
-
     return [
       if (meses.length > 1)
         _seccao('Gasto por mês', GraficoMeses(meses: meses)),
-      if (_lojaId == null && largo)
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: porLoja),
-              const SizedBox(width: 8),
-              Expanded(child: porCategoria),
-            ],
-          ),
+      if (_lojaId == null)
+        // Lado a lado só se houver espaço (não basta o ecrã ser largo: o
+        // menu fixo também ocupa largura).
+        LayoutBuilder(
+          builder: (context, c) => c.maxWidth >= 700
+              ? IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(child: porLoja),
+                      const SizedBox(width: 8),
+                      Expanded(child: porCategoria),
+                    ],
+                  ),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [porLoja, porCategoria],
+                ),
         )
-      else ...[
-        if (_lojaId == null) porLoja,
+      else
         porCategoria,
-      ],
       _seccao(
         'Artigos com mais gasto',
         Column(

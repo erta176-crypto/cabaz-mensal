@@ -419,6 +419,13 @@ void main() {
       },
     );
 
+    testWidgets('deitado com o teclado aberto (475×200): sem transbordos', (
+      tester,
+    ) async {
+      await abrir(tester, tamanho: const Size(475, 200));
+      expect(tester.takeException(), isNull);
+    });
+
     for (final escala in [1.0, 1.3]) {
       testWidgets('telemóvel deitado (área de 475×360, letra ×$escala): '
           'sem transbordos', (tester) async {

@@ -165,6 +165,8 @@ Testes (`test/lista_test.dart`, acrescentar): com orçamento e gasto mostra a li
 ## Portão da Fase 4
 
 > **No portão (2026-10-27):** o orçamento funcionou no telemóvel (diálogo e cartão). A captura do telemóvel deitado mostrou transbordos (anteriores à Fase 4): o menu fixo perdia espaço com as margens do sistema (passa a 300 px + a margem da esquerda, e ignora a da direita, que é da barra do sistema e pertence ao conteúdo) e a Lista não cabia em altura (em ecrã baixo, < 500 px, os três menus ficam numa só linha). Testes que os reproduzem em `shell_test.dart` e `lista_test.dart`.
+>
+> Segunda ronda (2026-10-27), também com testes primeiro: o menu fixo ignorava mal a margem da barra do sistema à direita; Histórico e Painel decidiam as duas colunas pela largura do ecrã (agora pela largura disponível ao lado do menu); Lista, Artigos e Histórico ganham `FiltrosEConteudo` (com pouca altura, os filtros sobem com a lista em vez de transbordar com o teclado aberto); o rótulo do primeiro campo do diálogo do orçamento já não fica cortado. A pedido do utilizador, "Painel e estatísticas" passa a ser o primeiro destino do menu e da barra inferior (a página inicial continua a ser a Lista).
 1. `dart format`, `flutter analyze`, `flutter test` verdes, com a saída real; `flutter build web` e `flutter build apk --release` compilam.
 2. Migração aplicada e verificada (T1), advisors sem avisos novos.
 3. Definir o orçamento no telemóvel aparece no PC (e vice-versa); sem rede, define-se e envia-se depois.

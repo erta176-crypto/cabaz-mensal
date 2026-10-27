@@ -202,40 +202,32 @@ class _ListaPageState extends ConsumerState<ListaPage> {
         ),
       ],
       corpo: ConteudoCentrado(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: _Menus(
-                prefs: prefs,
-                lojas: ativas,
-                aoMudar: _guardarPrefs,
-              ),
-            ),
-            Expanded(
-              child: ativas.isEmpty
-                  ? const _Vazio(
-                      'Ainda não há lojas. Importa os teus dados em '
-                      '"Importar e exportar" ou cria uma loja em "Artigos".',
-                    )
-                  : lista.linhas.isEmpty
-                  ? _Vazio(
-                      planear
-                          ? 'Ainda não há artigos habituais nesta loja. '
-                                'Usa "Adicionar artigo".'
-                          : 'A lista está vazia. Usa "Adicionar artigo" ou '
-                                'o modo Planear.',
-                    )
-                  : _Conteudo(
-                      lista: lista,
-                      prefs: prefs,
-                      aoGesto: _executar,
-                      aoAlternarGrupo: _alternarGrupo,
-                      aoAlterarQtd: _alterarQuantidade,
-                      aoVer: _verArtigo,
-                    ),
-            ),
-          ],
+        child: FiltrosEConteudo(
+          filtros: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: _Menus(prefs: prefs, lojas: ativas, aoMudar: _guardarPrefs),
+          ),
+          conteudo: ativas.isEmpty
+              ? const _Vazio(
+                  'Ainda não há lojas. Importa os teus dados em '
+                  '"Importar e exportar" ou cria uma loja em "Artigos".',
+                )
+              : lista.linhas.isEmpty
+              ? _Vazio(
+                  planear
+                      ? 'Ainda não há artigos habituais nesta loja. '
+                            'Usa "Adicionar artigo".'
+                      : 'A lista está vazia. Usa "Adicionar artigo" ou '
+                            'o modo Planear.',
+                )
+              : _Conteudo(
+                  lista: lista,
+                  prefs: prefs,
+                  aoGesto: _executar,
+                  aoAlternarGrupo: _alternarGrupo,
+                  aoAlterarQtd: _alterarQuantidade,
+                  aoVer: _verArtigo,
+                ),
         ),
       ),
       rodape: ativas.isEmpty

@@ -38,7 +38,7 @@
 - `texto_lista.dart`: TXT com emojis, também usado na partilha da Lista.
 
 ## `lib/features/`: um diretório por ecrã
-- `shell`: navegação com corte a 800 px e faixa de sincronização; `tema_controlos.dart` (botão sol/lua no menu lateral e menu Tema das Definições).
+- `shell`: navegação com corte a 800 px e faixa de sincronização; `FiltrosEConteudo` (filtros fixos, ou a rolar com a lista quando há pouca altura); `tema_controlos.dart` (botão sol/lua no menu lateral e menu Tema das Definições).
 - `entrada`
 - `lista`: Lista do mês e Concluir compra.
 - `artigos`: Artigos, categorias e lojas; `ver_artigo.dart` (Ver artigo com preços por loja e evolução do preço, aberto a partir de Artigos, Lista, Painel e detalhe da compra).

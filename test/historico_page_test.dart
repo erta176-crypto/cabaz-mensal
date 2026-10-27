@@ -70,8 +70,10 @@ void main() {
     WidgetTester t,
     _EstatisticasFalsas repo, {
     double largura = 400,
+    double altura = 1600,
+    double menu = 0,
   }) async {
-    t.view.physicalSize = Size(largura, 1600);
+    t.view.physicalSize = Size(largura, altura);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
     await t.pumpWidget(
@@ -84,7 +86,13 @@ void main() {
         ],
         child: MaterialApp(
           theme: construirTema(Brightness.light, fontesGoogle: false),
-          home: const HistoricoPage(),
+          // [menu] simula o menu fixo do ecrã largo, ao lado da página.
+          home: Row(
+            children: [
+              SizedBox(width: menu),
+              const Expanded(child: HistoricoPage()),
+            ],
+          ),
         ),
       ),
     );
@@ -145,6 +153,34 @@ void main() {
     expect(find.byType(DetalheCompraPage), findsNothing);
     expect(find.byType(DetalheCompra), findsOneWidget);
     expect(find.byType(HistoricoPage), findsOneWidget);
+  });
+
+  testWidgets('ecrã largo mas pouco espaço ao lado do menu: uma coluna', (
+    t,
+  ) async {
+    await abrir(
+      t,
+      _EstatisticasFalsas(() async => _compras),
+      largura: 900,
+      altura: 600,
+      menu: 380,
+    );
+    expect(t.takeException(), isNull);
+    await t.tap(find.text(formatarCent(1500)));
+    await t.pumpAndSettle();
+    expect(find.byType(DetalheCompraPage), findsOneWidget);
+  });
+
+  testWidgets('deitado com o teclado aberto (475×200): sem transbordos', (
+    t,
+  ) async {
+    await abrir(
+      t,
+      _EstatisticasFalsas(() async => _compras),
+      largura: 475,
+      altura: 200,
+    );
+    expect(t.takeException(), isNull);
   });
 
   testWidgets('erro sem rede mostra a mensagem', (t) async {

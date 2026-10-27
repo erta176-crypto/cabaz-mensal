@@ -246,14 +246,12 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
               }),
             ),
       corpo: ConteudoCentrado(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: _filtros(listaCategorias),
-            ),
-            Expanded(child: corpo),
-          ],
+        child: FiltrosEConteudo(
+          filtros: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: _filtros(listaCategorias),
+          ),
+          conteudo: corpo,
         ),
       ),
     );

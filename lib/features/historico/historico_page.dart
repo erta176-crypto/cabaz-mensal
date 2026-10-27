@@ -88,9 +88,7 @@ class _HistoricoPageState extends ConsumerState<HistoricoPage> {
     final lojas = ref.watch(lojasProvider).value ?? const <Loja>[];
     final chave = _chave();
     final compras = ref.watch(_comprasHistoricoProvider(chave));
-    final largo = MediaQuery.sizeOf(context).width >= larguraEcraLargo;
-
-    final lista = compras.when(
+    Widget lista(bool largo) => compras.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (erro, _) => Center(
         child: Padding(
@@ -118,16 +116,21 @@ class _HistoricoPageState extends ConsumerState<HistoricoPage> {
 
     return Pagina(
       titulo: 'Histórico',
-      corpo: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(padding: const EdgeInsets.all(16), child: _filtros(lojas)),
-          Expanded(
-            child: largo
+      // Duas colunas só se couberem a lista (420) e o detalhe (320): não
+      // basta o ecrã ser largo, o menu fixo também ocupa largura.
+      corpo: LayoutBuilder(
+        builder: (context, c) {
+          final largo = c.maxWidth >= 420 + 1 + 320;
+          return FiltrosEConteudo(
+            filtros: Padding(
+              padding: const EdgeInsets.all(16),
+              child: _filtros(lojas),
+            ),
+            conteudo: largo
                 ? Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      SizedBox(width: 420, child: lista),
+                      SizedBox(width: 420, child: lista(true)),
                       const VerticalDivider(width: 1),
                       Expanded(
                         child: selecionada == null
@@ -139,9 +142,9 @@ class _HistoricoPageState extends ConsumerState<HistoricoPage> {
                       ),
                     ],
                   )
-                : lista,
-          ),
-        ],
+                : lista(false),
+          );
+        },
       ),
     );
   }

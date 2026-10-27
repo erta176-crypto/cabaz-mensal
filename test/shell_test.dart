@@ -128,6 +128,11 @@ void main() {
     );
   }
 
+  test('Painel e estatísticas é o primeiro destino', () {
+    expect(destinos.first.caminho, '/painel');
+    expect(destinosBarraInferior.first.caminho, '/painel');
+  });
+
   testWidgets('o corte é exatamente nos 800 px', (tester) async {
     await _tamanho(tester, 799);
     await tester.pumpWidget(_app('/lista'));

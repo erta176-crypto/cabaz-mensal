@@ -157,6 +157,14 @@ void main() {
     await t.tap(find.text('Definir orçamento'));
     await t.pumpAndSettle();
     expect(find.text('Editar orçamento'), findsOneWidget);
+    // O rótulo do primeiro campo flutua acima da caixa: não pode ficar
+    // cortado pelo topo da zona com scroll.
+    expect(
+      t.getRect(find.text('Total do mês (€)')).top,
+      greaterThanOrEqualTo(
+        t.getRect(find.byType(SingleChildScrollView).last).top,
+      ),
+    );
 
     await t.enterText(
       find.widgetWithText(TextField, 'Total do mês (€)'),

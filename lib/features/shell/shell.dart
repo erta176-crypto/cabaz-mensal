@@ -24,19 +24,19 @@ class Destino {
 
 const destinos = <Destino>[
   Destino(
-    caminho: '/lista',
-    rotulo: 'Lista do mês',
-    rotuloCurto: 'Lista',
-    icone: Icons.checklist_outlined,
-    iconeSelecionado: Icons.checklist,
-    naBarraInferior: true,
-  ),
-  Destino(
     caminho: '/painel',
     rotulo: 'Painel e estatísticas',
     rotuloCurto: 'Painel',
     icone: Icons.insights_outlined,
     iconeSelecionado: Icons.insights,
+    naBarraInferior: true,
+  ),
+  Destino(
+    caminho: '/lista',
+    rotulo: 'Lista do mês',
+    rotuloCurto: 'Lista',
+    icone: Icons.checklist_outlined,
+    iconeSelecionado: Icons.checklist,
     naBarraInferior: true,
   ),
   Destino(
@@ -312,5 +312,39 @@ class ConteudoCentrado extends StatelessWidget {
       constraints: BoxConstraints(maxWidth: largura),
       child: child,
     ),
+  );
+}
+
+/// Filtros no topo e a lista por baixo. Com pouca altura (telemóvel deitado,
+/// teclado aberto) os filtros sobem com a lista em vez de a esmagarem.
+class FiltrosEConteudo extends StatelessWidget {
+  const FiltrosEConteudo({
+    super.key,
+    required this.filtros,
+    required this.conteudo,
+  });
+
+  final Widget filtros;
+
+  /// Normalmente uma lista com scroll (sem controlador próprio).
+  final Widget conteudo;
+
+  /// Abaixo desta altura os filtros deixam de ficar fixos.
+  static const alturaMinima = 420.0;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, c) => c.maxHeight >= alturaMinima
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              filtros,
+              Expanded(child: conteudo),
+            ],
+          )
+        : NestedScrollView(
+            headerSliverBuilder: (_, _) => [SliverToBoxAdapter(child: filtros)],
+            body: conteudo,
+          ),
   );
 }

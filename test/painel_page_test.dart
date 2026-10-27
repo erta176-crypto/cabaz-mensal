@@ -60,6 +60,7 @@ void main() {
     WidgetTester t,
     _EstatisticasFalsas repo, {
     double largura = 500,
+    double menu = 0,
   }) async {
     t.view.physicalSize = Size(largura, 3000);
     t.view.devicePixelRatio = 1;
@@ -74,7 +75,13 @@ void main() {
         ],
         child: MaterialApp(
           theme: construirTema(Brightness.light, fontesGoogle: false),
-          home: const PainelPage(),
+          // [menu] simula o menu fixo do ecrã largo, ao lado da página.
+          home: Row(
+            children: [
+              SizedBox(width: menu),
+              const Expanded(child: PainelPage()),
+            ],
+          ),
         ),
       ),
     );
@@ -169,6 +176,21 @@ void main() {
     expect(
       t.getTopLeft(find.text('Por loja')).dy,
       t.getTopLeft(find.text('Por categoria')).dy,
+    );
+  });
+
+  testWidgets('ecrã largo mas pouco espaço ao lado do menu: em coluna', (
+    t,
+  ) async {
+    await abrir(
+      t,
+      _EstatisticasFalsas(() async => ResultadoPainel(_dados())),
+      largura: 900,
+      menu: 400,
+    );
+    expect(
+      t.getTopLeft(find.text('Por categoria')).dy,
+      greaterThan(t.getTopLeft(find.text('Por loja')).dy),
     );
   });
 
