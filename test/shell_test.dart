@@ -88,6 +88,18 @@ void main() {
     expect(find.text('pagina /definicoes'), findsOneWidget);
   });
 
+  testWidgets('telemóvel deitado com a barra do sistema à direita: menu sem '
+      'transbordos', (tester) async {
+    tester.view.physicalSize = const Size(820, 360);
+    tester.view.devicePixelRatio = 1;
+    tester.view.padding = const FakeViewPadding(right: 48);
+    tester.view.viewPadding = const FakeViewPadding(right: 48);
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(_app('/lista'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
   for (final escala in [1.0, 1.3, 1.5, 2.0]) {
     testWidgets(
       'telemóvel deitado (820×360, recorte à esquerda, letra ×$escala): '
