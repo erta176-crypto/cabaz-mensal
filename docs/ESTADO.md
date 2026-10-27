@@ -1,9 +1,9 @@
 # Estado do projeto
 
-*Atualizado em 2026-10-26. Manter curto; o detalhe está nos ficheiros ligados.*
+*Atualizado em 2026-10-27. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**5 · Talões em PDF:** a planear (Lidl, Pingo Doce, E.Leclerc; pré-visualizar e confirmar). Depois: Fase 6 talões por fotografia.
+**5 · Talões em PDF:** plano escrito a 2026-10-27, à espera de aprovação ([`planning/fase-5.md`](planning/fase-5.md)). Depois: Fase 6 talões por fotografia.
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -21,7 +21,7 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Plano da Fase 5 (talões em PDF).
+1. Aprovar o plano da Fase 5 e executá-lo (T1 → T7).
 2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
