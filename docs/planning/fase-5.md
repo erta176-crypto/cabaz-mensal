@@ -51,7 +51,7 @@ Comum: trabalhar linha a linha sobre `fullText` (linhas sem espaços nas pontas;
   |---|---|
   | `C SALMAO POSTA KG 0,600 X 16,99 10,19` | letra do IVA + texto + `q X preço` + valor. Se o texto acaba em ` KG` ou `q` não é inteiro (`,000`) → peso (`q` kg → g); senão quantidade inteira |
   | `E FOLHADO DE SALSICHA 0,99` | letra + texto + valor (quantidade 1) |
-  | `Poupança Imediata (3,00)` | desconto do artigo anterior |
+  | `Poupança Imediata (3,00)`, `Exclusivo APP/Poupa Mais (0,05)`, `Exclusivo O Meu Pingo Doce (1,00)` — qualquer `<texto> (x)` antes de `Descontos Extra` | desconto do artigo anterior |
   | `Descontos Extra` e depois `<texto> (15,36)` | desconto da compra inteira (ex.: "Saldo Pingo Doce") |
   | linha só com maiúsculas, espaços e `/ . , & + -` (ex.: `PEIXARIA`, `MERCEARIA + PET FOOD`) | secção (guardar como sugestão de categoria, ver T6) |
 
@@ -125,7 +125,9 @@ Fotografias e OCR (Fase 6); outras lojas; editar compras já gravadas; marcar it
   - `flutter build web` e `flutter build apk --release` compilam;
   - à mão, um talão real de cada loja lido na web (Chrome) e no Android dá o mesmo texto que o protótipo (comparar contagem de linhas).
 
-## T2 · Modelo e leitor do Pingo Doce [ ]
+## T2 · Modelo e leitor do Pingo Doce [x]
+
+> **Feito a 2026-10-27.** Com os talões reais apareceram mais duas formas de desconto do artigo ("Exclusivo …"); a regra passou a geral (qualquer `<texto> (x)` antes de `Descontos Extra`). Em vez do script em `tool/`, a verificação com os talões reais é um teste (`test/taloes/taloes_reais_test.dart`) que lê `dados-privados/talões/` com o `pdfrx` e é saltado se a pasta não existir; só mostra contagens. **Pingo Doce: 24/24 batem.**
 Testes primeiro (`test/taloes/pingo_doce_test.dart`), com textos **fictícios** em `test/fixtures/taloes/pingo_doce_*.txt` (estrutura igual, artigos/valores/sítios inventados, sem NIF nem cartões).
 
 `lib/import/taloes/talao.dart`:
@@ -177,7 +179,7 @@ Testes (um caso por regra):
   - Lidl: as 6 formas, incluindo o `------------` no meio e as três formas de desconto;
   - E.Leclerc: cabeçalho com letras espaçadas, linha em duas partes, `* `, `Total 35 artigos …`, os ganhos do cartão não contam como desconto;
   - `lerTalao` escolhe o leitor certo; texto sem loja → null.
-- **Verificação local, não versionada:** um script em `tool/verificar_taloes.dart` (no `.gitignore`), que lê `dados-privados/talões/` com o `pdfrx_engine`, corre `lerTalao` e imprime só contagens. Tem de dar `bate` em todos os PDFs (meta: Pingo Doce 24/24, Lidl 66/66, E.Leclerc 1/1); registar aqui as contagens.
+- **Verificação com os talões reais:** acrescentar Lidl e E.Leclerc a `test/taloes/taloes_reais_test.dart` (saltado sem `dados-privados/`; só contagens). Meta: Lidl 66/66, E.Leclerc 1/1; registar aqui.
 
 ## T4 · Do talão ao lote de importação [ ]
 `lib/import/taloes/importar_taloes.dart` (puro, testável), sem mexer em `analisarCompras`:

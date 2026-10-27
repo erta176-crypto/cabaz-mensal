@@ -1,0 +1,30 @@
+PD Vila Ficticia Centro
+Tel.: 000 000 000
+Pingo Doce - Distribuição Alimentar, S.A.
+Sede: Rua Inventada, 1-000-000 Lisboa
+Artigos
+PEIXARIA 
+ C PESCADA POSTA KG 0,332 X 10,00 3,32 
+ Poupança Imediata (0,32)
+FRUTAS E VEGETAIS 
+ C SALADA MISTA 2,000 X 0,90 1,80 
+ C MAÇÃ GALA 1,250 X 2,00 2,50 
+MERCEARIA + PET FOOD 
+ E BOLACHA MARIA 1,20
+ Poupança Imediata (0,20)
+ E ARROZ CAROLINO 3,000 X 1,10 3,30 
+ Exclusivo APP/Poupa Mais (0,05)
+Descontos Extra 
+ Saldo Pingo Doce (2,00)
+Resumo
+TOTAL 12,12 
+TOTAL POUPANÇA (2,57)
+TOTAL A PAGAR 9,55
+Pagamentos
+TOTAL PAGO 9,55 
+ Multibanco 9,55 
+Resumo IVA
+Taxa Valor s/IVA Valor IVA Valor c/IVA 
+ C 6% 7,00 0,42 7,42 
+Fatura Simplificada FS 0000000000000/000001
+1ª Via Original Data de emissão:05/10/2026
