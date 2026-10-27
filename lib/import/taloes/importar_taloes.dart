@@ -8,6 +8,7 @@ import '../../domain/texto.dart';
 import '../analise_comum.dart';
 import '../previsualizacao.dart';
 import 'ler_talao.dart';
+import 'seccoes.dart';
 import 'talao.dart';
 
 enum EstadoTalao {
@@ -29,6 +30,7 @@ class LinhaAnalisada {
     required this.descontoTotalCent,
     required this.artigo,
     required this.nomeNovo,
+    this.categoriaSugerida,
   });
 
   final LinhaTalao linha;
@@ -41,6 +43,9 @@ class LinhaAnalisada {
 
   /// Nome do artigo novo: o texto com só a 1.ª letra maiúscula.
   final String nomeNovo;
+
+  /// Id da categoria sugerida pela secção do talão (para um artigo novo).
+  final String? categoriaSugerida;
 
   int get pagoCent => linha.brutoCent - descontoTotalCent;
 }
@@ -184,6 +189,10 @@ analisarTaloes(
               descontoTotalCent: l.descontoCent + parte[i],
               artigo: cat.artigo(l.texto) ?? cat.artigo(nomeDoTexto(l.texto)),
               nomeNovo: nomeDoTexto(l.texto),
+              categoriaSugerida: switch (categoriaDaSeccao(l.seccao)) {
+                final nome? => cat.categoria(nome)?.id,
+                null => null,
+              },
             ),
         ],
       ),
@@ -192,9 +201,15 @@ analisarTaloes(
   return (taloes: taloes, naoReconhecidos: falhas);
 }
 
-/// O lote para a RPC importar_lote com os talões que entram ([EstadoTalao.importa]).
-/// [escolhas] (por [chaveEscolha]) trocam o artigo de uma linha.
-LoteImportacao loteDosTaloes(
+/// Texto de talão a guardar como alias depois de importar.
+typedef AliasNovo = ({String lojaId, String texto, String artigoId});
+
+/// O lote para a RPC importar_lote com os talões que entram
+/// ([EstadoTalao.importa]); [escolhas] (por [chaveEscolha]) trocam o artigo
+/// de uma linha. [aliases]: os textos que não ligavam a nenhum artigo
+/// (novos ou ligados à mão), para gravar depois de importar — da próxima
+/// vez ligam sozinhos, mesmo que o artigo mude de nome.
+({LoteImportacao lote, List<AliasNovo> aliases}) loteDosTaloes(
   List<TalaoAnalisado> taloes,
   Map<String, EscolhaArtigo> escolhas,
   Catalogo cat, {
@@ -203,6 +218,7 @@ LoteImportacao loteDosTaloes(
   final lote = LoteImportacao();
   final r = Resolvedor(cat, lote, novoId: novoId);
   final nomeCategoria = {for (final c in cat.categorias) c.id: c.nome};
+  final aliases = <String, AliasNovo>{};
 
   String artigoDe(TalaoAnalisado t, LinhaAnalisada l) {
     final unidade = l.linha.pesoG != null ? Unidade.kg : Unidade.un;
@@ -220,7 +236,11 @@ LoteImportacao loteDosTaloes(
       case null:
         return (l.artigo ??
                 r.artigoExistente(l.nomeNovo) ??
-                r.criarArtigo(l.nomeNovo, unidade: unidade))
+                r.criarArtigo(
+                  l.nomeNovo,
+                  categoria: nomeCategoria[l.categoriaSugerida],
+                  unidade: unidade,
+                ))
             .id;
     }
   }
@@ -240,6 +260,14 @@ LoteImportacao loteDosTaloes(
     });
     for (final l in t.linhas) {
       final artigoId = artigoDe(t, l);
+      final chave = chaveEscolha(t.loja.id, l.linha.texto);
+      if (l.artigo == null || escolhas.containsKey(chave)) {
+        aliases[chave] = (
+          lojaId: t.loja.id,
+          texto: l.linha.texto,
+          artigoId: artigoId,
+        );
+      }
       lote.linhas.add({
         'id': r.novoId(),
         'compra_id': compraId,
@@ -262,5 +290,5 @@ LoteImportacao loteDosTaloes(
       });
     }
   }
-  return lote;
+  return (lote: lote, aliases: aliases.values.toList());
 }

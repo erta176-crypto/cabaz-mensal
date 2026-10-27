@@ -217,9 +217,15 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
     final taloes = _taloes!;
     setState(() => _ocupado = true);
     try {
-      final lote = loteDosTaloes(taloes, _escolhas, _catalogo());
+      final (:lote, :aliases) = loteDosTaloes(taloes, _escolhas, _catalogo());
       await ref.read(dadosRepositoryProvider).importarLote(lote.toJson());
       await ref.read(syncRepositoryProvider).recarregarTudo();
+      // Depois de recarregar (que limpa a cache): os artigos já existem no
+      // servidor e os aliases vão pela fila, como as outras escritas.
+      final artigos = ref.read(artigosRepositoryProvider);
+      for (final a in aliases) {
+        await artigos.guardarAlias(a.lojaId, a.texto, a.artigoId);
+      }
       if (!mounted) return;
       final n = lote.compras.length;
       _mostrar(
@@ -829,6 +835,12 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
                       in ref.watch(artigosProvider).value ?? const <Artigo>[])
                     a.id: a.nome,
                 },
+                artigos: ref.watch(artigosProvider).value ?? const [],
+                categorias: ref.watch(categoriasProvider).value ?? const [],
+                aoEscolher: (chave, escolha) => setState(() {
+                  _escolhas = {..._escolhas}..remove(chave);
+                  if (escolha != null) _escolhas[chave] = escolha;
+                }),
                 online: online,
                 aGravar: _ocupado,
                 aoImportar: _gravarTaloes,

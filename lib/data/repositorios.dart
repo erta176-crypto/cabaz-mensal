@@ -68,6 +68,10 @@ abstract interface class ArtigosRepository {
   /// Textos de talão por artigo (para a pesquisa).
   Stream<Map<String, List<String>>> observarAliases();
 
+  /// Guarda um texto de talão como alias do artigo nessa loja (da próxima
+  /// importação liga sozinho). Gravar um alias que já existe não duplica.
+  Future<void> guardarAlias(String lojaId, String textoTalao, String artigoId);
+
   /// Registos de preço de um artigo (não apagados), por data crescente.
   Stream<List<RegistoPreco>> observarRegistos(String artigoId);
 

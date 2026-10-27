@@ -23,7 +23,7 @@
   - `supabase_estatisticas.dart`: RPC `painel` (com cache do último resultado na tabela `estado`, chave `painel:<período>:<loja|todas>`) e `historico_compras` e linhas de uma compra (só com rede). Cada pedido tem um limite de 10 s; esgotado, conta como sem rede (decidido no portão da Fase 2: no Android, sem ligação, o pedido podia ficar preso).
 
 ## `lib/import/`: importação sem interface, testável
-- `taloes/`: `texto_pdf.dart` (`textoDoPdf`, com o `pdfrx`), `talao.dart` (`TalaoLido`, `LinhaTalao`), `pingo_doce.dart`, `lidl.dart`, `leclerc.dart` (leitores) `ler_talao.dart` (`lerTalao`: reconhece a loja) e `importar_taloes.dart` (`analisarTaloes`: estado de cada talão e artigo de cada linha; `loteDosTaloes`: lote para a `importar_lote`; `repartirDesconto`). Testes com talões fictícios em `test/fixtures/taloes/`; `test/taloes/taloes_reais_test.dart` verifica os reais de `dados-privados/` (saltado sem a pasta).
+- `taloes/`: `texto_pdf.dart` (`textoDoPdf`, com o `pdfrx`), `talao.dart` (`TalaoLido`, `LinhaTalao`), `pingo_doce.dart`, `lidl.dart`, `leclerc.dart` (leitores) `ler_talao.dart` (`lerTalao`: reconhece a loja) e `importar_taloes.dart` (`analisarTaloes`: estado de cada talão e artigo de cada linha; `loteDosTaloes`: lote para a `importar_lote` e aliases a gravar; `repartirDesconto`), `seccoes.dart` (secção do talão → categoria sugerida). Testes com talões fictícios em `test/fixtures/taloes/`; `test/taloes/taloes_reais_test.dart` verifica os reais de `dados-privados/` (saltado sem a pasta).
 - Cópia completa JSON (formato v2 do `cabaz-seed.json`): `seed_modelo.dart`, `importar_seed.dart`, `exportar.dart`.
 - Ficheiros CSV e XLSX:
   - `tabela_lida.dart`: leitura;

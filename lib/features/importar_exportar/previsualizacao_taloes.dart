@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/formatos.dart';
+import '../../domain/modelos.dart';
+import '../../domain/texto.dart';
 import '../../import/taloes/importar_taloes.dart';
+import '../artigos/artigos_page.dart' show artigoCorresponde;
 
 final _kg = NumberFormat('0.000', 'pt_PT');
 
@@ -19,7 +22,9 @@ class PrevisualizacaoTaloes extends StatelessWidget {
     required this.aGravar,
     required this.aoImportar,
     required this.aoCancelar,
-    this.acoesLinha,
+    this.artigos = const [],
+    this.categorias = const [],
+    this.aoEscolher,
   });
 
   final List<TalaoAnalisado> taloes;
@@ -33,8 +38,13 @@ class PrevisualizacaoTaloes extends StatelessWidget {
   final VoidCallback aoImportar;
   final VoidCallback aoCancelar;
 
-  /// Ações de uma linha com artigo novo (ligar, mudar o nome, categoria).
-  final Widget Function(TalaoAnalisado talao, LinhaAnalisada linha)? acoesLinha;
+  /// Artigos ativos (para "Ligar a um artigo…") e categorias.
+  final List<Artigo> artigos;
+  final List<Categoria> categorias;
+
+  /// Escolha numa linha com artigo novo (null = desfazer). Sem isto, as
+  /// linhas não têm menu.
+  final void Function(String chave, EscolhaArtigo? escolha)? aoEscolher;
 
   int _contar(EstadoTalao e) => taloes.where((t) => t.estado == e).length;
 
@@ -61,12 +71,73 @@ class PrevisualizacaoTaloes extends StatelessWidget {
         : '$resumo · ${n(naoReconhecidos.length, 'não reconhecido', 'não reconhecidos')}';
   }
 
-  String _artigoDa(TalaoAnalisado t, LinhaAnalisada l) =>
-      switch (escolhas[chaveEscolha(t.loja.id, l.linha.texto)]) {
-        LigarArtigo(:final artigoId) => nomesArtigos[artigoId] ?? '—',
-        NovoArtigo(:final nome) => 'Novo: $nome',
-        null => l.artigo?.nome ?? 'Novo: ${l.nomeNovo}',
-      };
+  String? _categoria(String? id) =>
+      categorias.where((c) => c.id == id).firstOrNull?.nome;
+
+  String _artigoDa(TalaoAnalisado t, LinhaAnalisada l) {
+    String novo(String nome, String? categoriaId) =>
+        ['Novo: $nome', ?_categoria(categoriaId)].join(' · ');
+    return switch (escolhas[chaveEscolha(t.loja.id, l.linha.texto)]) {
+      LigarArtigo(:final artigoId) => nomesArtigos[artigoId] ?? '—',
+      NovoArtigo(:final nome, :final categoriaId) => novo(nome, categoriaId),
+      null => l.artigo?.nome ?? novo(l.nomeNovo, l.categoriaSugerida),
+    };
+  }
+
+  /// Menu da linha: só nas linhas com artigo novo dos talões que entram.
+  Widget? _menu(BuildContext context, TalaoAnalisado t, LinhaAnalisada l) {
+    final escolher = aoEscolher;
+    if (escolher == null || !t.estado.importa || l.artigo != null) return null;
+    final chave = chaveEscolha(t.loja.id, l.linha.texto);
+    final atual = escolhas[chave];
+    final nome = atual is NovoArtigo ? atual.nome : l.nomeNovo;
+    final categoria = atual is NovoArtigo
+        ? atual.categoriaId
+        : l.categoriaSugerida;
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.more_vert),
+      tooltip: 'Artigo desta linha',
+      onSelected: (acao) async {
+        switch (acao) {
+          case 'ligar':
+            final a = await showDialog<Artigo>(
+              context: context,
+              builder: (_) => _DialogoLigar(artigos: artigos),
+            );
+            if (a != null) escolher(chave, LigarArtigo(a.id));
+          case 'nome':
+            final n = await showDialog<String>(
+              context: context,
+              builder: (_) => _DialogoNome(nome: nome),
+            );
+            if (n != null && n.trim().isNotEmpty) {
+              escolher(
+                chave,
+                NovoArtigo(nome: n.trim(), categoriaId: categoria),
+              );
+            }
+          case 'categoria':
+            final c = await showDialog<(String?,)>(
+              context: context,
+              builder: (_) =>
+                  _DialogoCategoria(categorias: categorias, atual: categoria),
+            );
+            if (c != null) {
+              escolher(chave, NovoArtigo(nome: nome, categoriaId: c.$1));
+            }
+          case 'desfazer':
+            escolher(chave, null);
+        }
+      },
+      itemBuilder: (_) => [
+        const PopupMenuItem(value: 'ligar', child: Text('Ligar a um artigo…')),
+        const PopupMenuItem(value: 'nome', child: Text('Mudar o nome…')),
+        const PopupMenuItem(value: 'categoria', child: Text('Categoria…')),
+        if (atual != null)
+          const PopupMenuItem(value: 'desfazer', child: Text('Desfazer')),
+      ],
+    );
+  }
 
   String _quantidade(LinhaAnalisada l) => l.linha.pesoG != null
       ? '${_kg.format(l.linha.pesoG! / 1000)} kg'
@@ -159,13 +230,155 @@ class PrevisualizacaoTaloes extends StatelessWidget {
             subtitle: Text('${_quantidade(l)} · ${_artigoDa(t, l)}'),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(formatarCent(l.pagoCent)),
-                if (acoesLinha != null) acoesLinha!(t, l),
-              ],
+              children: [Text(formatarCent(l.pagoCent)), ?_menu(context, t, l)],
             ),
           ),
       ],
     );
   }
+}
+
+/// Escolher um artigo existente, com pesquisa sem acentos (nome ou EAN).
+class _DialogoLigar extends StatefulWidget {
+  const _DialogoLigar({required this.artigos});
+  final List<Artigo> artigos;
+
+  @override
+  State<_DialogoLigar> createState() => _DialogoLigarState();
+}
+
+class _DialogoLigarState extends State<_DialogoLigar> {
+  String _termo = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final termo = normalizar(_termo.trim());
+    final achados = [
+      for (final a in widget.artigos)
+        if (a.ativo && artigoCorresponde(a, termo)) a,
+    ]..sort((a, b) => a.nome.compareTo(b.nome));
+    return AlertDialog(
+      title: const Text('Ligar a um artigo'),
+      content: SizedBox(
+        width: 420,
+        height: 420,
+        child: Column(
+          children: [
+            TextField(
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Pesquisar',
+                prefixIcon: Icon(Icons.search),
+              ),
+              onChanged: (v) => setState(() => _termo = v),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: ListView(
+                children: [
+                  for (final a in achados.take(50))
+                    ListTile(
+                      dense: true,
+                      title: Text(a.nome),
+                      onTap: () => Navigator.pop(context, a),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+      ],
+    );
+  }
+}
+
+class _DialogoNome extends StatefulWidget {
+  const _DialogoNome({required this.nome});
+  final String nome;
+
+  @override
+  State<_DialogoNome> createState() => _DialogoNomeState();
+}
+
+class _DialogoNomeState extends State<_DialogoNome> {
+  late final _campo = TextEditingController(text: widget.nome);
+
+  @override
+  void dispose() {
+    _campo.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Nome do artigo novo'),
+    content: SizedBox(
+      width: 420,
+      child: TextField(
+        controller: _campo,
+        autofocus: true,
+        decoration: const InputDecoration(labelText: 'Nome'),
+        onSubmitted: (v) => Navigator.pop(context, v),
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Cancelar'),
+      ),
+      TextButton(
+        onPressed: () => Navigator.pop(context, _campo.text),
+        child: const Text('Guardar'),
+      ),
+    ],
+  );
+}
+
+/// Devolve `(categoriaId,)`; `(null,)` = sem categoria; null = cancelado.
+class _DialogoCategoria extends StatefulWidget {
+  const _DialogoCategoria({required this.categorias, required this.atual});
+  final List<Categoria> categorias;
+  final String? atual;
+
+  @override
+  State<_DialogoCategoria> createState() => _DialogoCategoriaState();
+}
+
+class _DialogoCategoriaState extends State<_DialogoCategoria> {
+  late String? _id = widget.atual;
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Categoria do artigo novo'),
+    content: SizedBox(
+      width: 420,
+      child: DropdownButtonFormField<String?>(
+        initialValue: _id,
+        isExpanded: true,
+        decoration: const InputDecoration(labelText: 'Categoria'),
+        items: [
+          const DropdownMenuItem(child: Text('Sem categoria')),
+          for (final c in widget.categorias)
+            DropdownMenuItem(value: c.id, child: Text(c.nome)),
+        ],
+        onChanged: (v) => setState(() => _id = v),
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Cancelar'),
+      ),
+      TextButton(
+        onPressed: () => Navigator.pop(context, (_id,)),
+        child: const Text('Guardar'),
+      ),
+    ],
+  );
 }

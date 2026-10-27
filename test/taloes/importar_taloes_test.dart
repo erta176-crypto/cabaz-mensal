@@ -27,7 +27,10 @@ const _gelado = Artigo(
 
 Catalogo _cat() => Catalogo(
   lojas: const [_pd, _lidl],
-  categorias: const [],
+  categorias: const [
+    Categoria(id: 'c-peixe', nome: 'Peixe', ordem: 1),
+    Categoria(id: 'c-fruta', nome: 'Frutas e legumes', ordem: 2),
+  ],
   artigos: const [_bife, _gelado],
   aliases: const {
     'a-gelado': ['GELADO DOUBLE COCO'],
@@ -165,7 +168,12 @@ void main() {
   group('loteDosTaloes', () {
     test('compras, linhas, preços e artigos novos', () {
       final r = analisar([('lidl.pdf', _f('lidl'))]);
-      final lote = loteDosTaloes(r.taloes, const {}, _cat(), novoId: _id);
+      final (:lote, aliases: _) = loteDosTaloes(
+        r.taloes,
+        const {},
+        _cat(),
+        novoId: _id,
+      );
 
       final compra = lote.compras.single;
       expect(compra['loja_id'], 'lidl');
@@ -210,7 +218,12 @@ void main() {
         final texto = _f('lidl')
             .replaceFirst('BIFE DE FRANGO 3,63 B', 'PEITO DE PERU 3,63 B');
         final r = analisar([('a.pdf', texto)]);
-        final lote = loteDosTaloes(r.taloes, const {}, _cat(), novoId: _id);
+        final (:lote, aliases: _) = loteDosTaloes(
+          r.taloes,
+          const {},
+          _cat(),
+          novoId: _id,
+        );
         final peru = lote.artigos.values.firstWhere(
           (a) => a['nome'] == 'Peito de peru',
         );
@@ -227,14 +240,19 @@ void main() {
           _f('pingo_doce').replaceFirst('9,55\nPagamentos', '9,99\nPagamentos'),
         ),
       ]);
-      final lote = loteDosTaloes(r.taloes, const {}, _cat(), novoId: _id);
+      final (:lote, aliases: _) = loteDosTaloes(
+        r.taloes,
+        const {},
+        _cat(),
+        novoId: _id,
+      );
       expect(lote.compras, hasLength(2));
       expect(lote.compras[1]['rever'], isTrue);
     });
 
     test('escolhas: ligar a um artigo ou criar com outro nome', () {
       final r = analisar([('lidl.pdf', _f('lidl'))]);
-      final lote = loteDosTaloes(
+      final (:lote, aliases: _) = loteDosTaloes(
         r.taloes,
         {
           chaveEscolha('lidl', 'SALADA COM COENTROS'): const LigarArtigo(
@@ -258,6 +276,81 @@ void main() {
       expect(
         lote.artigos.values.map((a) => a['nome']),
         isNot(contains('Salada com coentros')),
+      );
+    });
+  });
+
+  group('categoria sugerida e aliases (T6)', () {
+    test('a secção do talão sugere a categoria, se existir no catálogo', () {
+      final pd = analisar([('pd.pdf', _f('pingo_doce'))]).taloes.single;
+      final cat = {
+        for (final l in pd.linhas) l.linha.texto: l.categoriaSugerida,
+      };
+      expect(cat['PESCADA POSTA KG'], 'c-peixe'); // PEIXARIA
+      expect(cat['SALADA MISTA'], 'c-fruta'); // FRUTAS E VEGETAIS
+      expect(cat['BOLACHA MARIA'], isNull); // Mercearia não está no catálogo
+    });
+
+    test('artigo novo fica com a categoria sugerida', () {
+      final r = analisar([('pd.pdf', _f('pingo_doce'))]);
+      final (:lote, aliases: _) = loteDosTaloes(
+        r.taloes,
+        const {},
+        _cat(),
+        novoId: _id,
+      );
+      final pescada = lote.artigos.values.firstWhere(
+        (a) => a['nome'] == 'Pescada posta kg',
+      );
+      expect(pescada['categoria_id'], 'c-peixe');
+    });
+
+    test('aliases: textos sem correspondência e ligações à mão', () {
+      final r = analisar([('lidl.pdf', _f('lidl'))]);
+      final (:lote, :aliases) = loteDosTaloes(
+        r.taloes,
+        {
+          chaveEscolha('lidl', 'SALADA COM COENTROS'): const LigarArtigo(
+            'a-bife',
+          ),
+        },
+        _cat(),
+        novoId: _id,
+      );
+      final porTexto = {for (final a in aliases) a.texto: a};
+      // Ligado à mão.
+      expect(porTexto['SALADA COM COENTROS']!.artigoId, 'a-bife');
+      expect(porTexto['SALADA COM COENTROS']!.lojaId, 'lidl');
+      // Artigo novo: o alias aponta para o artigo criado no lote.
+      final marinadas = lote.artigos.values.firstWhere(
+        (a) => a['nome'] == 'Marinadas para frango',
+      );
+      expect(porTexto['MARINADAS PARA FRANGO']!.artigoId, marinadas['id']);
+      // Já ligados pelo nome ou por um alias existente: sem alias novo.
+      expect(porTexto.containsKey('BIFE DE FRANGO'), isFalse);
+      expect(porTexto.containsKey('GELADO DOUBLE COCO'), isFalse);
+    });
+
+    test('o mesmo texto em dois talões dá um só alias', () {
+      final r = analisar([
+        ('a.pdf', _f('lidl')),
+        (
+          'b.pdf',
+          _f('lidl').replaceFirst(
+            'No : FS 000000000/000001',
+            'No : FS 000000000/000002',
+          ),
+        ),
+      ]);
+      final (lote: _, :aliases) = loteDosTaloes(
+        r.taloes,
+        const {},
+        _cat(),
+        novoId: _id,
+      );
+      expect(
+        aliases.where((a) => a.texto == 'MARINADAS PARA FRANGO'),
+        hasLength(1),
       );
     });
   });

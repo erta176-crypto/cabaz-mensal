@@ -257,7 +257,9 @@ Testes de widget (`test/importar_taloes_page_test.dart`, com `textoDoPdf` falso 
 - "Importar" envia o lote com 2 compras;
 - sem rede → mensagem.
 
-## T6 · Ligar linhas a artigos e categoria dos artigos novos (D3, D8) [ ]
+## T6 · Ligar linhas a artigos e categoria dos artigos novos (D3, D8) [x]
+
+> **Feito a 2026-10-27.** Menu ⋮ nas linhas com artigo novo ("Ligar a um artigo…" com pesquisa sem acentos por nome ou EAN, "Mudar o nome…", "Categoria…", "Desfazer"); a escolha vale para o mesmo texto na mesma loja. Categoria sugerida pela secção (`seccoes.dart`). `loteDosTaloes` devolve também os aliases (textos sem correspondência ou ligados à mão), gravados por `ArtigosRepository.guardarAlias` **depois** de importar e recarregar (sincronizam pela fila).
 - Em cada linha "Novo: <nome>", menu ⋮:
   - "Ligar a um artigo…": diálogo com pesquisa sem acentos (`normalizar`, a mesma regra de Artigos: nome ou EAN) sobre os artigos ativos;
   - "Mudar o nome…": campo de texto, por omissão o nome D8;

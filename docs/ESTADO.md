@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-27. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**5 · Talões em PDF:** T1–T5 feitas e **publicadas** a 2026-10-27 (importar talões em PDF em Importar e exportar; 91/91 talões reais leem certo). Por fazer: T6 (ligar linhas a artigos, nome e categoria dos novos, aliases), T7, T8. **6 · Talões por fotografia (OCR):** a planear.
+**5 · Talões em PDF:** T1–T5 feitas e **publicadas** a 2026-10-27 (importar talões em PDF em Importar e exportar; 91/91 talões reais leem certo). T6 (ligar linhas a artigos, nome e categoria dos novos, aliases) feita a 2026-10-27; por fazer: T7 (verificação com um talão novo), T8. **6 · Talões por fotografia (OCR):** a planear.
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).

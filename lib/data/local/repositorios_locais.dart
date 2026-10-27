@@ -171,6 +171,17 @@ class LocalArtigosRepository implements ArtigosRepository {
       });
 
   @override
+  Future<void> guardarAlias(
+    String lojaId,
+    String textoTalao,
+    String artigoId,
+  ) => _escrita.inserir('aliases', {
+    'loja_id': lojaId,
+    'texto_talao': textoTalao,
+    'artigo_id': artigoId,
+  });
+
+  @override
   Stream<List<RegistoPreco>> observarRegistos(String artigoId) => _base
       .observarTabela('registos_preco')
       .map(

@@ -55,6 +55,8 @@ void main() {
     bool online = true,
     VoidCallback? aoImportar,
     VoidCallback? aoCancelar,
+    Map<String, EscolhaArtigo> escolhas = const {},
+    void Function(String chave, EscolhaArtigo? escolha)? aoEscolher,
   }) async {
     t.view.physicalSize = const Size(800, 2400);
     t.view.devicePixelRatio = 1;
@@ -67,8 +69,13 @@ void main() {
             child: PrevisualizacaoTaloes(
               taloes: analise.taloes,
               naoReconhecidos: analise.naoReconhecidos,
-              escolhas: const {},
+              escolhas: escolhas,
               nomesArtigos: const {'a-bife': 'Bife de frango'},
+              artigos: const [_bife],
+              categorias: const [
+                Categoria(id: 'c-peixe', nome: 'Peixe', ordem: 1),
+              ],
+              aoEscolher: aoEscolher,
               online: online,
               aGravar: false,
               aoImportar: aoImportar ?? () {},
@@ -130,5 +137,86 @@ void main() {
       find.text('Sem rede: a importação de talões precisa do servidor.'),
       findsOneWidget,
     );
+  });
+
+  group('menu das linhas novas (T6)', () {
+    final salada = chaveEscolha('lidl', 'SALADA COM COENTROS');
+
+    Future<void> abrirMenu(WidgetTester t) async {
+      await t.tap(
+        find.descendant(
+          of: find.ancestor(
+            of: find.text('SALADA COM COENTROS'),
+            matching: find.byType(ListTile),
+          ),
+          matching: find.byTooltip('Artigo desta linha'),
+        ),
+      );
+      await t.pumpAndSettle();
+    }
+
+    testWidgets('só as linhas com artigo novo têm o menu', (t) async {
+      await abrir(t, aoEscolher: (_, _) {});
+      // Linhas novas do Lidl: salada, pão, iogurte, marinadas, gelado.
+      expect(find.byTooltip('Artigo desta linha'), findsNWidgets(5));
+    });
+
+    testWidgets('ligar a um artigo existente, com pesquisa', (t) async {
+      final escolhas = <(String, EscolhaArtigo?)>[];
+      await abrir(t, aoEscolher: (c, e) => escolhas.add((c, e)));
+      await abrirMenu(t);
+      await t.tap(find.text('Ligar a um artigo…'));
+      await t.pumpAndSettle();
+      await t.enterText(find.byType(TextField), 'bife');
+      await t.pumpAndSettle();
+      await t.tap(find.text('Bife de frango').last);
+      await t.pumpAndSettle();
+      expect(escolhas.single.$1, salada);
+      expect((escolhas.single.$2! as LigarArtigo).artigoId, 'a-bife');
+    });
+
+    testWidgets('mudar o nome do artigo novo', (t) async {
+      final escolhas = <(String, EscolhaArtigo?)>[];
+      await abrir(t, aoEscolher: (c, e) => escolhas.add((c, e)));
+      await abrirMenu(t);
+      await t.tap(find.text('Mudar o nome…'));
+      await t.pumpAndSettle();
+      await t.enterText(find.byType(TextField), 'Salada de coentros');
+      await t.tap(find.text('Guardar'));
+      await t.pumpAndSettle();
+      final e = escolhas.single.$2! as NovoArtigo;
+      expect(e.nome, 'Salada de coentros');
+    });
+
+    testWidgets('escolher a categoria do artigo novo', (t) async {
+      final escolhas = <(String, EscolhaArtigo?)>[];
+      await abrir(t, aoEscolher: (c, e) => escolhas.add((c, e)));
+      await abrirMenu(t);
+      await t.tap(find.text('Categoria…'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Sem categoria').last);
+      await t.pumpAndSettle();
+      await t.tap(find.text('Peixe').last);
+      await t.pumpAndSettle();
+      await t.tap(find.text('Guardar'));
+      await t.pumpAndSettle();
+      final e = escolhas.single.$2! as NovoArtigo;
+      expect(e.nome, 'Salada com coentros');
+      expect(e.categoriaId, 'c-peixe');
+    });
+
+    testWidgets('linha ligada mostra o artigo e tem Desfazer', (t) async {
+      final escolhas = <(String, EscolhaArtigo?)>[];
+      await abrir(
+        t,
+        escolhas: {salada: const LigarArtigo('a-bife')},
+        aoEscolher: (c, e) => escolhas.add((c, e)),
+      );
+      expect(find.text('3 un · Bife de frango'), findsOneWidget);
+      await abrirMenu(t);
+      await t.tap(find.text('Desfazer'));
+      await t.pumpAndSettle();
+      expect(escolhas.single, (salada, null));
+    });
   });
 }
