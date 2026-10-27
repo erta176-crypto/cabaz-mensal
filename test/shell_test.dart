@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
-Widget _app(String inicial) {
+Widget _app(String inicial, {Widget? acaoMenu}) {
   final router = GoRouter(
     initialLocation: inicial,
     routes: [
       ShellRoute(
-        builder: (_, estado, filho) =>
-            AppShell(localizacao: estado.matchedLocation, child: filho),
+        builder: (_, estado, filho) => AppShell(
+          localizacao: estado.matchedLocation,
+          acaoMenu: acaoMenu,
+          child: filho,
+        ),
         routes: [
           for (final d in destinos)
             GoRoute(
@@ -84,6 +87,34 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('pagina /definicoes'), findsOneWidget);
   });
+
+  for (final escala in [1.0, 1.3, 1.5, 2.0]) {
+    testWidgets(
+      'telemóvel deitado (820×360, recorte à esquerda, letra ×$escala): '
+      'menu sem transbordos',
+      (tester) async {
+        tester.view.physicalSize = const Size(820, 360);
+        tester.view.devicePixelRatio = 1;
+        tester.platformDispatcher.textScaleFactorTestValue = escala;
+        // Telemóvel deitado: o recorte da câmara fica de um dos lados.
+        tester.view.padding = const FakeViewPadding(left: 45);
+        tester.view.viewPadding = const FakeViewPadding(left: 45);
+        addTearDown(tester.view.reset);
+        addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+        await tester.pumpWidget(
+          _app(
+            '/lista',
+            acaoMenu: const IconButton(
+              onPressed: null,
+              icon: Icon(Icons.dark_mode),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   testWidgets('o corte é exatamente nos 800 px', (tester) async {
     await _tamanho(tester, 799);

@@ -163,6 +163,8 @@ Testes (`test/lista_test.dart`, acrescentar): com orçamento e gasto mostra a li
 - `notas.md`: orçamento fora da cópia JSON e da importação.
 
 ## Portão da Fase 4
+
+> **No portão (2026-10-27):** o orçamento funcionou no telemóvel (diálogo e cartão). A captura do telemóvel deitado mostrou transbordos (anteriores à Fase 4): o menu fixo perdia a margem do recorte da câmara (menu passa a 300 px + essa margem) e a Lista não cabia em altura (em ecrã baixo, < 500 px, os três menus ficam numa só linha). Testes que os reproduzem em `shell_test.dart` e `lista_test.dart`.
 1. `dart format`, `flutter analyze`, `flutter test` verdes, com a saída real; `flutter build web` e `flutter build apk --release` compilam.
 2. Migração aplicada e verificada (T1), advisors sem avisos novos.
 3. Definir o orçamento no telemóvel aparece no PC (e vice-versa); sem rede, define-se e envia-se depois.

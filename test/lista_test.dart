@@ -294,8 +294,9 @@ void main() {
       WidgetTester tester, {
       List<Orcamento> orcamentos = const [],
       int gastoMesCent = 0,
+      Size tamanho = const Size(500, 1400),
     }) async {
-      tester.view.physicalSize = const Size(500, 1400);
+      tester.view.physicalSize = tamanho;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
@@ -417,6 +418,16 @@ void main() {
         expect(find.byType(FloatingActionButton), findsNothing);
       },
     );
+
+    for (final escala in [1.0, 1.3]) {
+      testWidgets('telemóvel deitado (área de 475×360, letra ×$escala): '
+          'sem transbordos', (tester) async {
+        tester.platformDispatcher.textScaleFactorTestValue = escala;
+        addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+        await abrir(tester, tamanho: const Size(475, 360));
+        expect(tester.takeException(), isNull);
+      });
+    }
 
     group('orçamento no rodapé', () {
       final agora = DateTime.now();

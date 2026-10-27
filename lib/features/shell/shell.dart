@@ -189,7 +189,12 @@ class _AppShellState extends State<AppShell> {
         key: _chave,
         body: Row(
           children: [
-            SizedBox(width: 300, child: menu),
+            // A margem do recorte da câmara (telemóvel deitado) soma-se aos
+            // 300 px: o NavigationDrawer tira-a e os rótulos deixavam de caber.
+            SizedBox(
+              width: 300 + MediaQuery.paddingOf(context).left,
+              child: menu,
+            ),
             const VerticalDivider(width: 1),
             Expanded(
               child: ShellScope(

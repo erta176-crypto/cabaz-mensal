@@ -284,7 +284,14 @@ class _Menus extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, c) {
         final estreito = c.maxWidth < 600;
-        double largura(double l) => estreito ? c.maxWidth : l;
+        // Ecrã baixo (telemóvel deitado): os três menus numa só linha, para
+        // sobrar altura para a lista.
+        final baixo = MediaQuery.sizeOf(context).height < 500;
+        double largura(double l) => baixo
+            ? (c.maxWidth - 24) / 3
+            : estreito
+            ? c.maxWidth
+            : l;
         final lojaValida = lojas.any((l) => l.id == prefs.lojaId)
             ? prefs.lojaId
             : null;
