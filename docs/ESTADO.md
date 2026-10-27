@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-27. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**5 · Talões em PDF:** plano aprovado a 2026-10-27; T1 a T3 feitas (pdfrx; leitores do Pingo Doce, Lidl e E.Leclerc: 91/91 talões reais batem), próxima T4 ([`planning/fase-5.md`](planning/fase-5.md)). Depois: Fase 6 talões por fotografia.
+**5 · Talões em PDF:** plano aprovado a 2026-10-27; T1 a T4 feitas (pdfrx; leitores das 3 lojas, 91/91 talões reais batem; lote de importação), próxima T5 ([`planning/fase-5.md`](planning/fase-5.md)). Depois: Fase 6 talões por fotografia.
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -21,7 +21,7 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Executar a Fase 5 (T4 → T8).
+1. Executar a Fase 5 (T5 → T8).
 2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase

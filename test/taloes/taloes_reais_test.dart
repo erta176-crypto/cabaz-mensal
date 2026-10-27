@@ -3,6 +3,9 @@
 // nenhum texto de talão real sai daqui.
 import 'dart:io';
 
+import 'package:cabaz_mensal/domain/modelos.dart';
+import 'package:cabaz_mensal/import/previsualizacao.dart';
+import 'package:cabaz_mensal/import/taloes/importar_taloes.dart';
 import 'package:cabaz_mensal/import/taloes/leclerc.dart';
 import 'package:cabaz_mensal/import/taloes/lidl.dart';
 import 'package:cabaz_mensal/import/taloes/pingo_doce.dart';
@@ -56,4 +59,43 @@ void main() {
       skip: saltar,
     );
   }
+
+  test('análise: o pago das linhas soma o total e nenhuma linha é negativa', () async {
+    final lidos = <({String ficheiro, String texto})>[
+      for (final f in _pasta.listSync(recursive: true).whereType<File>())
+        if (f.path.toLowerCase().endsWith('.pdf'))
+          (
+            ficheiro: f.uri.pathSegments.last,
+            texto: await textoDoPdf(f.readAsBytesSync()),
+          ),
+    ];
+    final r = analisarTaloes(
+      lidos,
+      Catalogo(
+        lojas: const [
+          Loja(id: 'pd', slug: 'pingo-doce', nome: 'Pingo Doce'),
+          Loja(id: 'lidl', slug: 'lidl', nome: 'Lidl'),
+          Loja(id: 'lec', slug: 'e-leclerc', nome: 'E.Leclerc'),
+        ],
+        categorias: const [],
+        artigos: const [],
+      ),
+      const [],
+    );
+    var certos = 0;
+    for (final t in r.taloes) {
+      final pago = t.linhas.fold(0, (s, l) => s + l.pagoCent);
+      if (pago == t.talao.totalCent && t.linhas.every((l) => l.pagoCent >= 0)) {
+        certos++;
+      }
+    }
+    // ignore: avoid_print
+    print(
+      'análise: $certos/${r.taloes.length} certos; '
+      '${r.taloes.where((t) => t.estado == EstadoTalao.repetidoNoLote).length} '
+      'repetidos no lote; ${r.naoReconhecidos.length} não reconhecidos',
+    );
+    expect(r.naoReconhecidos, isEmpty);
+    expect(certos, r.taloes.length);
+  }, skip: saltar);
 }

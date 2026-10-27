@@ -183,7 +183,9 @@ Testes (um caso por regra):
   - `lerTalao` escolhe o leitor certo; texto sem loja → null.
 - **Verificação com os talões reais:** acrescentar Lidl e E.Leclerc a `test/taloes/taloes_reais_test.dart` (saltado sem `dados-privados/`; só contagens). Meta: Lidl 66/66, E.Leclerc 1/1; registar aqui.
 
-## T4 · Do talão ao lote de importação [ ]
+## T4 · Do talão ao lote de importação [x]
+
+> **Feito a 2026-10-27.** Nomes finais: `EstadoTalao.novo/jaExiste/repetidoNoLote/aRever`, `NaoReconhecido(ficheiro, motivo)`, escolhas `LigarArtigo`/`NovoArtigo` por `chaveEscolha(lojaId, texto)`. A categoria sugerida fica para a T6. Com os talões reais: o pago das linhas soma o total em 91/91 depois de repartir o desconto da compra; as 3 cópias "(1)" saem como repetidas no lote.
 `lib/import/taloes/importar_taloes.dart` (puro, testável), sem mexer em `analisarCompras`:
 ```dart
 class TalaoAnalisado {
