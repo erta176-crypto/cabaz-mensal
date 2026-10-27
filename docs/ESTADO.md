@@ -3,12 +3,13 @@
 *Atualizado em 2026-10-26. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**4 · Orçamento mensal:** T1–T6 feitas; **em portão** ([`planning/fase-4.md`](planning/fase-4.md)). Falta a verificação manual e a confirmação; só depois o push. Depois: Fase 5 talões em PDF, Fase 6 talões por fotografia.
+**5 · Talões em PDF:** a planear (Lidl, Pingo Doce, E.Leclerc; pré-visualizar e confirmar). Depois: Fase 6 talões por fotografia.
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
 - **Fase 1A · Lista e offline:** concluída e publicada ([`planning/fase-1a.md`](planning/fase-1a.md)).
 - **Comparação de preços · P0 · EAN e fonte do preço:** concluído (portão a 2026-10-25; [`comparacao-precos/P0-modelo-dados.md`](comparacao-precos/P0-modelo-dados.md)). No portão: GTIN-14 com 0 à frente passa a EAN-13, código repetido é recusado e a pesquisa de Artigos procura também pelo código.
+- **Fase 4 · Orçamento mensal:** concluída e publicada (portão a 2026-10-27; [`planning/fase-4.md`](planning/fase-4.md)). Orçamento por mês (total e categorias, cópia do mês anterior), cartão no Painel, linha no rodapé da Lista, sincronizado (decisão 0009). No portão: correções do telemóvel deitado (menu fixo, filtros que rolam com pouca altura, duas colunas pela largura disponível) e Painel em primeiro no menu.
 - **Fase 3 · Tema:** concluída e publicada (portão a 2026-10-26; [`planning/fase-3.md`](planning/fase-3.md)). Paleta violeta/azul/castanho claro (decisão 0008), tema Sistema/Claro/Escuro guardado no aparelho, botão sol/lua no menu lateral.
 - **Fase 2 · Painel, estatísticas e histórico:** concluída e publicada (portão a 2026-10-26; [`planning/fase-2.md`](planning/fase-2.md)). No portão: limite de 10 s por pedido (no Android, sem rede, o pedido ficava preso), cartões do Painel com largura igual, eixo do gráfico do preço sem rótulos soltos. O tema escuro não foi verificado (a app não tem opção de tema; segue o sistema).
 - **Fase 1B · Importar e exportar:** concluída e publicada (portão a 2026-10-25; [`planning/fase-1b.md`](planning/fase-1b.md)). No portão, a cópia JSON recusava compras com origem `lista`; corrigido com teste.
@@ -20,7 +21,7 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Portão da Fase 4; depois push.
+1. Plano da Fase 5 (talões em PDF).
 2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase

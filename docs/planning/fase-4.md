@@ -1,6 +1,6 @@
 # Fase 4 · Orçamento mensal
 
-**Estado:** plano aprovado a 2026-10-26; T1–T6 feitas; **em portão**. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano aprovado a 2026-10-26; T1–T6 feitas; **portão confirmado pelo utilizador a 2026-10-27** e publicada. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Executar tarefa a tarefa (T1 → T6). O que não está aqui não se faz: vai para `docs/planning/notas.md`.
 
