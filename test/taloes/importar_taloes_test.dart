@@ -6,7 +6,9 @@ import 'package:cabaz_mensal/import/taloes/importar_taloes.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 String _f(String nome) =>
-    File('test/fixtures/taloes/$nome.txt').readAsStringSync();
+    File('test/fixtures/taloes/$nome.txt')
+        .readAsStringSync()
+        .replaceAll('\r\n', '\n');
 
 const _pd = Loja(id: 'pd', slug: 'pingo-doce', nome: 'Pingo Doce');
 const _lidl = Loja(id: 'lidl', slug: 'lidl', nome: 'Lidl');

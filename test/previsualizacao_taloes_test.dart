@@ -11,7 +11,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 String _f(String nome) =>
-    File('test/fixtures/taloes/$nome.txt').readAsStringSync();
+    File('test/fixtures/taloes/$nome.txt')
+        .readAsStringSync()
+        .replaceAll('\r\n', '\n');
 
 const _bife = Artigo(
   id: 'a-bife',

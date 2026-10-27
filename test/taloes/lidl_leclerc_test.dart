@@ -6,7 +6,9 @@ import 'package:cabaz_mensal/import/taloes/lidl.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 String _f(String nome) =>
-    File('test/fixtures/taloes/$nome.txt').readAsStringSync();
+    File('test/fixtures/taloes/$nome.txt')
+        .readAsStringSync()
+        .replaceAll('\r\n', '\n');
 
 void main() {
   group('Lidl', () {

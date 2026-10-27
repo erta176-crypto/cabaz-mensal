@@ -5,7 +5,9 @@ import 'package:cabaz_mensal/import/taloes/talao.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 String _fixture() =>
-    File('test/fixtures/taloes/pingo_doce.txt').readAsStringSync();
+    File('test/fixtures/taloes/pingo_doce.txt')
+        .readAsStringSync()
+        .replaceAll('\r\n', '\n');
 
 void main() {
   late TalaoLido t;
