@@ -43,7 +43,7 @@
 - `entrada`
 - `lista`: Lista do mês e Concluir compra.
 - `artigos`: Artigos, categorias e lojas; `ver_artigo.dart` (Ver artigo com preços por loja e evolução do preço, aberto a partir de Artigos, Lista, Painel e detalhe da compra).
-- `importar_exportar`: pré-visualização e arrastar e largar na web.
+- `importar_exportar`: pré-visualização e arrastar e largar na web; "Talões (PDF)" com `previsualizacao_taloes.dart` (um cartão por talão, estado e linhas).
 - `definicoes`
 - `painel`: Painel e estatísticas (filtros de período e loja, números, gráficos; aviso quando os dados vêm da cache); `orcamento_cartao.dart` (cartão do orçamento do mês e diálogo "Editar orçamento").
 - `historico`: Histórico só de consulta (filtros, pesquisa por artigo, alias, EAN ou texto do talão, lista por mês) e detalhe da compra (ao lado a partir de 800 px).

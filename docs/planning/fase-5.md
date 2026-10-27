@@ -228,7 +228,9 @@ Testes:
 - `rever` quando a soma não bate;
 - uma loja que não está no catálogo → não reconhecido, com o motivo.
 
-## T5 · Ecrã: "Talões (PDF)" em Importar e exportar [ ]
+## T5 · Ecrã: "Talões (PDF)" em Importar e exportar [x]
+
+> **Código feito a 2026-10-27; falta a prova à mão (talões reais no Chrome e no Android).** Os testes ficaram em três peças em vez de um teste do ecrã inteiro (que exigiria simular o seletor de ficheiros, o servidor e uma dúzia de providers): `lerPdfs` (vários PDFs, ilegíveis à parte, progresso), `PrevisualizacaoTaloes` (resumo, estados, linhas, botões, sem rede) e a análise da T4. A `ZonaLargar` ganhou `aoLargarVarios` (vários PDFs na web). Um `.pdf` escolhido ou largado noutra opção muda para "Talões (PDF)". "Talões (PDF)" não aparece em Exportar.
 - `OQue.taloes('Talões (PDF)', 'taloes')`: só para importar (não aparece em exportar); `paraImportar = [Formato.pdf]`; o botão usa `FilePicker.pickFiles(allowMultiple: true, allowedExtensions: ['pdf'])`; o arrastar e largar aceita vários `.pdf`.
 - **Fluxo:**
   1. "A ler 3 de 12…";

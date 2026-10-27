@@ -7,9 +7,18 @@ import 'package:web/web.dart' as web;
 /// Na web, aceita um ficheiro largado em qualquer ponto da janela enquanto
 /// este widget estiver visível, e realça o [child] durante o arrasto.
 class ZonaLargar extends StatefulWidget {
-  const ZonaLargar({super.key, required this.aoLargar, required this.child});
+  const ZonaLargar({
+    super.key,
+    required this.aoLargar,
+    this.aoLargarVarios,
+    required this.child,
+  });
 
   final void Function(String nome, Uint8List bytes) aoLargar;
+
+  /// Se existir, recebe todos os ficheiros largados de uma vez.
+  final void Function(List<({String nome, Uint8List bytes})> ficheiros)?
+  aoLargarVarios;
   final Widget child;
 
   @override
@@ -30,6 +39,19 @@ class _ZonaLargarState extends State<ZonaLargar> {
     setState(() => _aArrastar = false);
     final ficheiros = e.dataTransfer?.files;
     if (ficheiros == null || ficheiros.length == 0) return;
+    final varios = widget.aoLargarVarios;
+    if (varios != null) {
+      final todos = [
+        for (var i = 0; i < ficheiros.length; i++) ficheiros.item(i)!,
+      ];
+      Future.wait([
+        for (final f in todos)
+          f.arrayBuffer().toDart.then(
+            (b) => (nome: f.name, bytes: b.toDart.asUint8List()),
+          ),
+      ]).then(varios);
+      return;
+    }
     final f = ficheiros.item(0)!;
     f.arrayBuffer().toDart.then(
       (b) => widget.aoLargar(f.name, b.toDart.asUint8List()),

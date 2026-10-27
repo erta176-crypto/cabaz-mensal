@@ -25,16 +25,21 @@ import '../../import/importar_seed.dart';
 import '../../import/previsualizacao.dart';
 import '../../import/seed_modelo.dart';
 import '../../import/tabela_lida.dart';
+import '../../import/taloes/importar_taloes.dart';
+import '../../import/taloes/ler_pdfs.dart';
+import '../../import/taloes/texto_pdf.dart';
 import '../lista/lista_logica.dart' show formatarQtd;
 import '../shell/shell.dart';
 import 'previsualizacao_card.dart';
+import 'previsualizacao_taloes.dart';
 
 /// O mesmo menu para importar e exportar.
 enum OQue {
   artigos('Artigos e preços', 'artigos'),
   compras('Compras e linhas', 'compras'),
   lista('Lista de compras', 'lista'),
-  copia('Cópia completa', 'copia');
+  copia('Cópia completa', 'copia'),
+  taloes('Talões (PDF)', 'taloes');
 
   const OQue(this.rotulo, this.slug);
   final String rotulo;
@@ -44,20 +49,26 @@ enum OQue {
     OQue.artigos => TipoImportacao.artigos,
     OQue.compras => TipoImportacao.compras,
     OQue.lista => TipoImportacao.lista,
-    OQue.copia => null,
+    OQue.copia || OQue.taloes => null,
   };
 
-  List<Formato> get paraImportar => this == OQue.copia
-      ? const [Formato.json]
-      : const [Formato.csv, Formato.xlsx];
+  List<Formato> get paraImportar => switch (this) {
+    OQue.copia => const [Formato.json],
+    OQue.taloes => const [Formato.pdf],
+    _ => const [Formato.csv, Formato.xlsx],
+  };
 
   List<Formato> get paraExportar => switch (this) {
     OQue.artigos => const [Formato.xlsx, Formato.csv, Formato.pdf],
     OQue.compras => const [Formato.xlsx, Formato.csv],
     OQue.lista => const [Formato.xlsx, Formato.csv, Formato.pdf, Formato.txt],
     OQue.copia => const [Formato.json],
+    OQue.taloes => const [],
   };
 }
+
+/// Leitura do texto dos PDFs (substituída nos testes).
+final lerTextoPdfProvider = Provider<LerTextoPdf>((_) => textoDoPdf);
 
 enum Formato {
   xlsx('Excel (.xlsx)', 'xlsx'),
@@ -101,6 +112,11 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
   String? _lojaSemSupermercado;
   bool _incluirSemQuantidade = false;
 
+  // Talões (PDF) em pré-visualização.
+  List<TalaoAnalisado>? _taloes;
+  List<NaoReconhecido> _naoReconhecidos = const [];
+  Map<String, EscolhaArtigo> _escolhas = const {};
+
   // ---- Exportar ----
   OQue _oQueExportar = OQue.artigos;
   Formato _formatoExportar = Formato.xlsx;
@@ -122,11 +138,107 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
       allowedExtensions: [for (final f in _oQue.paraImportar) f.extensao],
     );
     if (ficheiros.isEmpty || !mounted) return;
+    if (_oQue == OQue.taloes) {
+      return _abrirTaloes([
+        for (final f in ficheiros) (nome: f.name, bytes: await f.readAsBytes()),
+      ]);
+    }
     final f = ficheiros.first;
     await _abrir(f.name, await f.readAsBytes());
   }
 
+  /// Ficheiros largados: PDFs vão para os talões; outro ficheiro, o primeiro.
+  void _largar(List<({String nome, Uint8List bytes})> ficheiros) {
+    if (_ocupado || ficheiros.isEmpty) return;
+    final pdfs = [
+      for (final f in ficheiros)
+        if (f.nome.toLowerCase().endsWith('.pdf')) f,
+    ];
+    if (pdfs.isEmpty) {
+      _abrir(ficheiros.first.nome, ficheiros.first.bytes);
+      return;
+    }
+    if (_oQue != OQue.taloes) setState(() => _oQue = OQue.taloes);
+    _abrirTaloes(pdfs);
+  }
+
+  Future<void> _abrirTaloes(
+    List<({String nome, Uint8List bytes})> ficheiros,
+  ) async {
+    _cancelarPrevia();
+    setState(() {
+      _ocupado = true;
+      _estado = 'A ler ${ficheiros.length} PDF…';
+    });
+    try {
+      final lidos = await lerPdfs(
+        ficheiros,
+        ref.read(lerTextoPdfProvider),
+        progresso: (i, n) {
+          if (mounted) setState(() => _estado = 'A ler ${i + 1} de $n…');
+        },
+      );
+      final List<CompraExistente> existentes;
+      try {
+        existentes = [
+          for (final c
+              in await ref.read(dadosRepositoryProvider).comprasExistentes())
+            CompraExistente(
+              lojaId: c.lojaId,
+              data: DateTime.parse(c.data),
+              local: c.local,
+              totalCent: c.totalCent,
+            ),
+        ];
+      } catch (_) {
+        if (mounted) setState(() => _estado = null);
+        _mostrar('Sem rede: a importação de talões precisa do servidor.');
+        return;
+      }
+      _artigosApagados = await ref.read(artigosRepositoryProvider).apagados();
+      _categoriasApagadas = await ref
+          .read(categoriasRepositoryProvider)
+          .apagadas();
+      if (!mounted) return;
+      final r = analisarTaloes(lidos.lidos, _catalogo(), existentes);
+      setState(() {
+        _taloes = r.taloes;
+        _naoReconhecidos = [...lidos.ilegiveis, ...r.naoReconhecidos];
+        _escolhas = {};
+        _estado = null;
+      });
+    } finally {
+      if (mounted) setState(() => _ocupado = false);
+    }
+  }
+
+  Future<void> _gravarTaloes() async {
+    final taloes = _taloes!;
+    setState(() => _ocupado = true);
+    try {
+      final lote = loteDosTaloes(taloes, _escolhas, _catalogo());
+      await ref.read(dadosRepositoryProvider).importarLote(lote.toJson());
+      await ref.read(syncRepositoryProvider).recarregarTudo();
+      if (!mounted) return;
+      final n = lote.compras.length;
+      _mostrar(
+        'Importados $n ${n == 1 ? 'talão' : 'talões'} '
+        '(${lote.linhas.length} linhas).',
+      );
+      _cancelarPrevia();
+      setState(() => _versaoResumo++);
+    } catch (e) {
+      _mostrar('A importação falhou e nada foi alterado: $e');
+    } finally {
+      if (mounted) setState(() => _ocupado = false);
+    }
+  }
+
   Future<void> _abrir(String nome, Uint8List bytes) async {
+    if (nome.toLowerCase().endsWith('.pdf')) {
+      if (_oQue != OQue.taloes) setState(() => _oQue = OQue.taloes);
+      return _abrirTaloes([(nome: nome, bytes: bytes)]);
+    }
     if (nome.toLowerCase().endsWith('.json')) {
       if (_oQue != OQue.copia) setState(() => _oQue = OQue.copia);
       return _importarJson(nome, bytes);
@@ -246,6 +358,9 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
     _bytes = null;
     _tabela = null;
     _previa = null;
+    _taloes = null;
+    _naoReconhecidos = const [];
+    _escolhas = const {};
   });
 
   Future<void> _gravarLote() async {
@@ -449,6 +564,8 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
     try {
       final List<int> bytes;
       switch (_oQueExportar) {
+        case OQue.taloes:
+          return; // Os talões só se importam (não estão no menu Exportar).
         case OQue.copia:
           final tabelas = await ref.read(dadosRepositoryProvider).lerTudo();
           bytes = utf8.encode(exportacaoParaTexto(montarExportacao(tabelas)));
@@ -573,6 +690,7 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
             const SizedBox(height: 16),
             ZonaLargar(
               aoLargar: (nome, bytes) => _ocupado ? null : _abrir(nome, bytes),
+              aoLargarVarios: _largar,
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -693,6 +811,23 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
                 aoCancelar: _cancelarPrevia,
               ),
             ],
+            if (_taloes != null) ...[
+              const SizedBox(height: 16),
+              PrevisualizacaoTaloes(
+                taloes: _taloes!,
+                naoReconhecidos: _naoReconhecidos,
+                escolhas: _escolhas,
+                nomesArtigos: {
+                  for (final a
+                      in ref.watch(artigosProvider).value ?? const <Artigo>[])
+                    a.id: a.nome,
+                },
+                online: online,
+                aGravar: _ocupado,
+                aoImportar: _gravarTaloes,
+                aoCancelar: _cancelarPrevia,
+              ),
+            ],
             if (_resultado != null) ...[
               const SizedBox(height: 16),
               ResumoImportacao(resultado: _resultado!),
@@ -720,7 +855,8 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
                           }),
                           dropdownMenuEntries: [
                             for (final o in OQue.values)
-                              DropdownMenuEntry(value: o, label: o.rotulo),
+                              if (o.paraExportar.isNotEmpty)
+                                DropdownMenuEntry(value: o, label: o.rotulo),
                           ],
                         ),
                         if (_oQueExportar == OQue.compras)
