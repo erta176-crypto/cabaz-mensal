@@ -1,6 +1,6 @@
 # Fase 5 · Talões em PDF
 
-**Estado:** plano revisto e aprovado a 2026-10-27 (com a D6). Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano revisto e aprovado a 2026-10-27 (com a D6). **Publicado a 2026-10-27 a pedido do utilizador com T1–T5 feitas** (importação de talões em PDF a funcionar, confirmada no Chrome); T6 (ligar linhas a artigos, nome/categoria, aliases), T7 e T8 por fazer; portão completo ainda não feito. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Executar tarefa a tarefa (T1 → T8). O que não está aqui não se faz: vai para `docs/planning/notas.md`. A seguir: Fase 6, talões por fotografia (OCR, só Android).
 
