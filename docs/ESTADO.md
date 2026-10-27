@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-27. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**5 · Talões em PDF:** T1–T5 feitas e **publicadas** a 2026-10-27 (importar talões em PDF em Importar e exportar; 91/91 talões reais leem certo). T6 (ligar linhas a artigos, nome e categoria dos novos, aliases) feita a 2026-10-27; por fazer: T7 (verificação com um talão novo), T8. **6 · Talões por fotografia (OCR):** a planear.
+**5 · Talões em PDF:** T1–T5 feitas e **publicadas** a 2026-10-27 (importar talões em PDF em Importar e exportar; 91/91 talões reais leem certo). T6 (ligar linhas a artigos, nome e categoria dos novos, aliases) e T8 (docs) feitas a 2026-10-27; **T7 pendente** (verificar com um talão novo, quando houver) e, com ela, o portão. **6 · Talões por fotografia (OCR):** a planear.
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -21,8 +21,9 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Plano da Fase 6 (OCR) e decidir quando fazer a T6 da Fase 5.
-2. Depois: P1 da comparação de preços (primeiro conector).
+1. Plano da Fase 6 (talões por fotografia: as quatro lojas, câmara e galeria só no Android, correção na pré-visualização).
+2. Quando houver um talão novo: T7 e portão da Fase 5.
+3. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
 - Ligar a "Leaked Password Protection" no Supabase (Authentication → Policies). É o único aviso que os advisors ainda dão.

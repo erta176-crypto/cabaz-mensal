@@ -283,6 +283,8 @@ Testes:
 - numa segunda análise, o mesmo texto já aparece ligado.
 
 ## T7 · Verificação com os talões reais (local) [ ]
+
+> **Pendente (2026-10-27):** o utilizador não tem talões novos; fica para quando tiver. Já verificado: os 91 talões reais leem certo (teste local), talões já importados aparecem "Já importado" no Chrome e os aliases ligam os artigos existentes.
 Na web e no Android, com talões de `dados-privados/talões/`:
 - importar todos os Pingo Doce, Lidl e E.Leclerc → todos "Já importado" (já estão na base) e as cópias "(1)" "Repetido neste lote";
 - apagar à mão no SQL Editor **uma** compra de teste (ou usar um talão novo da semana) → importá-la de novo → compra, linhas, preços e poupança batem com o SQL de controlo e com o PDF;
@@ -290,7 +292,9 @@ Na web e no Android, com talões de `dados-privados/talões/`:
 
 Registar aqui só contagens e resultados, sem valores reais.
 
-## T8 · Documentação e fecho [ ]
+## T8 · Documentação e fecho [x]
+
+> **Feito a 2026-10-27.** Docs atualizados ao longo das tarefas (`mapa.md`, `visao-geral.md`, decisão 0010, `notas.md`); o portão completo espera pela T7.
 - `mapa.md` (`lib/import/taloes/`, `PrevisualizacaoTaloes`), `visao-geral.md` (pacote), decisão 0010, `ESTADO.md`, marcar T1–T8.
 - `notas.md`: mais variantes do E.Leclerc; Mercadona (Fase 6); se valer a pena, `origem 'talao'` (mudança na RPC).
 
