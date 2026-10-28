@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/formatos.dart';
+import '../../core/tema.dart';
 import '../../data/providers.dart';
 import '../../domain/estatisticas.dart';
 import '../../domain/modelos.dart';
@@ -175,7 +176,7 @@ class _PainelPageState extends ConsumerState<PainelPage> {
         // 4 colunas se couberem com 160 px cada; senão 2, todas iguais.
         final colunas = c.maxWidth >= 4 * 160 + 3 * 8 ? 4 : 2;
         final largura = (c.maxWidth - (colunas - 1) * 8) / colunas;
-        Widget cartao(String titulo, String valor) => SizedBox(
+        Widget cartao(String titulo, String valor, {Color? cor}) => SizedBox(
           width: largura,
           child: Card(
             margin: EdgeInsets.zero,
@@ -185,9 +186,21 @@ class _PainelPageState extends ConsumerState<PainelPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(titulo, style: tema.textTheme.bodyMedium),
+                  Text(
+                    titulo,
+                    style: tema.textTheme.bodyMedium?.copyWith(
+                      color: tema.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(valor, style: tema.textTheme.headlineSmall),
+                  Text(
+                    valor,
+                    style: tema.textTheme.headlineSmall?.copyWith(
+                      color: cor,
+                      fontWeight: FontWeight.bold,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -200,7 +213,11 @@ class _PainelPageState extends ConsumerState<PainelPage> {
             cartao('Total gasto', formatarCent(d.totalCent)),
             cartao('Compras', formatarInteiro(d.nCompras)),
             cartao('Média por compra', formatarCent(d.mediaCent)),
-            cartao('Poupança', formatarCent(d.poupancaCent)),
+            cartao(
+              'Poupança',
+              formatarCent(d.poupancaCent),
+              cor: CoresCabaz.of(context).ok,
+            ),
           ],
         );
       },

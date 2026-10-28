@@ -60,6 +60,21 @@ void main() {
     expect(nivel(1, 0), NivelOrcamento.passou);
   });
 
+  test('percentagemGasta arredonda e devolve null sem orçamento', () {
+    LinhaOrcamento l(int orc, int gasto) => (
+      categoriaId: null,
+      orcamentoCent: orc,
+      gastoCent: gasto,
+      faltaCent: orc - gasto,
+      nivel: nivel(gasto, orc),
+    );
+    expect(percentagemGasta(l(50000, 42000)), 84);
+    expect(percentagemGasta(l(40000, 49100)), 123);
+    expect(percentagemGasta(l(30000, 100)), 0);
+    expect(percentagemGasta(l(0, 0)), isNull);
+    expect(percentagemGasta(l(0, 500)), isNull);
+  });
+
   test('compararOrcamento: total e categorias com orçamento', () {
     final r = compararOrcamento(
       [_orc(null, 50000), _orc('c1', 10000), _orc('c2', 5000)],

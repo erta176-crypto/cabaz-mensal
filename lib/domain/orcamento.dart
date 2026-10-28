@@ -77,6 +77,10 @@ typedef LinhaOrcamento = ({
   NivelOrcamento nivel,
 });
 
+/// Percentagem gasta, arredondada (491 de 400 → 123); null sem orçamento.
+int? percentagemGasta(LinhaOrcamento l) =>
+    l.orcamentoCent <= 0 ? null : (l.gastoCent * 100 / l.orcamentoCent).round();
+
 LinhaOrcamento _linha(String? categoriaId, int orcamentoCent, int gastoCent) =>
     (
       categoriaId: categoriaId,

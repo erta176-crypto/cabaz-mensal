@@ -124,7 +124,7 @@ Letras, tamanhos, ordem e conteúdo dos ecrãs; filtros dentro do cabeçalho (D4
 
 **Testes (`test/shell_test.dart`)**: o separador está entre "Artigos…" e "Importar…" e os 6 destinos continuam a navegar; o item ativo segue a rota; o cabeçalho da gaveta tem o gradiente e começa no topo (com uma margem de cima de 24 px simulada, o gradiente cobre-a); a barra inferior tem o contorno; os testes de transbordo (telemóvel deitado, letra ×2, margens dos dois lados) continuam verdes.
 
-## T4 · Cartões de resumo e orçamento [ ]
+## T4 · Cartões de resumo e orçamento [x]
 **Cartões do Painel (`_numeros`)**: rótulo em `onSurfaceVariant` (`bodyMedium`), valor em `headlineSmall` negrito com `FontFeature.tabularFigures()`; o valor da Poupança em `ok`.
 
 **Orçamento (`orcamento_cartao.dart`)**

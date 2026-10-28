@@ -11,7 +11,7 @@
 - `ean.dart`: `normalizarEan` (EAN-8/13, GTIN-14; UPC-A e GTIN-14 com 0 à frente → EAN-13; dígito de controlo GS1).
 - `compra.dart`: cálculos de Concluir compra.
 - `preferencias.dart`: preferências e gestos; `ModoTema` (Sistema/Claro/Escuro).
-- `orcamento.dart`: `Orcamento`, `idOrcamento` (uuid v5 determinístico), `nivel` (ok/quase/passou a 80 % e 100 %), `compararOrcamento`.
+- `orcamento.dart`: `Orcamento`, `idOrcamento` (uuid v5 determinístico), `nivel` (ok/quase/passou a 80 % e 100 %), `percentagemGasta`, `compararOrcamento`.
 - `estatisticas.dart`: períodos e filtros do Painel, `DadosPainel` (resultado da RPC `painel`), `CompraResumo` (RPC `historico_compras`), `mesesCompletos`, `categoriasTopo`, `porMes`.
 
 ## `lib/data/`: a única pasta que fala com o Supabase e com o drift

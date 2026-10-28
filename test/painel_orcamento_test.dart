@@ -143,6 +143,57 @@ void main() {
     );
   });
 
+  testWidgets('percentagens e cor da barra por nível; sem "Ultrapassado"', (
+    t,
+  ) async {
+    await abrir(t, [
+      _orc(_mes, null, 50000), // 420 de 500: quase, 84 %
+      _orc(_mes, 'c1', 10000), // 110 de 100: passou, 110 %
+      _orc(_mes, 'c2', 5000), // 0 de 50: ok, 0 %
+    ]);
+    expect(find.text('84 %'), findsOneWidget);
+    expect(find.text('110 %'), findsOneWidget);
+    expect(find.text('0 %'), findsOneWidget);
+    expect(find.text('Ultrapassado'), findsNothing);
+
+    final tema = construirTema(Brightness.light, fontesGoogle: false);
+    final barras = t
+        .widgetList<LinearProgressIndicator>(
+          find.byType(LinearProgressIndicator),
+        )
+        .toList();
+    expect(barras.map((b) => b.color), [
+      tema.colorScheme.tertiary,
+      tema.colorScheme.error,
+      CoresCabaz.claro.ok,
+    ]);
+    for (final b in barras) {
+      expect(b.backgroundColor, CoresCabaz.claro.pista);
+      expect(b.minHeight, 6);
+    }
+  });
+
+  testWidgets('"Ultrapassado" quando o total do mês passou', (t) async {
+    await abrir(t, [_orc(_mes, null, 40000)]); // 420 de 400
+    expect(find.text('105 %'), findsOneWidget);
+    expect(find.text('Ultrapassado'), findsOneWidget);
+  });
+
+  testWidgets('cartões: valor da Poupança na cor ok', (t) async {
+    await abrir(t, const []);
+    final poupanca = t.widget<Text>(
+      find.descendant(
+        of: find.ancestor(
+          of: find.text('Poupança'),
+          matching: find.byType(Card),
+        ),
+        matching: find.text(formatarCent(0)),
+      ),
+    );
+    expect(poupanca.style?.color, CoresCabaz.claro.ok);
+    expect(poupanca.style?.fontWeight, FontWeight.bold);
+  });
+
   testWidgets('com outro período o cartão não aparece', (t) async {
     await abrir(t, [_orc(_mes, null, 50000)]);
     await t.tap(find.text('Este mês'));

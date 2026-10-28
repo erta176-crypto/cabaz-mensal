@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/formatos.dart';
+import '../../core/tema.dart';
 import '../../data/providers.dart';
 import '../../domain/dinheiro.dart';
 import '../../domain/estatisticas.dart';
@@ -23,8 +24,8 @@ String textoOrcamento(LinhaOrcamento l) {
       '$resto${l.nivel == NivelOrcamento.quase ? ' · quase no limite' : ''}';
 }
 
-Color corDoNivel(NivelOrcamento n, ColorScheme e) => switch (n) {
-  NivelOrcamento.ok => e.primary,
+Color corDoNivel(NivelOrcamento n, ColorScheme e, CoresCabaz c) => switch (n) {
+  NivelOrcamento.ok => c.ok,
   NivelOrcamento.quase => e.tertiary,
   NivelOrcamento.passou => e.error,
 };
@@ -40,6 +41,7 @@ class OrcamentoCartao extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tema = Theme.of(context);
+    final cores = CoresCabaz.of(context);
     final mes = DateTime(hoje.year, hoje.month);
     final anterior = DateTime(hoje.year, hoje.month - 1);
     final todos = ref.watch(orcamentosProvider).value ?? const <Orcamento>[];
@@ -58,8 +60,9 @@ class OrcamentoCartao extends ConsumerWidget {
           DialogoOrcamento(mes: mes, doMes: doMes, categorias: categorias),
     );
 
+    final r = doMes.isEmpty ? null : compararOrcamento(doMes, gasto);
     final Widget corpo;
-    if (doMes.isEmpty) {
+    if (r == null) {
       corpo = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -85,23 +88,39 @@ class OrcamentoCartao extends ConsumerWidget {
         ],
       );
     } else {
-      final r = compararOrcamento(doMes, gasto);
       Widget linha(String titulo, LinhaOrcamento l) {
-        final cor = corDoNivel(l.nivel, tema.colorScheme);
+        final cor = corDoNivel(l.nivel, tema.colorScheme, cores);
+        final pct = percentagemGasta(l);
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(titulo, style: tema.textTheme.bodyLarge),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(titulo, style: tema.textTheme.bodyLarge),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    pct == null ? '—' : '$pct %',
+                    style: tema.textTheme.labelLarge?.copyWith(
+                      color: cor,
+                      fontWeight: FontWeight.bold,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 4),
               LinearProgressIndicator(
                 value: l.orcamentoCent <= 0
                     ? 1
                     : min(l.gastoCent / l.orcamentoCent, 1),
                 color: cor,
-                minHeight: 8,
-                borderRadius: BorderRadius.circular(4),
+                backgroundColor: cores.pista,
+                minHeight: 6,
+                borderRadius: BorderRadius.circular(3),
               ),
               const SizedBox(height: 4),
               Text(
@@ -138,6 +157,23 @@ class OrcamentoCartao extends ConsumerWidget {
                 Expanded(
                   child: Text('Orçamento', style: tema.textTheme.titleMedium),
                 ),
+                if (r?.total?.nivel == NivelOrcamento.passou)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: ShapeDecoration(
+                      color: tema.colorScheme.errorContainer,
+                      shape: const StadiumBorder(),
+                    ),
+                    child: Text(
+                      'Ultrapassado',
+                      style: tema.textTheme.labelMedium?.copyWith(
+                        color: tema.colorScheme.onErrorContainer,
+                      ),
+                    ),
+                  ),
                 if (doMes.isNotEmpty)
                   PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert),
