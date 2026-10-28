@@ -112,4 +112,21 @@ void main() {
     expect(r.lidos.single.ficheiro, 'F2');
     expect(progresso, [(0, 2), (1, 2)]);
   });
+
+  test('apagarFotosTemporarias só apaga o que está numa pasta cache', () {
+    final raiz = Directory.systemTemp.createTempSync('fotos');
+    addTearDown(() => raiz.deleteSync(recursive: true));
+    final cache = Directory('${raiz.path}/cache/abc')
+      ..createSync(recursive: true);
+    final temporaria = File('${cache.path}/talao.jpg')..writeAsStringSync('x');
+    final original = File('${raiz.path}/DCIM/talao.jpg')
+      ..createSync(recursive: true);
+    apagarFotosTemporarias([
+      temporaria.path,
+      original.path,
+      '${cache.path}/ja-nao-existe.jpg',
+    ]);
+    expect(temporaria.existsSync(), isFalse);
+    expect(original.existsSync(), isTrue);
+  });
 }

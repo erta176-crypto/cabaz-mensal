@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../core/ficheiros/guardar_ficheiro.dart';
 import '../../core/ficheiros/largar_ficheiro.dart';
@@ -26,8 +28,10 @@ import '../../import/previsualizacao.dart';
 import '../../import/seed_modelo.dart';
 import '../../import/tabela_lida.dart';
 import '../../import/taloes/importar_taloes.dart';
+import '../../import/taloes/ler_fotos.dart';
 import '../../import/taloes/ler_pdfs.dart';
 import '../../import/taloes/talao.dart';
+import '../../import/taloes/texto_foto.dart';
 import '../../import/taloes/texto_pdf.dart';
 import '../lista/lista_logica.dart' show formatarQtd;
 import '../shell/shell.dart';
@@ -40,7 +44,8 @@ enum OQue {
   compras('Compras e linhas', 'compras'),
   lista('Lista de compras', 'lista'),
   copia('Cópia completa', 'copia'),
-  taloes('Talões (PDF)', 'taloes');
+  taloes('Talões (PDF)', 'taloes'),
+  fotos('Talões (fotografia)', 'fotos');
 
   const OQue(this.rotulo, this.slug);
   final String rotulo;
@@ -50,12 +55,13 @@ enum OQue {
     OQue.artigos => TipoImportacao.artigos,
     OQue.compras => TipoImportacao.compras,
     OQue.lista => TipoImportacao.lista,
-    OQue.copia || OQue.taloes => null,
+    OQue.copia || OQue.taloes || OQue.fotos => null,
   };
 
   List<Formato> get paraImportar => switch (this) {
     OQue.copia => const [Formato.json],
     OQue.taloes => const [Formato.pdf],
+    OQue.fotos => const [Formato.foto],
     _ => const [Formato.csv, Formato.xlsx],
   };
 
@@ -64,17 +70,46 @@ enum OQue {
     OQue.compras => const [Formato.xlsx, Formato.csv],
     OQue.lista => const [Formato.xlsx, Formato.csv, Formato.pdf, Formato.txt],
     OQue.copia => const [Formato.json],
-    OQue.taloes => const [],
+    OQue.taloes || OQue.fotos => const [],
   };
 }
 
 /// Leitura do texto dos PDFs (substituída nos testes).
 final lerTextoPdfProvider = Provider<LerTextoPdf>((_) => textoDoPdf);
 
+/// Talões por fotografia: só no Android (D7 da Fase 7).
+bool get fotosNoAparelho =>
+    !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
+/// Câmara, galeria e fotografia recuperada depois de o Android terminar a
+/// app com a câmara aberta (substituídas nos testes).
+typedef SeletorFotos = ({
+  Future<List<XFile>> Function() camera,
+  Future<List<XFile>> Function() galeria,
+  Future<List<XFile>> Function() perdidas,
+});
+
+final seletorFotosProvider = Provider<SeletorFotos>((_) {
+  final picker = ImagePicker();
+  return (
+    // Sem reduzir a fotografia: a letra do talão é pequena.
+    camera: () async => [?await picker.pickImage(source: ImageSource.camera)],
+    galeria: picker.pickMultiImage,
+    perdidas: () async {
+      final r = await picker.retrieveLostData();
+      return r.isEmpty ? const <XFile>[] : r.files ?? const <XFile>[];
+    },
+  );
+});
+
+/// OCR das fotografias (substituído nos testes).
+final ocrFotosProvider = Provider<LeitorOcr>((_) => ocrDoAparelho);
+
 enum Formato {
   xlsx('Excel (.xlsx)', 'xlsx'),
   csv('CSV', 'csv'),
   pdf('PDF', 'pdf'),
+  foto('Fotografia', 'jpg'),
   txt('TXT', 'txt'),
   json('JSON', 'json');
 
@@ -118,6 +153,9 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
   List<NaoReconhecido> _falhasTaloes = const [];
   List<CompraExistente> _existentesTaloes = const [];
   List<TalaoAnalisado>? _taloes;
+
+  /// Caminho de cada fotografia em pré-visualização (vazio nos PDFs).
+  Map<String, String> _fotosTaloes = const {};
   List<NaoReconhecido> _naoReconhecidos = const [];
   Map<String, EscolhaArtigo> _escolhas = const {};
 
@@ -126,6 +164,34 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
   Formato _formatoExportar = Formato.xlsx;
   Periodo _periodo = Periodo.tudo;
   String? _lojaExportar;
+
+  @override
+  void initState() {
+    super.initState();
+    if (fotosNoAparelho) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _recuperarFoto());
+    }
+  }
+
+  @override
+  void dispose() {
+    apagarFotosTemporarias(_fotosTaloes.values);
+    super.dispose();
+  }
+
+  /// Se o Android terminou a app com a câmara aberta, a fotografia ficou
+  /// guardada: lê-a agora.
+  Future<void> _recuperarFoto() async {
+    final List<XFile> perdidas;
+    try {
+      perdidas = await ref.read(seletorFotosProvider).perdidas();
+    } on Exception {
+      return; // Sem fotografia para recuperar.
+    }
+    if (perdidas.isEmpty || !mounted) return;
+    setState(() => _oQue = OQue.fotos);
+    await _abrirFotos(perdidas);
+  }
 
   void _mostrar(String texto) =>
       ScaffoldMessenger.of(context)
@@ -182,41 +248,88 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
           if (mounted) setState(() => _estado = 'A ler ${i + 1} de $n…');
         },
       );
-      final List<CompraExistente> existentes;
-      try {
-        existentes = [
-          for (final c
-              in await ref.read(dadosRepositoryProvider).comprasExistentes())
-            CompraExistente(
-              lojaId: c.lojaId,
-              data: DateTime.parse(c.data),
-              local: c.local,
-              totalCent: c.totalCent,
-            ),
-        ];
-      } catch (_) {
-        if (mounted) setState(() => _estado = null);
-        _mostrar('Sem rede: a importação de talões precisa do servidor.');
-        return;
-      }
-      _artigosApagados = await ref.read(artigosRepositoryProvider).apagados();
-      _categoriasApagadas = await ref
-          .read(categoriasRepositoryProvider)
-          .apagadas();
-      await carregarCatalogo(ref.read);
-      if (!mounted) return;
-      final l = lerTaloes(lidos.lidos);
-      setState(() {
-        _lidosTaloes = l.lidos;
-        _falhasTaloes = [...lidos.ilegiveis, ...l.falhas];
-        _existentesTaloes = existentes;
-        _escolhas = {};
-        _estado = null;
-        _analisarTaloes();
-      });
+      await _prepararTaloes(lidos.lidos, lidos.ilegiveis);
     } finally {
       if (mounted) setState(() => _ocupado = false);
     }
+  }
+
+  Future<void> _tirarFotografia() async =>
+      _abrirFotos(await ref.read(seletorFotosProvider).camera());
+
+  Future<void> _escolherFotografias() async =>
+      _abrirFotos(await ref.read(seletorFotosProvider).galeria());
+
+  /// Fotografias de talões: OCR no aparelho e a mesma análise dos PDFs.
+  Future<void> _abrirFotos(List<XFile> escolhidas) async {
+    if (escolhidas.isEmpty || !mounted) return;
+    _cancelarPrevia();
+    // Um nome por fotografia: duas da galeria podem ter o mesmo nome.
+    final fotos = [
+      for (final (i, f) in escolhidas.indexed)
+        (nome: 'Fotografia ${i + 1} (${f.name})', caminho: f.path),
+    ];
+    setState(() {
+      _ocupado = true;
+      _fotosTaloes = {for (final f in fotos) f.nome: f.caminho};
+      _estado = fotos.length == 1
+          ? 'A ler a fotografia…'
+          : 'A ler ${fotos.length} fotografias…';
+    });
+    try {
+      final lidos = await lerFotos(
+        fotos,
+        ref.read(ocrFotosProvider),
+        progresso: (i, n) {
+          if (mounted && n > 1) {
+            setState(() => _estado = 'A ler ${i + 1} de $n…');
+          }
+        },
+      );
+      await _prepararTaloes(lidos.lidos, lidos.ilegiveis);
+    } finally {
+      if (mounted) setState(() => _ocupado = false);
+    }
+  }
+
+  /// Depois de ler os textos (PDF ou fotografia): compras já gravadas,
+  /// catálogo e análise.
+  Future<void> _prepararTaloes(
+    List<({String ficheiro, String texto})> textos,
+    List<NaoReconhecido> ilegiveis,
+  ) async {
+    final List<CompraExistente> existentes;
+    try {
+      existentes = [
+        for (final c
+            in await ref.read(dadosRepositoryProvider).comprasExistentes())
+          CompraExistente(
+            lojaId: c.lojaId,
+            data: DateTime.parse(c.data),
+            local: c.local,
+            totalCent: c.totalCent,
+          ),
+      ];
+    } catch (_) {
+      if (mounted) setState(() => _estado = null);
+      _mostrar('Sem rede: a importação de talões precisa do servidor.');
+      return;
+    }
+    _artigosApagados = await ref.read(artigosRepositoryProvider).apagados();
+    _categoriasApagadas = await ref
+        .read(categoriasRepositoryProvider)
+        .apagadas();
+    await carregarCatalogo(ref.read);
+    if (!mounted) return;
+    final l = lerTaloes(textos);
+    setState(() {
+      _lidosTaloes = l.lidos;
+      _falhasTaloes = [...ilegiveis, ...l.falhas];
+      _existentesTaloes = existentes;
+      _escolhas = {};
+      _estado = null;
+      _analisarTaloes();
+    });
   }
 
   /// Analisa o lote todo (os repetidos dependem dos outros talões).
@@ -389,6 +502,8 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
     _tabela = null;
     _previa = null;
     _taloes = null;
+    apagarFotosTemporarias(_fotosTaloes.values);
+    _fotosTaloes = const {};
     _lidosTaloes = const [];
     _falhasTaloes = const [];
     _naoReconhecidos = const [];
@@ -596,7 +711,7 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
     try {
       final List<int> bytes;
       switch (_oQueExportar) {
-        case OQue.taloes:
+        case OQue.taloes || OQue.fotos:
           return; // Os talões só se importam (não estão no menu Exportar).
         case OQue.copia:
           final tabelas = await ref.read(dadosRepositoryProvider).lerTudo();
@@ -751,7 +866,8 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
                             },
                             dropdownMenuEntries: [
                               for (final o in OQue.values)
-                                DropdownMenuEntry(value: o, label: o.rotulo),
+                                if (o != OQue.fotos || fotosNoAparelho)
+                                  DropdownMenuEntry(value: o, label: o.rotulo),
                             ],
                           ),
                           DropdownMenu<Formato>(
@@ -772,15 +888,27 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
                         runSpacing: 8,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          FilledButton.icon(
-                            onPressed:
-                                _ocupado || (_oQue == OQue.copia && !online)
-                                ? null
-                                : _escolherFicheiro,
-                            icon: const Icon(Icons.upload_file),
-                            label: const Text('Escolher ficheiro'),
-                          ),
-                          if (largo)
+                          if (_oQue == OQue.fotos) ...[
+                            FilledButton.icon(
+                              onPressed: _ocupado ? null : _tirarFotografia,
+                              icon: const Icon(Icons.photo_camera),
+                              label: const Text('Tirar fotografia'),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: _ocupado ? null : _escolherFotografias,
+                              icon: const Icon(Icons.photo_library),
+                              label: const Text('Escolher da galeria'),
+                            ),
+                          ] else
+                            FilledButton.icon(
+                              onPressed:
+                                  _ocupado || (_oQue == OQue.copia && !online)
+                                  ? null
+                                  : _escolherFicheiro,
+                              icon: const Icon(Icons.upload_file),
+                              label: const Text('Escolher ficheiro'),
+                            ),
+                          if (largo && _oQue != OQue.fotos)
                             Text(
                               'ou larga aqui o ficheiro',
                               style: TextStyle(
@@ -866,6 +994,10 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
                   if (escolha != null) _escolhas[chave] = escolha;
                 }),
                 aoEditar: _editarTalao,
+                fotos: _fotosTaloes,
+                titulo: _fotosTaloes.isEmpty
+                    ? 'Talões (PDF)'
+                    : 'Talões (fotografia)',
                 online: online,
                 aGravar: _ocupado,
                 aoImportar: _gravarTaloes,

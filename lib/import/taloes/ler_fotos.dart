@@ -3,6 +3,8 @@
 /// análise dos PDFs.
 library;
 
+import 'dart:io';
+
 import 'importar_taloes.dart';
 import 'ler_talao.dart';
 import 'linhas_ocr.dart';
@@ -55,4 +57,19 @@ lerFotos(
     }
   }
   return (lidos: lidos, ilegiveis: ilegiveis);
+}
+
+/// Apaga as cópias temporárias das fotografias (D1). Só apaga ficheiros
+/// dentro de uma pasta "cache" (onde o image_picker as copia): nunca a
+/// fotografia original da galeria.
+void apagarFotosTemporarias(Iterable<String> caminhos) {
+  for (final c in caminhos) {
+    final partes = File(c).absolute.uri.pathSegments;
+    if (!partes.contains('cache')) continue;
+    try {
+      File(c).deleteSync();
+    } on FileSystemException {
+      // Já não existe: nada a apagar.
+    }
+  }
 }

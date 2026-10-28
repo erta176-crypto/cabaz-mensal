@@ -113,7 +113,7 @@ iOS; OCR na web; talão em várias fotografias; recortar/endireitar a fotografia
 
 **Testes**: `analisarTalao` com linhas editadas passa de "A rever" a "Novo" quando bate; editar o texto volta a procurar o artigo; apagar e acrescentar linhas; widget: editar uma linha muda o valor e o estado no cartão; o lote (`loteDosTaloes`) leva os valores editados.
 
-## T5 · "Talões (fotografia)" em Importar e exportar [ ]
+## T5 · "Talões (fotografia)" em Importar e exportar [x]
 - Novo cartão/entrada "Talões (fotografia)" com "Tirar fotografia" (`ImagePicker.pickImage(source: camera)`) e "Escolher da galeria" (`pickMultiImage`); só quando `!kIsWeb && defaultTargetPlatform == TargetPlatform.android` (D7).
 - Progresso "A ler N fotografias…"; depois a mesma pré-visualização dos PDFs (título "Talões (fotografia)"), com "Ver fotografia".
 - Ficheiros temporários apagados ao importar ou cancelar (D1). A fotografia não é reduzida (`pickImage` sem `maxWidth`/`imageQuality`): a letra do talão é pequena.
