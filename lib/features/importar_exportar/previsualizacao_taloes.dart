@@ -629,74 +629,64 @@ class _DialogoLinhaState extends State<DialogoLinha> {
     final descontoMau = desconto == null || desconto > (_bruto ?? 0);
     TextInputType numero() =>
         const TextInputType.numberWithOptions(decimal: true);
-    return AlertDialog(
-      // Deitado e com o teclado aberto não cabe: o título e os campos rolam.
-      scrollable: true,
-      title: Text(widget.linha == null ? 'Acrescentar linha' : 'Editar linha'),
-      content: SizedBox(
-        width: 420,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _texto,
-              autofocus: true,
-              decoration: InputDecoration(
-                labelText: 'Texto do talão',
-                errorText: erro(_texto.text.trim().isEmpty, 'Obrigatório'),
+    return _dialogoCorrecao(
+      context,
+      titulo: widget.linha == null ? 'Acrescentar linha' : 'Editar linha',
+      aoGuardar: _guardar,
+      campos: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _texto,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: 'Texto do talão',
+              errorText: erro(_texto.text.trim().isEmpty, 'Obrigatório'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<bool>(
+            initialValue: _peso,
+            isExpanded: true,
+            decoration: const InputDecoration(labelText: 'Medida'),
+            items: const [
+              DropdownMenuItem(value: false, child: Text('Unidades')),
+              DropdownMenuItem(value: true, child: Text('Peso (kg)')),
+            ],
+            onChanged: (v) => setState(() => _peso = v ?? _peso),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _medida,
+            keyboardType: numero(),
+            decoration: InputDecoration(
+              labelText: _peso ? 'Peso (kg)' : 'Quantidade',
+              errorText: erro(
+                medidaMa,
+                _peso ? 'Peso inválido' : 'Quantidade inválida',
               ),
             ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<bool>(
-              initialValue: _peso,
-              isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Medida'),
-              items: const [
-                DropdownMenuItem(value: false, child: Text('Unidades')),
-                DropdownMenuItem(value: true, child: Text('Peso (kg)')),
-              ],
-              onChanged: (v) => setState(() => _peso = v ?? _peso),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _valor,
+            keyboardType: numero(),
+            decoration: InputDecoration(
+              labelText: 'Valor (€)',
+              errorText: erro(_bruto == null, 'Valor inválido'),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _medida,
-              keyboardType: numero(),
-              decoration: InputDecoration(
-                labelText: _peso ? 'Peso (kg)' : 'Quantidade',
-                errorText: erro(
-                  medidaMa,
-                  _peso ? 'Peso inválido' : 'Quantidade inválida',
-                ),
-              ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _desconto,
+            keyboardType: numero(),
+            decoration: InputDecoration(
+              labelText: 'Desconto (€)',
+              errorText: erro(descontoMau, 'Desconto inválido'),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _valor,
-              keyboardType: numero(),
-              decoration: InputDecoration(
-                labelText: 'Valor (€)',
-                errorText: erro(_bruto == null, 'Valor inválido'),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _desconto,
-              keyboardType: numero(),
-              decoration: InputDecoration(
-                labelText: 'Desconto (€)',
-                errorText: erro(descontoMau, 'Desconto inválido'),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
-        ),
-        TextButton(onPressed: _guardar, child: const Text('Guardar')),
-      ],
     );
   }
 }
@@ -735,55 +725,80 @@ class _DialogoTotalState extends State<DialogoTotal> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      scrollable: true,
-      title: const Text('Corrigir total e data'),
-      content: SizedBox(
-        width: 420,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _total,
-              autofocus: true,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: InputDecoration(
-                labelText: 'Total pago (€)',
-                errorText: _validar && centDeTexto(_total.text) == null
-                    ? 'Valor inválido'
-                    : null,
-              ),
+    return _dialogoCorrecao(
+      context,
+      titulo: 'Corrigir total e data',
+      aoGuardar: _guardar,
+      campos: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextField(
+            controller: _total,
+            autofocus: true,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(
+              labelText: 'Total pago (€)',
+              errorText: _validar && centDeTexto(_total.text) == null
+                  ? 'Valor inválido'
+                  : null,
             ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final d = await showDatePicker(
-                  context: context,
-                  initialDate: _data,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now().add(const Duration(days: 1)),
-                );
-                if (d != null) setState(() => _data = d);
-              },
-              icon: const Icon(Icons.calendar_today),
-              label: Text('Data: ${formatarData(_data)}'),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () async {
+              final d = await showDatePicker(
+                context: context,
+                initialDate: _data,
+                firstDate: DateTime(2000),
+                lastDate: DateTime.now().add(const Duration(days: 1)),
+              );
+              if (d != null) setState(() => _data = d);
+            },
+            icon: const Icon(Icons.calendar_today),
+            label: Text('Data: ${formatarData(_data)}'),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
-        ),
-        TextButton(onPressed: _guardar, child: const Text('Guardar')),
-      ],
     );
   }
 }
+
+/// Diálogo de correção com Cancelar e Guardar. Deitado e com o teclado
+/// aberto sobram ≈110 dp: rola tudo (título, campos e botões) e as margens
+/// de cima e de baixo são pequenas.
+Widget _dialogoCorrecao(
+  BuildContext context, {
+  required String titulo,
+  required Widget campos,
+  required VoidCallback aoGuardar,
+}) => AlertDialog(
+  scrollable: true,
+  insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
+  title: Text(titulo),
+  content: SizedBox(
+    width: 420,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        campos,
+        const SizedBox(height: 24),
+        OverflowBar(
+          alignment: MainAxisAlignment.end,
+          spacing: 8,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(onPressed: aoGuardar, child: const Text('Guardar')),
+          ],
+        ),
+      ],
+    ),
+  ),
+);
 
 /// A fotografia do talão em ecrã inteiro, com zoom.
 class _VerFotografia extends StatelessWidget {

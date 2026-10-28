@@ -252,7 +252,9 @@ void main() {
     expect(t.takeException(), isNull);
   });
 
-  // Telemóvel deitado com o teclado aberto: sobram ≈150 dp de altura.
+  // Telemóvel deitado com o teclado aberto (medido no aparelho): barra de
+  // estado de 30 dp e teclado de 250 dp, sobram ≈110 dp. O campo com o foco
+  // fica à vista; o Guardar alcança-se rolando.
   for (final (nome, dialogo, campo) in [
     ('linha', DialogoLinha(linha: _lidl().linhas.first), 'Texto do talão'),
     (
@@ -265,7 +267,8 @@ void main() {
         'vista', (t) async {
       t.view.physicalSize = const Size(873, 393);
       t.view.devicePixelRatio = 1;
-      t.view.viewInsets = const FakeViewPadding(bottom: 240);
+      t.view.padding = const FakeViewPadding(top: 30);
+      t.view.viewInsets = const FakeViewPadding(bottom: 250);
       addTearDown(t.view.reset);
       await t.pumpWidget(
         MaterialApp(
@@ -282,15 +285,17 @@ void main() {
       await t.tap(find.text('abrir'));
       await t.pumpAndSettle();
       expect(t.takeException(), isNull);
-      const visivel = Rect.fromLTRB(0, 0, 873, 393 - 240.0);
-      for (final f in [
-        find.widgetWithText(TextField, campo),
-        find.text('Guardar'),
-      ]) {
+      const visivel = Rect.fromLTRB(0, 30, 873, 393 - 250.0);
+      void aVista(Finder f) {
         final r = t.getRect(f);
         expect(r.height, greaterThan(0), reason: '$f');
         expect(visivel.intersect(r).height, r.height, reason: '$f');
       }
+
+      aVista(find.widgetWithText(TextField, campo));
+      await t.ensureVisible(find.text('Guardar'));
+      await t.pumpAndSettle();
+      aVista(find.text('Guardar'));
     });
   }
 }
