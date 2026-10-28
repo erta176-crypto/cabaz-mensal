@@ -1,6 +1,6 @@
 # Fase 5 · Talões em PDF
 
-**Estado:** plano revisto e aprovado a 2026-10-27 (com a D6). **Publicado a 2026-10-27 a pedido do utilizador com T1–T5 feitas** (importação de talões em PDF a funcionar, confirmada no Chrome); T6 (ligar linhas a artigos, nome/categoria, aliases), T7 e T8 por fazer; portão completo ainda não feito. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano revisto e aprovado a 2026-10-27 (com a D6). **T1–T8 feitas; portão confirmado pelo utilizador a 2026-10-28** (importação de talões em PDF a funcionar no Android e no Chrome). Publicado por partes a 2026-10-27 (T1–T5, depois T6) (importação de talões em PDF a funcionar, confirmada no Chrome); T6 (ligar linhas a artigos, nome/categoria, aliases), T7 e T8 por fazer; portão completo ainda não feito. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Executar tarefa a tarefa (T1 → T8). O que não está aqui não se faz: vai para `docs/planning/notas.md`. A seguir: Fase 6, talões por fotografia (OCR, só Android).
 
@@ -282,9 +282,9 @@ Testes:
 - depois de importar, os aliases estão na fila (`Dispositivo` dos testes de sincronização);
 - numa segunda análise, o mesmo texto já aparece ligado.
 
-## T7 · Verificação com os talões reais (local) [ ]
+## T7 · Verificação com os talões reais (local) [x]
 
-> **Pendente (2026-10-27):** o utilizador não tem talões novos; fica para quando tiver. Já verificado: os 91 talões reais leem certo (teste local), talões já importados aparecem "Já importado" no Chrome e os aliases ligam os artigos existentes.
+> **Feita a 2026-10-28:** o utilizador importou no Android um talão novo do Lidl. No servidor: 10 linhas, total = soma do pago, poupança = soma dos descontos, linhas coerentes, 10 preços com origem `talao`, sem "a rever", com local; 2 artigos novos com a categoria sugerida pela secção; 3 aliases novos. Antes disso: Já verificado: os 91 talões reais leem certo (teste local), talões já importados aparecem "Já importado" no Chrome e os aliases ligam os artigos existentes.
 Na web e no Android, com talões de `dados-privados/talões/`:
 - importar todos os Pingo Doce, Lidl e E.Leclerc → todos "Já importado" (já estão na base) e as cópias "(1)" "Repetido neste lote";
 - apagar à mão no SQL Editor **uma** compra de teste (ou usar um talão novo da semana) → importá-la de novo → compra, linhas, preços e poupança batem com o SQL de controlo e com o PDF;
