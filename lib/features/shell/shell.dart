@@ -310,12 +310,16 @@ class Pagina extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
-        flexibleSpace: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [cores.gradienteInicio, cores.gradienteFim],
+        // O AppBar dá ao flexibleSpace uma altura solta: sem o expand, o
+        // DecoratedBox (sem filho) ficava com altura 0.
+        flexibleSpace: SizedBox.expand(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [cores.gradienteInicio, cores.gradienteFim],
+              ),
             ),
           ),
         ),

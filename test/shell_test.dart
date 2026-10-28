@@ -172,6 +172,12 @@ void main() {
       );
       final gradiente =
           (caixa.decoration as BoxDecoration).gradient! as LinearGradient;
+      // O gradiente tem de ocupar o cabeçalho todo (um DecoratedBox sem
+      // filho fica com altura 0 dentro do AppBar).
+      expect(
+        tester.getSize(find.byWidget(caixa)),
+        tester.getSize(find.byType(AppBar)),
+      );
       expect(gradiente.colors, [cores.gradienteInicio, cores.gradienteFim]);
 
       final titulo = tester.widget<RichText>(
