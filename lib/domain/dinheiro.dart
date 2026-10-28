@@ -36,6 +36,14 @@ int? centDeTexto(String texto) {
   return eurosParaCent(v);
 }
 
+/// Lê um peso em quilos escrito pelo utilizador ("0,338", "1.2") em gramas.
+/// Devolve null se estiver vazio, não for um número ou não for positivo.
+int? gDeTexto(String texto) {
+  final v = double.tryParse(texto.trim().replaceAll(',', '.'));
+  if (v == null || v.isNaN || v.isInfinite || v <= 0) return null;
+  return kgParaG(v);
+}
+
 /// Preço unitário em cêntimos: por unidade (artigos 'un') ou por quilo
 /// (artigos ao peso). Devolve null se não houver quantidade nem peso.
 int? precoUnitarioCent({required int brutoCent, int? quantidade, int? pesoG}) {

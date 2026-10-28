@@ -71,11 +71,41 @@ class TalaoLido {
   /// Linhas da zona dos artigos que não se reconheceram.
   final List<String> naoReconhecidas;
 
-  /// A soma das linhas, menos os descontos, dá o total pago.
-  bool get bate =>
+  /// A soma das linhas, menos os descontos.
+  int get somaCent =>
       linhas.fold(0, (s, l) => s + l.brutoCent - l.descontoCent) -
-          descontoCompraCent ==
-      totalCent;
+      descontoCompraCent;
+
+  /// A soma das linhas, menos os descontos, dá o total pago.
+  bool get bate => somaCent == totalCent;
+
+  /// Para as correções da pré-visualização.
+  TalaoLido copyWith({
+    DateTime? data,
+    List<LinhaTalao>? linhas,
+    int? totalCent,
+    List<String>? naoReconhecidas,
+  }) => TalaoLido(
+    loja: loja,
+    local: local,
+    data: data ?? this.data,
+    numero: numero,
+    linhas: linhas ?? this.linhas,
+    totalCent: totalCent ?? this.totalCent,
+    descontoCompraCent: descontoCompraCent,
+    naoReconhecidas: naoReconhecidas ?? this.naoReconhecidas,
+  );
+}
+
+final _valorNoFim = RegExp(r'^(.*?) ?(\d+[,.]\d{2})(?: ?[A-Z€])?$');
+
+/// Uma linha por reconhecer separada em texto e valor, para preencher
+/// "Acrescentar linha": "BANANA 1,234 kg 1,59 B" → ("BANANA 1,234 kg", 159).
+({String texto, int? valorCent}) separarValor(String linha) {
+  final m = _valorNoFim.firstMatch(linha.trim());
+  return m == null
+      ? (texto: linha.trim(), valorCent: null)
+      : (texto: m[1]!.trim(), valorCent: centDeTexto(m[2]!));
 }
 
 /// "3,32", "1.234,56" ou "3.79" → cêntimos. Lança se não for dinheiro.

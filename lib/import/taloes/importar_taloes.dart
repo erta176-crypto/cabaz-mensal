@@ -123,10 +123,55 @@ List<int> repartirDesconto(List<int> valores, int desconto) {
   return partes;
 }
 
+/// Um talão lido, com o ficheiro (ou fotografia) de onde veio.
+typedef TalaoDoFicheiro = ({String ficheiro, TalaoLido talao});
+
+/// Lê o texto de cada talão; os que não se leem ficam com o motivo.
+({List<TalaoDoFicheiro> lidos, List<NaoReconhecido> falhas}) lerTaloes(
+  List<({String ficheiro, String texto})> textos,
+) {
+  final lidos = <TalaoDoFicheiro>[];
+  final falhas = <NaoReconhecido>[];
+  for (final (:ficheiro, :texto) in textos) {
+    try {
+      switch (lerTalao(texto)) {
+        case final t?:
+          lidos.add((ficheiro: ficheiro, talao: t));
+        case null:
+          falhas.add(
+            NaoReconhecido(ficheiro, 'Formato de talão não reconhecido'),
+          );
+      }
+    } on FormatException catch (e) {
+      falhas.add(NaoReconhecido(ficheiro, e.message));
+    }
+  }
+  return (lidos: lidos, falhas: falhas);
+}
+
 /// Lê os talões, reconhece a loja e marca os repetidos.
 ({List<TalaoAnalisado> taloes, List<NaoReconhecido> naoReconhecidos})
 analisarTaloes(
-  List<({String ficheiro, String texto})> lidos,
+  List<({String ficheiro, String texto})> textos,
+  Catalogo cat,
+  List<CompraExistente> existentes,
+) {
+  final l = lerTaloes(textos);
+  final r = analisarLidos(l.lidos, cat, existentes);
+  final ordem = {for (final (i, t) in textos.indexed) t.ficheiro: i};
+  return (
+    taloes: r.taloes,
+    naoReconhecidos: [...l.falhas, ...r.naoReconhecidos]
+      ..sort((a, b) => ordem[a.ficheiro]!.compareTo(ordem[b.ficheiro]!)),
+  );
+}
+
+/// Analisa talões já lidos (também depois de corrigidos na
+/// pré-visualização): loja, estado, repetidos e artigo de cada linha. Os
+/// repetidos dependem do lote todo, por isso analisa-se sempre o lote todo.
+({List<TalaoAnalisado> taloes, List<NaoReconhecido> naoReconhecidos})
+analisarLidos(
+  List<TalaoDoFicheiro> lidos,
   Catalogo cat,
   List<CompraExistente> existentes,
 ) {
@@ -134,18 +179,7 @@ analisarTaloes(
   final falhas = <NaoReconhecido>[];
   final vistos = <String>{};
 
-  for (final (:ficheiro, :texto) in lidos) {
-    final TalaoLido? t;
-    try {
-      t = lerTalao(texto);
-    } on FormatException catch (e) {
-      falhas.add(NaoReconhecido(ficheiro, e.message));
-      continue;
-    }
-    if (t == null) {
-      falhas.add(NaoReconhecido(ficheiro, 'Formato de talão não reconhecido'));
-      continue;
-    }
+  for (final (:ficheiro, talao: t) in lidos) {
     final loja = cat.loja(t.loja);
     if (loja == null) {
       falhas.add(
@@ -162,7 +196,7 @@ analisarTaloes(
     final jaExiste = existentes.any(
       (e) =>
           e.lojaId == loja.id &&
-          dataIso(e.data) == dataIso(t!.data) &&
+          dataIso(e.data) == dataIso(t.data) &&
           e.totalCent == t.totalCent,
     );
     final estado = jaExiste

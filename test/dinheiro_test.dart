@@ -66,4 +66,12 @@ void main() {
     expect(centParaCampo(129), '1,29');
     expect(centParaCampo(5), '0,05');
   });
+
+  test('gDeTexto: quilos escritos à mão em gramas', () {
+    expect(gDeTexto('0,338'), 338);
+    expect(gDeTexto(' 1.2 '), 1200);
+    expect(gDeTexto('0'), isNull);
+    expect(gDeTexto(''), isNull);
+    expect(gDeTexto('abc'), isNull);
+  });
 }

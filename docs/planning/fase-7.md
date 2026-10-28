@@ -99,7 +99,7 @@ iOS; OCR na web; talão em várias fotografias; recortar/endireitar a fotografia
 
 **Testes**: `faixasDa` (imagem baixa → uma faixa; alta → faixas sobrepostas que cobrem tudo; nenhuma faixa com menos de 32 px em muitos tamanhos; imagem estreita não fica em ciclo); `caixasDaFaixa` (deslocamento e escala certos; uma caixa na sobreposição só conta numa faixa); `ler_fotos` com um `OcrDaFoto` falso: inteira que bate não chama as faixas; inteira que não bate usa as faixas; nenhuma bate → fica a com menos estranhas; erro do OCR → não reconhecida. `test/taloes/fotos_reais_test.dart` (saltado sem `dados-privados/`): com o JSON da prova, Mercadona inteira e Lidl em faixas batem.
 
-## T4 · Correção na pré-visualização [ ]
+## T4 · Correção na pré-visualização [x]
 **`importar_taloes.dart`**: `analisarTaloes` divide-se em ler (texto → `TalaoLido`) e `analisarTalao(ficheiro, TalaoLido, …)`, para voltar a analisar um talão editado sem reler o texto. `TalaoLido` ganha `copyWith`.
 
 **`previsualizacao_taloes.dart`**:

@@ -27,6 +27,7 @@ import '../../import/seed_modelo.dart';
 import '../../import/tabela_lida.dart';
 import '../../import/taloes/importar_taloes.dart';
 import '../../import/taloes/ler_pdfs.dart';
+import '../../import/taloes/talao.dart';
 import '../../import/taloes/texto_pdf.dart';
 import '../lista/lista_logica.dart' show formatarQtd;
 import '../shell/shell.dart';
@@ -112,7 +113,10 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
   String? _lojaSemSupermercado;
   bool _incluirSemQuantidade = false;
 
-  // Talões (PDF) em pré-visualização.
+  // Talões em pré-visualização: os lidos (corrigíveis) e a análise deles.
+  List<TalaoDoFicheiro> _lidosTaloes = const [];
+  List<NaoReconhecido> _falhasTaloes = const [];
+  List<CompraExistente> _existentesTaloes = const [];
   List<TalaoAnalisado>? _taloes;
   List<NaoReconhecido> _naoReconhecidos = const [];
   Map<String, EscolhaArtigo> _escolhas = const {};
@@ -201,17 +205,35 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
           .apagadas();
       await carregarCatalogo(ref.read);
       if (!mounted) return;
-      final r = analisarTaloes(lidos.lidos, _catalogo(), existentes);
+      final l = lerTaloes(lidos.lidos);
       setState(() {
-        _taloes = r.taloes;
-        _naoReconhecidos = [...lidos.ilegiveis, ...r.naoReconhecidos];
+        _lidosTaloes = l.lidos;
+        _falhasTaloes = [...lidos.ilegiveis, ...l.falhas];
+        _existentesTaloes = existentes;
         _escolhas = {};
         _estado = null;
+        _analisarTaloes();
       });
     } finally {
       if (mounted) setState(() => _ocupado = false);
     }
   }
+
+  /// Analisa o lote todo (os repetidos dependem dos outros talões).
+  void _analisarTaloes() {
+    final r = analisarLidos(_lidosTaloes, _catalogo(), _existentesTaloes);
+    _taloes = r.taloes;
+    _naoReconhecidos = [..._falhasTaloes, ...r.naoReconhecidos];
+  }
+
+  /// Correção feita na pré-visualização.
+  void _editarTalao(String ficheiro, TalaoLido talao) => setState(() {
+    _lidosTaloes = [
+      for (final l in _lidosTaloes)
+        l.ficheiro == ficheiro ? (ficheiro: ficheiro, talao: talao) : l,
+    ];
+    _analisarTaloes();
+  });
 
   Future<void> _gravarTaloes() async {
     final taloes = _taloes!;
@@ -367,6 +389,8 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
     _tabela = null;
     _previa = null;
     _taloes = null;
+    _lidosTaloes = const [];
+    _falhasTaloes = const [];
     _naoReconhecidos = const [];
     _escolhas = const {};
   });
@@ -841,6 +865,7 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
                   _escolhas = {..._escolhas}..remove(chave);
                   if (escolha != null) _escolhas[chave] = escolha;
                 }),
+                aoEditar: _editarTalao,
                 online: online,
                 aGravar: _ocupado,
                 aoImportar: _gravarTaloes,

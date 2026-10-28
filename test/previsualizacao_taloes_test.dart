@@ -149,7 +149,7 @@ void main() {
             of: find.text('SALADA COM COENTROS'),
             matching: find.byType(ListTile),
           ),
-          matching: find.byTooltip('Artigo desta linha'),
+          matching: find.byTooltip('Ações da linha'),
         ),
       );
       await t.pumpAndSettle();
@@ -158,7 +158,7 @@ void main() {
     testWidgets('só as linhas com artigo novo têm o menu', (t) async {
       await abrir(t, aoEscolher: (_, _) {});
       // Linhas novas do Lidl: salada, pão, iogurte, marinadas, gelado.
-      expect(find.byTooltip('Artigo desta linha'), findsNWidgets(5));
+      expect(find.byTooltip('Ações da linha'), findsNWidgets(5));
     });
 
     testWidgets('ligar a um artigo existente, com pesquisa', (t) async {

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cabaz_mensal/domain/modelos.dart';
 import 'package:cabaz_mensal/import/previsualizacao.dart';
 import 'package:cabaz_mensal/import/taloes/importar_taloes.dart';
+import 'package:cabaz_mensal/import/taloes/talao.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 String _f(String nome) =>
@@ -162,6 +163,137 @@ void main() {
       expect(r.naoReconhecidos[0].motivo, contains('E.Leclerc'));
       expect(r.naoReconhecidos[1].motivo, 'Formato de talão não reconhecido');
       expect(r.naoReconhecidos[2].motivo, 'Talão sem data');
+    });
+  });
+
+  group('correções da pré-visualização (Fase 7)', () {
+    TalaoDoFicheiro lido(String texto) =>
+        lerTaloes([(ficheiro: 'f', texto: texto)]).lidos.single;
+
+    ({List<TalaoAnalisado> taloes, List<NaoReconhecido> naoReconhecidos})
+    reanalisar(
+      List<TalaoDoFicheiro> lidos, {
+      List<CompraExistente> existentes = const [],
+    }) => analisarLidos(lidos, _cat(), existentes);
+
+    test('lerTaloes separa os lidos das falhas, com o motivo', () {
+      final r = lerTaloes([
+        (ficheiro: 'a', texto: _f('lidl')),
+        (ficheiro: 'b', texto: 'NADA'),
+      ]);
+      expect(r.lidos.single.ficheiro, 'a');
+      expect(r.falhas.single.motivo, 'Formato de talão não reconhecido');
+    });
+
+    test('corrigir o total passa de "a rever" a "novo"', () {
+      final t = lido(_f('lidl').replaceFirst('Total 14,77', 'Total 14,99'));
+      expect(reanalisar([t]).taloes.single.estado, EstadoTalao.aRever);
+      final corrigido = (
+        ficheiro: t.ficheiro,
+        talao: t.talao.copyWith(totalCent: 1477),
+      );
+      expect(reanalisar([corrigido]).taloes.single.estado, EstadoTalao.novo);
+    });
+
+    test('linhas por reconhecer: "a rever" até serem tratadas', () {
+      final t = lido(_f('lidl'));
+      final comEstranha = (
+        ficheiro: 'f',
+        talao: t.talao.copyWith(naoReconhecidas: ['XPTO 1,00']),
+      );
+      expect(
+        reanalisar([comEstranha]).taloes.single.estado,
+        EstadoTalao.aRever,
+      );
+      final tratada = (
+        ficheiro: 'f',
+        talao: comEstranha.talao.copyWith(naoReconhecidas: const []),
+      );
+      expect(reanalisar([tratada]).taloes.single.estado, EstadoTalao.novo);
+    });
+
+    test('corrigir o texto volta a procurar o artigo', () {
+      final t = lido(_f('lidl'));
+      final i = t.talao.linhas.indexWhere(
+        (l) => l.texto == 'SALADA COM COENTROS',
+      );
+      expect(reanalisar([t]).taloes.single.linhas[i].artigo, isNull);
+      final l = t.talao.linhas[i];
+      final linhas = [...t.talao.linhas]
+        ..[i] = LinhaTalao(
+          texto: 'BIFE DE FRANGO',
+          quantidade: l.quantidade,
+          pesoG: l.pesoG,
+          precoUnitCent: l.precoUnitCent,
+          brutoCent: l.brutoCent,
+          descontoCent: l.descontoCent,
+        );
+      final r = reanalisar([
+        (ficheiro: 'f', talao: t.talao.copyWith(linhas: linhas)),
+      ]);
+      expect(r.taloes.single.linhas[i].artigo?.id, 'a-bife');
+    });
+
+    test('corrigir a data: passa a "já importado" e o lote todo é '
+        'reanalisado', () {
+      // Sem número (como as fotografias do Mercadona): os repetidos contam
+      // pela loja, data e total.
+      final a = lido(_f('lidl').replaceFirst(RegExp(r'No : FS .*\n'), ''));
+      expect(a.talao.numero, isNull);
+      final b = (
+        ficheiro: 'b',
+        talao: a.talao.copyWith(data: DateTime(2026, 10, 5)),
+      );
+      // Datas diferentes: não são repetidos.
+      expect(reanalisar([a, b]).taloes.map((t) => t.estado), [
+        EstadoTalao.novo,
+        EstadoTalao.novo,
+      ]);
+      // Corrigida para a mesma data: o segundo passa a repetido.
+      final b2 = (ficheiro: 'b', talao: b.talao.copyWith(data: a.talao.data));
+      expect(reanalisar([a, b2]).taloes.map((t) => t.estado), [
+        EstadoTalao.novo,
+        EstadoTalao.repetidoNoLote,
+      ]);
+      final existente = CompraExistente(
+        lojaId: 'lidl',
+        data: DateTime(2026, 10, 5),
+        local: null,
+        totalCent: 1477,
+      );
+      expect(
+        reanalisar([b], existentes: [existente]).taloes.single.estado,
+        EstadoTalao.jaExiste,
+      );
+    });
+
+    test('o lote leva os valores corrigidos', () {
+      final t = lido(_f('lidl'));
+      final linhas = [...t.talao.linhas]..removeLast();
+      final apagada = t.talao.linhas.last;
+      final corrigido = t.talao.copyWith(
+        linhas: linhas,
+        totalCent: t.talao.totalCent - apagada.brutoCent + apagada.descontoCent,
+      );
+      final analisados = reanalisar([(ficheiro: 'f', talao: corrigido)]).taloes;
+      expect(analisados.single.estado, EstadoTalao.novo);
+      final (:lote, aliases: _) = loteDosTaloes(
+        analisados,
+        const {},
+        _cat(),
+        novoId: _id,
+      );
+      expect(lote.linhas, hasLength(linhas.length));
+      expect(lote.compras.single['total_cent'], corrigido.totalCent);
+    });
+
+    test('separarValor: texto e valor de uma linha por reconhecer', () {
+      expect(separarValor('BANANA 1,234 kg 1,59 B'), (
+        texto: 'BANANA 1,234 kg',
+        valorCent: 159,
+      ));
+      expect(separarValor('CAFE 3.15€'), (texto: 'CAFE', valorCent: 315));
+      expect(separarValor('SÓ TEXTO'), (texto: 'SÓ TEXTO', valorCent: null));
     });
   });
 
