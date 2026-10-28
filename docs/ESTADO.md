@@ -3,9 +3,10 @@
 *Atualizado em 2026-10-28. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**6 · Tema azul:** plano aprovado a 2026-10-28; T1 a T4 e T6 (paleta, cabeçalho alto com filtros em pílulas, gaveta e barra, cartões e orçamento) feitas, próxima T5 (verificação visual e portão) ([`planning/fase-6.md`](planning/fase-6.md)). Depois: **7 · Talões por fotografia (OCR)** (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
+**7 · Talões por fotografia (OCR)** (por planear) (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
 
 ## Feito
+- **Fase 6 · Tema azul:** concluída e publicada (portão a 2026-10-28; [`planning/fase-6.md`](planning/fase-6.md)). Paleta azul e `CoresCabaz` (decisão 0011, substitui a 0008), cabeçalho alto em gradiente com os filtros em pílulas e a pesquisa (D6, revoga a D4), gaveta e barra inferior, cartões e orçamento com verde/âmbar/vermelho e percentagem. No portão: o gradiente do cabeçalho tinha altura 0, as pílulas no escuro tinham pouco contraste e os cartões do Painel tinham alturas diferentes na mesma linha — corrigidos com testes.
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
 - **Fase 1A · Lista e offline:** concluída e publicada ([`planning/fase-1a.md`](planning/fase-1a.md)).
 - **Comparação de preços · P0 · EAN e fonte do preço:** concluído (portão a 2026-10-25; [`comparacao-precos/P0-modelo-dados.md`](comparacao-precos/P0-modelo-dados.md)). No portão: GTIN-14 com 0 à frente passa a EAN-13, código repetido é recusado e a pesquisa de Artigos procura também pelo código.
@@ -18,13 +19,12 @@
 - **Repositório público:** entram `.claude/settings.json` e `AGENTS.md`; ficam só locais `.claude/skills/`, `.codex/` e `.vscode/`.
 
 ## Ecrãs
-- Tema violeta/azul/castanho claro com escolha Sistema/Claro/Escuro (Definições e botão sol/lua no menu lateral).
+- Tema azul com escolha Sistema/Claro/Escuro (Definições e botão sol/lua no menu lateral).
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Executar a Fase 6 (tema azul; T5: verificação visual e portão).
-2. Fase 7: talões por fotografia.
-3. Depois: P1 da comparação de preços (primeiro conector).
+1. Planear a Fase 7: talões por fotografia.
+2. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
 - Ligar a "Leaked Password Protection" no Supabase (Authentication → Policies). É o único aviso que os advisors ainda dão.

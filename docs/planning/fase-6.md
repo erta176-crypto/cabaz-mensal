@@ -1,6 +1,6 @@
 # Fase 6 · Tema azul (cabeçalho em gradiente, cartões brancos, verde/âmbar/vermelho)
 
-**Estado:** plano revisto e aprovado a 2026-10-28 (com a D4). Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída; portão confirmado a 2026-10-28. Plano aprovado a 2026-10-28 (a D4 foi revogada pela D6). Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Origem: proposta do utilizador ("Painel e gaveta em azul": simulação HTML, resumo e prompt), revista contra o código. Substitui a paleta violeta da decisão 0008. A seguir: **Fase 7**, talões por fotografia.
 
@@ -176,7 +176,7 @@ Letras, tamanhos, ordem e conteúdo dos ecrãs (fora o cabeçalho da T6); cores 
 
 **Commit:** `Cabeçalho alto com os filtros em pílulas`.
 
-## T5 · Verificação visual, docs e fecho [ ]
+## T5 · Verificação visual, docs e fecho [x]
 - À mão, no Android e no Chrome, em claro e escuro: todos os ecrãs (Painel, Lista, Concluir compra, Histórico e detalhe, Artigos e Ver artigo, Importar e exportar com a pré-visualização dos talões, Definições, Entrada), a gaveta, a barra inferior e o orçamento; < e > 800 px, telemóvel deitado e letra do sistema a 200 %.
 - `mapa.md` (`CoresCabaz`), `ESTADO.md`, decisão 0011 (e 0008 marcada como substituída), marcar T1–T5.
 
