@@ -251,4 +251,46 @@ void main() {
     await t.pumpAndSettle();
     expect(t.takeException(), isNull);
   });
+
+  // Telemóvel deitado com o teclado aberto: sobram ≈150 dp de altura.
+  for (final (nome, dialogo, campo) in [
+    ('linha', DialogoLinha(linha: _lidl().linhas.first), 'Texto do talão'),
+    (
+      'total',
+      DialogoTotal(totalCent: 1477, data: DateTime(2026, 10, 5)),
+      'Total pago (€)',
+    ),
+  ]) {
+    testWidgets('diálogo da $nome deitado com teclado: campo e Guardar à '
+        'vista', (t) async {
+      t.view.physicalSize = const Size(873, 393);
+      t.view.devicePixelRatio = 1;
+      t.view.viewInsets = const FakeViewPadding(bottom: 240);
+      addTearDown(t.view.reset);
+      await t.pumpWidget(
+        MaterialApp(
+          theme: construirTema(Brightness.light, fontesGoogle: false),
+          home: Builder(
+            builder: (context) => TextButton(
+              onPressed: () =>
+                  showDialog<void>(context: context, builder: (_) => dialogo),
+              child: const Text('abrir'),
+            ),
+          ),
+        ),
+      );
+      await t.tap(find.text('abrir'));
+      await t.pumpAndSettle();
+      expect(t.takeException(), isNull);
+      const visivel = Rect.fromLTRB(0, 0, 873, 393 - 240.0);
+      for (final f in [
+        find.widgetWithText(TextField, campo),
+        find.text('Guardar'),
+      ]) {
+        final r = t.getRect(f);
+        expect(r.height, greaterThan(0), reason: '$f');
+        expect(visivel.intersect(r).height, r.height, reason: '$f');
+      }
+    });
+  }
 }

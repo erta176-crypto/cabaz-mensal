@@ -630,64 +630,64 @@ class _DialogoLinhaState extends State<DialogoLinha> {
     TextInputType numero() =>
         const TextInputType.numberWithOptions(decimal: true);
     return AlertDialog(
+      // Deitado e com o teclado aberto não cabe: o título e os campos rolam.
+      scrollable: true,
       title: Text(widget.linha == null ? 'Acrescentar linha' : 'Editar linha'),
       content: SizedBox(
         width: 420,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _texto,
-                autofocus: true,
-                decoration: InputDecoration(
-                  labelText: 'Texto do talão',
-                  errorText: erro(_texto.text.trim().isEmpty, 'Obrigatório'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _texto,
+              autofocus: true,
+              decoration: InputDecoration(
+                labelText: 'Texto do talão',
+                errorText: erro(_texto.text.trim().isEmpty, 'Obrigatório'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<bool>(
+              initialValue: _peso,
+              isExpanded: true,
+              decoration: const InputDecoration(labelText: 'Medida'),
+              items: const [
+                DropdownMenuItem(value: false, child: Text('Unidades')),
+                DropdownMenuItem(value: true, child: Text('Peso (kg)')),
+              ],
+              onChanged: (v) => setState(() => _peso = v ?? _peso),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _medida,
+              keyboardType: numero(),
+              decoration: InputDecoration(
+                labelText: _peso ? 'Peso (kg)' : 'Quantidade',
+                errorText: erro(
+                  medidaMa,
+                  _peso ? 'Peso inválido' : 'Quantidade inválida',
                 ),
               ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<bool>(
-                initialValue: _peso,
-                isExpanded: true,
-                decoration: const InputDecoration(labelText: 'Medida'),
-                items: const [
-                  DropdownMenuItem(value: false, child: Text('Unidades')),
-                  DropdownMenuItem(value: true, child: Text('Peso (kg)')),
-                ],
-                onChanged: (v) => setState(() => _peso = v ?? _peso),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _valor,
+              keyboardType: numero(),
+              decoration: InputDecoration(
+                labelText: 'Valor (€)',
+                errorText: erro(_bruto == null, 'Valor inválido'),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _medida,
-                keyboardType: numero(),
-                decoration: InputDecoration(
-                  labelText: _peso ? 'Peso (kg)' : 'Quantidade',
-                  errorText: erro(
-                    medidaMa,
-                    _peso ? 'Peso inválido' : 'Quantidade inválida',
-                  ),
-                ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _desconto,
+              keyboardType: numero(),
+              decoration: InputDecoration(
+                labelText: 'Desconto (€)',
+                errorText: erro(descontoMau, 'Desconto inválido'),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _valor,
-                keyboardType: numero(),
-                decoration: InputDecoration(
-                  labelText: 'Valor (€)',
-                  errorText: erro(_bruto == null, 'Valor inválido'),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _desconto,
-                keyboardType: numero(),
-                decoration: InputDecoration(
-                  labelText: 'Desconto (€)',
-                  errorText: erro(descontoMau, 'Desconto inválido'),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       actions: [
@@ -736,6 +736,7 @@ class _DialogoTotalState extends State<DialogoTotal> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      scrollable: true,
       title: const Text('Corrigir total e data'),
       content: SizedBox(
         width: 420,
