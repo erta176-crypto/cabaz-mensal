@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-28. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**6 · Talões por fotografia (OCR):** a planear (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização); faltam fotos de exemplo em `dados-privados/talões/fotos/`.
+**6 · Tema azul:** plano escrito a 2026-10-28, à espera de aprovação ([`planning/fase-6.md`](planning/fase-6.md)). Depois: **7 · Talões por fotografia (OCR)** (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -22,8 +22,9 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Plano da Fase 6 (talões por fotografia: as quatro lojas, câmara e galeria só no Android, correção na pré-visualização).
-2. Depois: P1 da comparação de preços (primeiro conector).
+1. Aprovar e executar a Fase 6 (tema azul).
+2. Fase 7: talões por fotografia.
+3. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
 - Ligar a "Leaked Password Protection" no Supabase (Authentication → Policies). É o único aviso que os advisors ainda dão.
