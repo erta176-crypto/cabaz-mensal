@@ -71,7 +71,7 @@ iOS; OCR na web; talão em várias fotografias; recortar/endireitar a fotografia
 
 ---
 
-## T1 · Linhas a partir das caixas do OCR [ ]
+## T1 · Linhas a partir das caixas do OCR [x]
 **Novo `lib/import/taloes/linhas_ocr.dart`** (Dart puro):
 - `CaixaOcr(texto, esquerda, cima, direita, baixo, angulo)`.
 - `linhasDasCaixas(List<CaixaOcr>) → String`: ângulo mediano → centro vertical corrigido; ordena; junta na mesma linha as caixas a menos de meia altura mediana; dentro da linha, ordena por x e junta com um espaço.
