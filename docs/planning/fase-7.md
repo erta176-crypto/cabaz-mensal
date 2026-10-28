@@ -128,6 +128,9 @@ iOS; OCR na web; talão em várias fotografias; recortar/endireitar a fotografia
 - Tamanho do APK antes e depois.
 - `mapa.md` (ficheiros novos), `ESTADO.md`, decisão `0012-ocr-no-aparelho.md` (D1–D3), plano marcado.
 
+**Feito (2026-10-28):** web e APK release compilam (APK 91,3 → 121,8 MB). O APK release falhava no R8 e depois lia todas as fotografias como ilegíveis: corrigido com `android/app/proguard-rules.pro` (decisão 0012). No telemóvel: captura de ecrã do Lidl pela galeria lida certo, linhas ligadas aos artigos e talão repetido marcado como "Já importado"; um talão importado.
+**Por fazer:** Pingo Doce e E.Leclerc em papel (D8, sem talões à mão); fotografia com o telemóvel deitado; diálogos com letra ×2 e deitado; escuro; tempo por fotografia.
+
 ## Portão da Fase 7
 1. `dart format`, `flutter analyze`, `flutter test` verdes, com a saída real; `flutter build web` e `flutter build apk --release` compilam.
 2. No telemóvel: Mercadona e Lidl (exemplos) entram como "Novo"; Pingo Doce e E.Leclerc em papel verificados (D8); uma correção feita na pré-visualização chega à compra importada.
