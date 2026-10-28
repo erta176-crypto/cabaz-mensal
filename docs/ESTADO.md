@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-28. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**6 · Tema azul:** plano escrito a 2026-10-28, à espera de aprovação ([`planning/fase-6.md`](planning/fase-6.md)). Depois: **7 · Talões por fotografia (OCR)** (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
+**6 · Tema azul:** plano revisto a 2026-10-28 (2.ª versão), à espera de aprovação ([`planning/fase-6.md`](planning/fase-6.md)). Depois: **7 · Talões por fotografia (OCR)** (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
