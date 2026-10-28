@@ -115,6 +115,28 @@ void main() {
     expect(largura('Total gasto'), largura('Compras'));
   });
 
+  testWidgets('a 360 px os cartões de cada linha têm a mesma altura', (
+    t,
+  ) async {
+    await abrir(
+      t,
+      _EstatisticasFalsas(() async => ResultadoPainel(_dados())),
+      largura: 360,
+    );
+    double altura(String titulo) => t
+        .getSize(
+          find.ancestor(of: find.text(titulo), matching: find.byType(Card)),
+        )
+        .height;
+    // "Média por compra" passa para duas linhas a esta largura.
+    expect(
+      t.getSize(find.text('Média por compra')).height,
+      greaterThan(t.getSize(find.text('Poupança')).height),
+    );
+    expect(altura('Média por compra'), altura('Poupança'));
+    expect(altura('Total gasto'), altura('Compras'));
+  });
+
   testWidgets('com guardadoEm mostra o aviso sem rede', (t) async {
     await abrir(
       t,

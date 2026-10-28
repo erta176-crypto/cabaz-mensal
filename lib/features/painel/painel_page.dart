@@ -149,49 +149,61 @@ class _PainelPageState extends ConsumerState<PainelPage> {
       builder: (context, c) {
         // 4 colunas se couberem com 160 px cada; senão 2, todas iguais.
         final colunas = c.maxWidth >= 4 * 160 + 3 * 8 ? 4 : 2;
-        final largura = (c.maxWidth - (colunas - 1) * 8) / colunas;
-        Widget cartao(String titulo, String valor, {Color? cor}) => SizedBox(
-          width: largura,
-          child: Card(
-            margin: EdgeInsets.zero,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    titulo,
-                    style: tema.textTheme.bodyMedium?.copyWith(
-                      color: tema.colorScheme.onSurfaceVariant,
-                    ),
+        Widget cartao(String titulo, String valor, {Color? cor}) => Card(
+          margin: EdgeInsets.zero,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  titulo,
+                  style: tema.textTheme.bodyMedium?.copyWith(
+                    color: tema.colorScheme.onSurfaceVariant,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    valor,
-                    style: tema.textTheme.headlineSmall?.copyWith(
-                      color: cor,
-                      fontWeight: FontWeight.bold,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  valor,
+                  style: tema.textTheme.headlineSmall?.copyWith(
+                    color: cor,
+                    fontWeight: FontWeight.bold,
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
-        return Wrap(
-          spacing: 8,
-          runSpacing: 8,
+        final cartoes = [
+          cartao('Total gasto', formatarCent(d.totalCent)),
+          cartao('Compras', formatarInteiro(d.nCompras)),
+          cartao('Média por compra', formatarCent(d.mediaCent)),
+          cartao(
+            'Poupança',
+            formatarCent(d.poupancaCent),
+            cor: CoresCabaz.of(context).ok,
+          ),
+        ];
+        // Cada linha fica com a altura do cartão mais alto (um rótulo pode
+        // ocupar duas linhas).
+        return Column(
           children: [
-            cartao('Total gasto', formatarCent(d.totalCent)),
-            cartao('Compras', formatarInteiro(d.nCompras)),
-            cartao('Média por compra', formatarCent(d.mediaCent)),
-            cartao(
-              'Poupança',
-              formatarCent(d.poupancaCent),
-              cor: CoresCabaz.of(context).ok,
-            ),
+            for (var i = 0; i < cartoes.length; i += colunas) ...[
+              if (i > 0) const SizedBox(height: 8),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var j = i; j < i + colunas; j++) ...[
+                      if (j > i) const SizedBox(width: 8),
+                      Expanded(child: cartoes[j]),
+                    ],
+                  ],
+                ),
+              ),
+            ],
           ],
         );
       },
