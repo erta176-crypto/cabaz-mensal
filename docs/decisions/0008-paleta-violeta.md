@@ -1,6 +1,6 @@
 # 0008 · Paleta violeta, azul e castanho claro
 
-**Estado:** em vigor desde 2026-10-26 (Fase 3). Substitui a paleta terracota da Fase 0.
+**Estado:** substituída a 2026-10-28 pela decisão 0011 (paleta azul). Esteve em vigor desde 2026-10-26 (Fase 3).
 
 ## Opções consideradas
 - **A — Violeta principal:** botões e destaques em violeta, azul para gráficos e informação, castanho claro/areia nos avisos e realces suaves, fundo creme neutro.

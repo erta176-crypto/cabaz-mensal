@@ -2,6 +2,9 @@
 
 *Atualizar quando mudarem pastas, ficheiros, tabelas ou funções. Para relações entre peças, usar o graphify.*
 
+## `lib/core/`
+- `tema.dart`: paleta azul (decisão 0011): `ColorScheme` claro e escuro e o `ThemeExtension` `CoresCabaz` (gradiente do cabeçalho, verde de "dentro do limite", parte vazia das barras; `CoresCabaz.of(context)`).
+
 ## `lib/domain/`: modelos e regras puras
 - `dinheiro.dart`: dinheiro sempre em cêntimos inteiros e pesos em gramas.
 - `texto.dart`: pesquisa sem acentos.

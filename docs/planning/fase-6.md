@@ -1,6 +1,6 @@
 # Fase 6 · Tema azul (cabeçalho em gradiente, cartões brancos, verde/âmbar/vermelho)
 
-**Estado:** plano revisto a 2026-10-28 (2.ª versão, com o mapa completo das cores e os contrastes já calculados), **à espera de aprovação**. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** plano revisto e aprovado a 2026-10-28 (com a D4). Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 Origem: proposta do utilizador ("Painel e gaveta em azul": simulação HTML, resumo e prompt), revista contra o código. Substitui a paleta violeta da decisão 0008. A seguir: **Fase 7**, talões por fotografia.
 
@@ -91,7 +91,7 @@ Letras, tamanhos, ordem e conteúdo dos ecrãs; filtros dentro do cabeçalho (D4
 
 ---
 
-## T1 · Paleta azul e `CoresCabaz` [ ]
+## T1 · Paleta azul e `CoresCabaz` [x]
 **`lib/core/tema.dart`**
 - `Cores` com os valores da 0.3 (nomes por papel, ex.: `azul`, `azulClaro`, `azulEscuro`, `ambar`, `verde`, …) e `_esquema` com **todos** os papéis da tabela (claro e escuro).
 - `class CoresCabaz extends ThemeExtension<CoresCabaz>` com `gradienteInicio`, `gradienteFim`, `sobreGradiente`, `ok`, `pista`; `copyWith`, `lerp` (`Color.lerp`), `static CoresCabaz of(BuildContext)` (lança se faltar, para não falhar em silêncio); `CoresCabaz.claro` e `CoresCabaz.escuro` constantes; registado em `extensions` nos dois `ThemeData`.
