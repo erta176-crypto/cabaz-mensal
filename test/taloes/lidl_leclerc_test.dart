@@ -103,7 +103,7 @@ void main() {
     });
 
     test('texto sem loja conhecida → null', () {
-      expect(lerTalao('MERCADONA\nTOTAL 1,00'), isNull);
+      expect(lerTalao('CONTINENTE\nTOTAL 1,00'), isNull);
     });
   });
 }

@@ -30,7 +30,7 @@ void main() {
       (ficheiro: 'lidl.pdf', texto: _f('lidl')),
       (ficheiro: 'lidl (1).pdf', texto: _f('lidl')),
       (ficheiro: 'pd.pdf', texto: _f('pingo_doce')),
-      (ficheiro: 'x.pdf', texto: 'MERCADONA'),
+      (ficheiro: 'x.pdf', texto: 'CONTINENTE'),
     ],
     Catalogo(
       lojas: const [

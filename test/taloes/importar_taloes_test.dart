@@ -150,7 +150,7 @@ void main() {
     test('loja que não está no catálogo e texto desconhecido', () {
       final r = analisar([
         ('lec.pdf', _f('leclerc')),
-        ('x.pdf', 'MERCADONA\nTOTAL 1,00'),
+        ('x.pdf', 'CONTINENTE\nTOTAL 1,00'),
         ('y.pdf', _f('lidl').replaceFirst('Data de Venda: 2026-10-04', '')),
       ]);
       expect(r.taloes, isEmpty);

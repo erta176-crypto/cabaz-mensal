@@ -79,7 +79,7 @@ iOS; OCR na web; talão em várias fotografias; recortar/endireitar a fotografia
 
 **Testes (`test/taloes/linhas_ocr_test.dart`)**: caixas fictícias com descrição e preço separados → uma linha; talão inclinado (ângulo −2°) → linhas certas; duas linhas próximas não se juntam; cada regra da normalização, e que não toca em datas ("2024-09-22"), horas nem nas linhas do E.Leclerc (a fixture `leclerc.txt` passa por `normalizarOcr` e continua a ser lida igual).
 
-## T2 · Leitor do Mercadona [ ]
+## T2 · Leitor do Mercadona [x]
 **Novo `lib/import/taloes/mercadona.dart`**; `lerTalao` passa a tentar também `lerMercadona`.
 - Reconhece por "MERCADONA"; artigos entre a linha "Descrição…" e "TOTAL": `^(\d+) ?(.+?)(?: (\d+,\d{2}))? (\d+,\d{2}) [A-Z]$` (quantidade, texto, preço unitário opcional, valor, letra do IVA); sem preço unitário, unitário = valor ÷ quantidade.
 - Total pela D4; data pela linha `^\d{2}-\d{2}-\d{2} \d{2}:\d{2}`. Linhas da zona dos artigos que não casam → `naoReconhecidas`.
