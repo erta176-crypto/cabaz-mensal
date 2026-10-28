@@ -9,6 +9,7 @@ import '../../data/providers.dart';
 import '../../domain/estatisticas.dart';
 import '../../domain/modelos.dart';
 import '../estatisticas/cores.dart';
+import '../shell/filtro_pilula.dart';
 import '../shell/shell.dart';
 import 'detalhe_compra.dart';
 import 'pesquisa.dart';
@@ -116,92 +117,53 @@ class _HistoricoPageState extends ConsumerState<HistoricoPage> {
 
     return Pagina(
       titulo: 'Histórico',
+      filtros: [
+        FiltroPilula<Periodo>(
+          rotulo: 'Período',
+          icone: Icons.calendar_month,
+          valor: _periodo,
+          opcoes: {for (final p in Periodo.values) p: p.rotulo},
+          aoMudar: (p) => setState(() => _periodo = p),
+        ),
+        FiltroPilula<String?>(
+          rotulo: 'Loja',
+          icone: Icons.storefront,
+          valor: lojas.any((l) => l.id == _lojaId) ? _lojaId : null,
+          opcoes: {null: 'Todas as lojas', for (final l in lojas) l.id: l.nome},
+          aoMudar: (id) => setState(() => _lojaId = id),
+        ),
+      ],
+      pesquisa: CampoPesquisa(
+        dica: 'Artigo ou texto do talão',
+        aoEscrever: _escrever,
+        aoSubmeter: _submeter,
+      ),
       // Duas colunas só se couberem a lista (420) e o detalhe (320): não
       // basta o ecrã ser largo, o menu fixo também ocupa largura.
       corpo: LayoutBuilder(
         builder: (context, c) {
           final largo = c.maxWidth >= 420 + 1 + 320;
-          return FiltrosEConteudo(
-            filtros: Padding(
-              padding: const EdgeInsets.all(16),
-              child: _filtros(lojas),
-            ),
-            conteudo: largo
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(width: 420, child: lista(true)),
-                      const VerticalDivider(width: 1),
-                      Expanded(
-                        child: selecionada == null
-                            ? const Center(child: Text('Escolhe uma compra.'))
-                            : DetalheCompra(
-                                key: ValueKey(selecionada.id),
-                                compra: selecionada,
-                              ),
-                      ),
-                    ],
-                  )
-                : lista(false),
-          );
+          return largo
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(width: 420, child: lista(true)),
+                    const VerticalDivider(width: 1),
+                    Expanded(
+                      child: selecionada == null
+                          ? const Center(child: Text('Escolhe uma compra.'))
+                          : DetalheCompra(
+                              key: ValueKey(selecionada.id),
+                              compra: selecionada,
+                            ),
+                    ),
+                  ],
+                )
+              : lista(false);
         },
       ),
     );
   }
-
-  Widget _filtros(List<Loja> lojas) => LayoutBuilder(
-    builder: (context, c) {
-      final largura = c.maxWidth < 600 ? c.maxWidth : 260.0;
-      return Wrap(
-        spacing: 16,
-        runSpacing: 12,
-        children: [
-          SizedBox(
-            width: largura,
-            child: DropdownButtonFormField<Periodo>(
-              initialValue: _periodo,
-              isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Período'),
-              items: [
-                for (final p in Periodo.values)
-                  DropdownMenuItem(value: p, child: Text(p.rotulo)),
-              ],
-              onChanged: (p) => setState(() => _periodo = p ?? _periodo),
-            ),
-          ),
-          SizedBox(
-            width: largura,
-            child: DropdownButtonFormField<String?>(
-              // A chave reconstrói o menu quando as lojas chegam.
-              key: ValueKey(lojas.length),
-              initialValue: lojas.any((l) => l.id == _lojaId) ? _lojaId : null,
-              isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Loja'),
-              items: [
-                const DropdownMenuItem(child: Text('Todas as lojas')),
-                for (final l in lojas)
-                  DropdownMenuItem(value: l.id, child: Text(l.nome)),
-              ],
-              onChanged: (id) => setState(() => _lojaId = id),
-            ),
-          ),
-          SizedBox(
-            width: largura,
-            child: TextField(
-              decoration: const InputDecoration(
-                labelText: 'Pesquisar',
-                hintText: 'Artigo ou texto do talão',
-                prefixIcon: Icon(Icons.search),
-              ),
-              textInputAction: TextInputAction.search,
-              onChanged: _escrever,
-              onSubmitted: _submeter,
-            ),
-          ),
-        ],
-      );
-    },
-  );
 
   Widget _lista(List<CompraResumo> compras, List<Loja> lojas, bool largo) {
     if (compras.isEmpty) {

@@ -11,6 +11,7 @@ import '../estatisticas/barras_horizontais.dart';
 import '../estatisticas/cores.dart';
 import '../estatisticas/grafico_meses.dart';
 import '../artigos/ver_artigo.dart';
+import '../shell/filtro_pilula.dart';
 import '../shell/shell.dart';
 import 'orcamento_cartao.dart';
 
@@ -37,6 +38,22 @@ class _PainelPageState extends ConsumerState<PainelPage> {
 
     return Pagina(
       titulo: 'Painel e estatísticas',
+      filtros: [
+        FiltroPilula<Periodo>(
+          rotulo: 'Período',
+          icone: Icons.calendar_month,
+          valor: _periodo,
+          opcoes: {for (final p in Periodo.values) p: p.rotulo},
+          aoMudar: (p) => setState(() => _periodo = p),
+        ),
+        FiltroPilula<String?>(
+          rotulo: 'Loja',
+          icone: Icons.storefront,
+          valor: lojas.any((l) => l.id == _lojaId) ? _lojaId : null,
+          opcoes: {null: 'Todas as lojas', for (final l in lojas) l.id: l.nome},
+          aoMudar: (id) => setState(() => _lojaId = id),
+        ),
+      ],
       corpo: RefreshIndicator(
         onRefresh: () async {
           try {
@@ -53,8 +70,6 @@ class _PainelPageState extends ConsumerState<PainelPage> {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _filtros(lojas),
-                const SizedBox(height: 16),
                 painel.when(
                   loading: () => const Padding(
                     padding: EdgeInsets.all(32),
@@ -83,47 +98,6 @@ class _PainelPageState extends ConsumerState<PainelPage> {
       ),
     );
   }
-
-  Widget _filtros(List<Loja> lojas) => LayoutBuilder(
-    builder: (context, c) {
-      final largura = c.maxWidth < 600 ? c.maxWidth : 260.0;
-      return Wrap(
-        spacing: 16,
-        runSpacing: 12,
-        children: [
-          SizedBox(
-            width: largura,
-            child: DropdownButtonFormField<Periodo>(
-              initialValue: _periodo,
-              isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Período'),
-              items: [
-                for (final p in Periodo.values)
-                  DropdownMenuItem(value: p, child: Text(p.rotulo)),
-              ],
-              onChanged: (p) => setState(() => _periodo = p ?? _periodo),
-            ),
-          ),
-          SizedBox(
-            width: largura,
-            child: DropdownButtonFormField<String?>(
-              // A chave reconstrói o menu quando as lojas chegam.
-              key: ValueKey(lojas.length),
-              initialValue: lojas.any((l) => l.id == _lojaId) ? _lojaId : null,
-              isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Loja'),
-              items: [
-                const DropdownMenuItem(child: Text('Todas as lojas')),
-                for (final l in lojas)
-                  DropdownMenuItem(value: l.id, child: Text(l.nome)),
-              ],
-              onChanged: (id) => setState(() => _lojaId = id),
-            ),
-          ),
-        ],
-      );
-    },
-  );
 
   Widget _conteudo(ResultadoPainel r, List<Loja> lojas) {
     final d = r.dados;

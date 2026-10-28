@@ -7,6 +7,7 @@ import '../../data/providers.dart';
 import '../../data/repositorios.dart';
 import '../../domain/modelos.dart';
 import '../../domain/texto.dart';
+import '../shell/filtro_pilula.dart';
 import '../shell/shell.dart';
 import 'dialogos.dart';
 import 'ver_artigo.dart';
@@ -245,72 +246,42 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
                 Mostrar.lojas => 'Nova loja',
               }),
             ),
-      corpo: ConteudoCentrado(
-        child: FiltrosEConteudo(
-          filtros: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: _filtros(listaCategorias),
-          ),
-          conteudo: corpo,
-        ),
-      ),
+      filtros: _filtros(listaCategorias),
+      pesquisa: _mostrar == Mostrar.artigos
+          ? CampoPesquisa(
+              dica: 'Pesquisar artigos',
+              aoEscrever: (v) => setState(() => _pesquisa = v),
+            )
+          : null,
+      corpo: ConteudoCentrado(child: corpo),
     );
   }
 
-  Widget _filtros(List<Categoria> categorias) {
-    return LayoutBuilder(
-      builder: (context, c) {
-        final estreito = c.maxWidth < 600;
-        final larguraMenu = estreito ? c.maxWidth : 220.0;
-        return Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          crossAxisAlignment: WrapCrossAlignment.end,
-          children: [
-            DropdownMenu<Mostrar>(
-              label: const Text('Mostrar'),
-              width: larguraMenu,
-              initialSelection: _mostrar,
-              onSelected: (v) => setState(() => _mostrar = v ?? _mostrar),
-              dropdownMenuEntries: [
-                for (final m in Mostrar.values)
-                  DropdownMenuEntry(value: m, label: m.rotulo),
-              ],
-            ),
-            if (_mostrar == Mostrar.artigos) ...[
-              DropdownMenu<String?>(
-                // A chave força a reconstrução quando as categorias mudam.
-                key: ValueKey(categorias.length),
-                label: const Text('Categoria'),
-                width: larguraMenu,
-                initialSelection: _filtroCategoria,
-                menuHeight: 400,
-                onSelected: (v) => setState(() => _filtroCategoria = v),
-                dropdownMenuEntries: [
-                  const DropdownMenuEntry(value: null, label: 'Todas'),
-                  const DropdownMenuEntry(
-                    value: _semCategoria,
-                    label: 'Sem categoria',
-                  ),
-                  for (final c in categorias)
-                    DropdownMenuEntry(value: c.id, label: c.nome),
-                ],
-              ),
-              SizedBox(
-                width: estreito ? c.maxWidth : 260,
-                child: TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'Pesquisar',
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                  onChanged: (v) => setState(() => _pesquisa = v),
-                ),
-              ),
-            ],
-          ],
-        );
-      },
-    );
+  List<Widget> _filtros(List<Categoria> categorias) {
+    final opcoesCategoria = <String?, String>{
+      null: 'Todas',
+      _semCategoria: 'Sem categoria',
+      for (final c in categorias) c.id: c.nome,
+    };
+    return [
+      FiltroPilula<Mostrar>(
+        rotulo: 'Mostrar',
+        icone: Icons.view_list,
+        valor: _mostrar,
+        opcoes: {for (final m in Mostrar.values) m: m.rotulo},
+        aoMudar: (v) => setState(() => _mostrar = v),
+      ),
+      if (_mostrar == Mostrar.artigos)
+        FiltroPilula<String?>(
+          rotulo: 'Categoria',
+          icone: Icons.category,
+          valor: opcoesCategoria.containsKey(_filtroCategoria)
+              ? _filtroCategoria
+              : null,
+          opcoes: opcoesCategoria,
+          aoMudar: (v) => setState(() => _filtroCategoria = v),
+        ),
+    ];
   }
 
   Widget _vazio(String texto) => Center(

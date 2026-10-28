@@ -3,7 +3,7 @@
 *Atualizar quando mudarem pastas, ficheiros, tabelas ou funções. Para relações entre peças, usar o graphify.*
 
 ## `lib/core/`
-- `tema.dart`: paleta azul (decisão 0011): `ColorScheme` claro e escuro e o `ThemeExtension` `CoresCabaz` (gradiente do cabeçalho, verde de "dentro do limite", parte vazia das barras; `CoresCabaz.of(context)`).
+- `tema.dart`: paleta azul (decisão 0011): `ColorScheme` claro e escuro e o `ThemeExtension` `CoresCabaz` (gradiente do cabeçalho, verde de "dentro do limite", parte vazia das barras, fundo e texto dos filtros do cabeçalho; `CoresCabaz.of(context)`); `estiloBotaoSobreGradiente` (☰ e sol/lua).
 
 ## `lib/domain/`: modelos e regras puras
 - `dinheiro.dart`: dinheiro sempre em cêntimos inteiros e pesos em gramas.
@@ -42,7 +42,7 @@
 - `texto_lista.dart`: TXT com emojis, também usado na partilha da Lista.
 
 ## `lib/features/`: um diretório por ecrã
-- `shell`: navegação com corte a 800 px e faixa de sincronização; `FiltrosEConteudo` (filtros fixos, ou a rolar com a lista quando há pouca altura); `tema_controlos.dart` (botão sol/lua no menu lateral e menu Tema das Definições).
+- `shell`: navegação com corte a 800 px e faixa de sincronização; `Pagina` com `CabecalhoPagina` (gradiente com ☰, ações, título, filtros e pesquisa; fixo, ou a rolar com a lista abaixo de 500 px de altura); `filtro_pilula.dart` (`FiltroPilula`, `CampoPesquisa`); `tema_controlos.dart` (botão sol/lua no menu lateral e menu Tema das Definições).
 - `entrada`
 - `lista`: Lista do mês e Concluir compra.
 - `artigos`: Artigos, categorias e lojas; `ver_artigo.dart` (Ver artigo com preços por loja e evolução do preço, aberto a partir de Artigos, Lista, Painel e detalhe da compra).

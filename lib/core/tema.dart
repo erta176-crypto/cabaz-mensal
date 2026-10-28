@@ -48,6 +48,8 @@ class CoresCabaz extends ThemeExtension<CoresCabaz> {
     required this.sobreGradiente,
     required this.ok,
     required this.pista,
+    required this.fundoFiltro,
+    required this.textoFiltro,
   });
 
   final Color gradienteInicio;
@@ -62,12 +64,19 @@ class CoresCabaz extends ThemeExtension<CoresCabaz> {
   /// Parte vazia das barras.
   final Color pista;
 
+  /// Pílulas e pesquisa do cabeçalho: claras nos dois temas, para se verem
+  /// contra o gradiente (≥ 3:1).
+  final Color fundoFiltro;
+  final Color textoFiltro;
+
   static const claro = CoresCabaz(
     gradienteInicio: Cores.azul,
     gradienteFim: Cores.azul2,
     sobreGradiente: Color(0xFFFFFFFF),
     ok: Cores.verde,
     pista: Cores.pista,
+    fundoFiltro: Cores.fundo,
+    textoFiltro: Cores.texto,
   );
 
   static const escuro = CoresCabaz(
@@ -76,6 +85,8 @@ class CoresCabaz extends ThemeExtension<CoresCabaz> {
     sobreGradiente: Color(0xFFFFFFFF),
     ok: Cores.verdeEscuro,
     pista: Cores.contornoEscuro,
+    fundoFiltro: Cores.textoEscuro,
+    textoFiltro: Cores.texto,
   );
 
   /// As cores do tema atual. Lança se o tema não as tiver (não falhar em
@@ -91,12 +102,16 @@ class CoresCabaz extends ThemeExtension<CoresCabaz> {
     Color? sobreGradiente,
     Color? ok,
     Color? pista,
+    Color? fundoFiltro,
+    Color? textoFiltro,
   }) => CoresCabaz(
     gradienteInicio: gradienteInicio ?? this.gradienteInicio,
     gradienteFim: gradienteFim ?? this.gradienteFim,
     sobreGradiente: sobreGradiente ?? this.sobreGradiente,
     ok: ok ?? this.ok,
     pista: pista ?? this.pista,
+    fundoFiltro: fundoFiltro ?? this.fundoFiltro,
+    textoFiltro: textoFiltro ?? this.textoFiltro,
   );
 
   @override
@@ -108,6 +123,8 @@ class CoresCabaz extends ThemeExtension<CoresCabaz> {
       sobreGradiente: Color.lerp(sobreGradiente, other.sobreGradiente, t)!,
       ok: Color.lerp(ok, other.ok, t)!,
       pista: Color.lerp(pista, other.pista, t)!,
+      fundoFiltro: Color.lerp(fundoFiltro, other.fundoFiltro, t)!,
+      textoFiltro: Color.lerp(textoFiltro, other.textoFiltro, t)!,
     );
   }
 
@@ -118,11 +135,20 @@ class CoresCabaz extends ThemeExtension<CoresCabaz> {
       other.gradienteFim == gradienteFim &&
       other.sobreGradiente == sobreGradiente &&
       other.ok == ok &&
-      other.pista == pista;
+      other.pista == pista &&
+      other.fundoFiltro == fundoFiltro &&
+      other.textoFiltro == textoFiltro;
 
   @override
-  int get hashCode =>
-      Object.hash(gradienteInicio, gradienteFim, sobreGradiente, ok, pista);
+  int get hashCode => Object.hash(
+    gradienteInicio,
+    gradienteFim,
+    sobreGradiente,
+    ok,
+    pista,
+    fundoFiltro,
+    textoFiltro,
+  );
 }
 
 /// Botões sobre o gradiente (☰ e sol/lua): fundo branco a 16 %, raio 12,

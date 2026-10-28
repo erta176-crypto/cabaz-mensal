@@ -64,6 +64,7 @@ void main() {
         'tertiary/surfaceContainerLow': (e.tertiary, e.surfaceContainerLow),
         'error/surface': (e.error, e.surface),
         'error/surfaceContainerLow': (e.error, e.surfaceContainerLow),
+        'textoFiltro/fundoFiltro': (c.textoFiltro, c.fundoFiltro),
         'ok/surface': (c.ok, e.surface),
         'ok/surfaceContainerLow': (c.ok, e.surfaceContainerLow),
       };
@@ -72,6 +73,16 @@ void main() {
           expect(_contraste(texto, fundo), greaterThanOrEqualTo(4.5));
         });
       }
+    });
+
+    test('pílulas contra o gradiente e ícone ≥ 3:1 (${brilho.name})', () {
+      for (final azul in [c.gradienteInicio, c.gradienteFim]) {
+        expect(_contraste(c.fundoFiltro, azul), greaterThanOrEqualTo(3));
+      }
+      expect(
+        _contraste(c.gradienteInicio, c.fundoFiltro),
+        greaterThanOrEqualTo(3),
+      );
     });
 
     test('barras sobre a pista ≥ 3:1 (${brilho.name})', () {

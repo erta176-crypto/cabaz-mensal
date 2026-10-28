@@ -76,7 +76,8 @@ Origem: proposta do utilizador ("Painel e gaveta em azul": simulação HTML, res
 | D1 | Cabeçalho azul em gradiente em **todos** os ecrãs (na `Pagina`); os que abrem por cima ficam com o azul sólido (`appBarTheme`). | utilizador |
 | D2 | Tema escuro também azul, com os valores da 0.3. | utilizador |
 | D3 | Esta fase antes das fotografias (Fase 7). | utilizador |
-| D4 | **Os filtros ficam no corpo, como hoje**, e não dentro do cabeçalho (diferença face à simulação): iguais em todos os ecrãs e continua a valer o `FiltrosEConteudo` (filtros que rolam com pouca altura). *Proposta — confirmar ao aprovar.* | revisão |
+| D4 | ~~**Os filtros ficam no corpo, como hoje**, e não dentro do cabeçalho (diferença face à simulação): iguais em todos os ecrãs e continua a valer o `FiltrosEConteudo` (filtros que rolam com pouca altura).~~ **Revogada pela D6.** | revisão |
+| D6 | **Cabeçalho alto com os filtros dentro** (revoga a D4; pedido a 2026-10-28 depois de ver o cabeçalho no telemóvel): ☰ e ações em cima, título grande, filtros em pílulas brancas e a pesquisa num campo branco, tudo no azul; cantos arredondados em baixo. Ver T6. Aprovada a 2026-10-28. | utilizador |
 | D5 | Gradiente da gaveta até ao topo: tira-se a margem de cima ao `NavigationDrawer` (`MediaQuery.removePadding`) e põe-se essa altura **dentro** do cabeçalho em gradiente, que passa a ser o `header` do `NavigationDrawer` (fixo, não rola). | revisão (fonte do Flutter) |
 
 ### 0.6 Regras
@@ -87,7 +88,7 @@ Origem: proposta do utilizador ("Painel e gaveta em azul": simulação HTML, res
 - Sem pacotes novos.
 
 ### 0.7 Fora do âmbito
-Letras, tamanhos, ordem e conteúdo dos ecrãs; filtros dentro do cabeçalho (D4); cores das lojas; mudar o comportamento de qualquer ecrã.
+Letras, tamanhos, ordem e conteúdo dos ecrãs (fora o cabeçalho da T6); cores das lojas; mudar o comportamento de qualquer ecrã.
 
 ---
 
@@ -135,6 +136,45 @@ Letras, tamanhos, ordem e conteúdo dos ecrãs; filtros dentro do cabeçalho (D4
 - Se o total do mês passou: rótulo "Ultrapassado" junto ao ⋮ (fundo `errorContainer`, texto `onErrorContainer`, raio total, `labelMedium`).
 
 **Testes**: `percentagemGasta` (420/500 → 84; 491/400 → 123; orçamento 0 → null) em `test/orcamento_test.dart`; em `test/painel_orcamento_test.dart`: as percentagens aparecem ("84 %", "110 %"), "Ultrapassado" só quando o total passou, a barra de cada nível tem a cor certa, e a Poupança usa `ok`.
+
+## T6 · Cabeçalho alto com os filtros dentro (D6) [x]
+**Hoje (confirmado no código):** a `Pagina` usa um `AppBar` de 56 px; os filtros são widgets de cada ecrã dentro do `FiltrosEConteudo` (fixos; com menos de 420 px de altura rolam com a lista).
+
+| Ecrã | Filtros (hoje) | No cabeçalho |
+|---|---|---|
+| Painel | Período, Loja (`DropdownButtonFormField`) | 2 pílulas |
+| Lista | Loja, Organizar, Modo (`DropdownMenu`); ação Partilhar | 3 pílulas; Partilhar fica em cima à direita |
+| Histórico | Período, Loja, Pesquisar | 2 pílulas + campo de pesquisa |
+| Artigos | Mostrar, Categoria (só em Artigos), Pesquisar (só em Artigos) | 1–2 pílulas + campo de pesquisa |
+| Importar, Definições | — | só título (cabeçalho mais baixo) |
+
+**Cabeçalho (`Pagina`, `lib/features/shell/shell.dart`)**
+- Deixa de usar `AppBar`: `Scaffold` sem `appBar`; o corpo é `Column[cabeçalho, faixa, Expanded(corpo)]`.
+- Cabeçalho = `DecoratedBox` com o gradiente e `borderRadius` 24 só em baixo, com a margem de cima do sistema por dentro (o azul cobre a barra de estado; ícones da barra de estado claros via `AnnotatedRegion<SystemUiOverlayStyle>`).
+- Linha 1 (48 px): ☰ (estilo da T2, só < 800 px) à esquerda; `acoes` à direita (cor `sobreGradiente`). Sem ☰ nem ações, a linha não existe.
+- Linha 2: título em `headlineSmall` negrito, `sobreGradiente`, uma linha com "…".
+- Linha 3 (se houver): `Wrap(spacing 8, runSpacing 8)` com as pílulas; linha 4 (se houver): campo de pesquisa. Margens 16 dos lados e 16 em baixo.
+- Novos parâmetros da `Pagina`: `filtros` (lista de pílulas) e `pesquisa` (widget). Ecrãs que abrem por cima (Concluir compra, detalhe da compra) continuam com o `AppBar` sólido.
+- Pouca altura (< 420 px disponíveis, ex.: telemóvel deitado): cabeçalho e conteúdo dentro de um `NestedScrollView`, o cabeçalho rola e sai (o que hoje faz o `FiltrosEConteudo`). O `FiltrosEConteudo` deixa de ser usado e é apagado; o teste dele passa para a `Pagina`.
+- Ecrã largo (≥ 800 px): igual, à direita do menu fixo, limitado pelo `ConteudoCentrado` só no corpo.
+
+**Pílula (`FiltroPilula<T>`, novo em `lib/features/shell/filtro_pilula.dart`)**
+- `PopupMenuButton<T>` com filho em forma de pílula (`StadiumBorder`): fundo `surfaceContainerLow` (branco no claro, cartão escuro no escuro), ícone pequeno do filtro + valor atual em `labelLarge` `onSurface` + ▾; altura 40, área de toque ≥ 48.
+- Parâmetros: `rotulo` (ex.: "Período", só para leitura de ecrã e dica), `icone`, `valor`, `opcoes` (valor → texto), `aoMudar`. `Semantics(button, label: "Período: Este mês")`.
+- Ícones: Período `calendar_month`, Loja `storefront`, Organizar `sort`, Modo `checklist`, Mostrar `view_list`, Categoria `category`.
+
+**Pesquisa:** `TextField` com `filled`, fundo `surfaceContainerLow`, `StadiumBorder` sem contorno, ícone de lupa, dica ("Artigo ou texto do talão" no Histórico, "Pesquisar artigos" em Artigos). Mantém o `onChanged`/`onSubmitted` de hoje.
+
+**Ecrãs:** Painel, Lista, Histórico e Artigos passam os filtros à `Pagina` em vez do `FiltrosEConteudo`; o comportamento dos filtros não muda (mesmos valores, mesmas preferências guardadas na Lista).
+
+**Contraste (`tema_test`):** no escuro, `surfaceContainerLow` contra o gradiente dava ~1,5:1; as pílulas e a pesquisa usam por isso `CoresCabaz.fundoFiltro`/`textoFiltro` (claras nos dois temas): fundo contra o gradiente ≥ 3:1, texto ≥ 4,5:1. Ao trocar de fixo para a rolar (teclado aberto), uma `GlobalKey` mantém o cabeçalho e o foco da pesquisa.
+
+**Testes**
+- `shell_test`: cabeçalho com título, ☰ ≥ 48 px, gradiente do tamanho do cabeçalho e a cobrir a margem de cima; pílulas e pesquisa aparecem dentro do cabeçalho; sem filtros o cabeçalho não tem linha 3; com 360 px de altura o cabeçalho rola com a lista (antigo `filtros_e_conteudo_test`); sem transbordos com letra ×2 a 360 px de largura.
+- `filtro_pilula_test`: mostra o valor; abre o menu e escolher chama `aoMudar`; semântica "Rótulo: valor".
+- Os testes do Painel, Lista, Histórico e Artigos continuam verdes sem alterações à lógica (mudam filtros tocando no texto).
+
+**Commit:** `Cabeçalho alto com os filtros em pílulas`.
 
 ## T5 · Verificação visual, docs e fecho [ ]
 - À mão, no Android e no Chrome, em claro e escuro: todos os ecrãs (Painel, Lista, Concluir compra, Histórico e detalhe, Artigos e Ver artigo, Importar e exportar com a pré-visualização dos talões, Definições, Entrada), a gaveta, a barra inferior e o orçamento; < e > 800 px, telemóvel deitado e letra do sistema a 200 %.

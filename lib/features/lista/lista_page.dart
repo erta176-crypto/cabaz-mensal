@@ -10,6 +10,7 @@ import '../../domain/modelos.dart';
 import '../../domain/orcamento.dart';
 import '../../domain/preferencias.dart';
 import '../artigos/artigos_page.dart' show corDeHex;
+import '../shell/filtro_pilula.dart';
 import '../shell/shell.dart';
 import 'adicionar_artigo.dart';
 import 'concluir_compra_page.dart';
@@ -190,6 +191,7 @@ class _ListaPageState extends ConsumerState<ListaPage> {
 
     return Pagina(
       titulo: 'Lista do mês',
+      filtros: _menus(prefs, ativas, _guardarPrefs),
       acoes: [
         PopupMenuButton<bool>(
           tooltip: 'Partilhar lista',
@@ -202,33 +204,27 @@ class _ListaPageState extends ConsumerState<ListaPage> {
         ),
       ],
       corpo: ConteudoCentrado(
-        child: FiltrosEConteudo(
-          filtros: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: _Menus(prefs: prefs, lojas: ativas, aoMudar: _guardarPrefs),
-          ),
-          conteudo: ativas.isEmpty
-              ? const _Vazio(
-                  'Ainda não há lojas. Importa os teus dados em '
-                  '"Importar e exportar" ou cria uma loja em "Artigos".',
-                )
-              : lista.linhas.isEmpty
-              ? _Vazio(
-                  planear
-                      ? 'Ainda não há artigos habituais nesta loja. '
-                            'Usa "Adicionar artigo".'
-                      : 'A lista está vazia. Usa "Adicionar artigo" ou '
-                            'o modo Planear.',
-                )
-              : _Conteudo(
-                  lista: lista,
-                  prefs: prefs,
-                  aoGesto: _executar,
-                  aoAlternarGrupo: _alternarGrupo,
-                  aoAlterarQtd: _alterarQuantidade,
-                  aoVer: _verArtigo,
-                ),
-        ),
+        child: ativas.isEmpty
+            ? const _Vazio(
+                'Ainda não há lojas. Importa os teus dados em '
+                '"Importar e exportar" ou cria uma loja em "Artigos".',
+              )
+            : lista.linhas.isEmpty
+            ? _Vazio(
+                planear
+                    ? 'Ainda não há artigos habituais nesta loja. '
+                          'Usa "Adicionar artigo".'
+                    : 'A lista está vazia. Usa "Adicionar artigo" ou '
+                          'o modo Planear.',
+              )
+            : _Conteudo(
+                lista: lista,
+                prefs: prefs,
+                aoGesto: _executar,
+                aoAlternarGrupo: _alternarGrupo,
+                aoAlterarQtd: _alterarQuantidade,
+                aoVer: _verArtigo,
+              ),
       ),
       rodape: ativas.isEmpty
           ? null
@@ -260,79 +256,33 @@ int? _faltaOrcamento(WidgetRef ref) {
   return gasto == null ? null : total.valorCent - gasto;
 }
 
-class _Menus extends StatelessWidget {
-  const _Menus({
-    required this.prefs,
-    required this.lojas,
-    required this.aoMudar,
-  });
-
-  final Preferencias prefs;
-  final List<Loja> lojas;
-  final Future<void> Function(Preferencias) aoMudar;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, c) {
-        final estreito = c.maxWidth < 600;
-        // Ecrã baixo (telemóvel deitado): os três menus numa só linha, para
-        // sobrar altura para a lista.
-        final baixo = MediaQuery.sizeOf(context).height < 500;
-        double largura(double l) => baixo
-            ? (c.maxWidth - 24) / 3
-            : estreito
-            ? c.maxWidth
-            : l;
-        final lojaValida = lojas.any((l) => l.id == prefs.lojaId)
-            ? prefs.lojaId
-            : null;
-        return Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            DropdownMenu<String?>(
-              key: ValueKey('loja-$lojaValida-${lojas.length}'),
-              label: const Text('Loja'),
-              width: largura(220),
-              initialSelection: lojaValida,
-              onSelected: (v) => aoMudar(prefs.copyWith(lojaId: () => v)),
-              dropdownMenuEntries: [
-                const DropdownMenuEntry(value: null, label: 'Todas as lojas'),
-                for (final l in lojas)
-                  DropdownMenuEntry(value: l.id, label: l.nome),
-              ],
-            ),
-            DropdownMenu<Organizar>(
-              key: ValueKey('org-${prefs.organizar}'),
-              label: const Text('Organizar'),
-              width: largura(220),
-              initialSelection: prefs.organizar,
-              onSelected: (v) =>
-                  v == null ? null : aoMudar(prefs.copyWith(organizar: v)),
-              dropdownMenuEntries: [
-                for (final o in Organizar.values)
-                  DropdownMenuEntry(value: o, label: o.rotulo),
-              ],
-            ),
-            DropdownMenu<ModoLista>(
-              key: ValueKey('modo-${prefs.modo}'),
-              label: const Text('Modo'),
-              width: largura(220),
-              initialSelection: prefs.modo,
-              onSelected: (v) =>
-                  v == null ? null : aoMudar(prefs.copyWith(modo: v)),
-              dropdownMenuEntries: [
-                for (final m in ModoLista.values)
-                  DropdownMenuEntry(value: m, label: m.rotulo),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
+List<Widget> _menus(
+  Preferencias prefs,
+  List<Loja> lojas,
+  Future<void> Function(Preferencias) aoMudar,
+) => [
+  FiltroPilula<String?>(
+    rotulo: 'Loja',
+    icone: Icons.storefront,
+    valor: lojas.any((l) => l.id == prefs.lojaId) ? prefs.lojaId : null,
+    opcoes: {null: 'Todas as lojas', for (final l in lojas) l.id: l.nome},
+    aoMudar: (v) => aoMudar(prefs.copyWith(lojaId: () => v)),
+  ),
+  FiltroPilula<Organizar>(
+    rotulo: 'Organizar',
+    icone: Icons.sort,
+    valor: prefs.organizar,
+    opcoes: {for (final o in Organizar.values) o: o.rotulo},
+    aoMudar: (v) => aoMudar(prefs.copyWith(organizar: v)),
+  ),
+  FiltroPilula<ModoLista>(
+    rotulo: 'Modo',
+    icone: Icons.checklist,
+    valor: prefs.modo,
+    opcoes: {for (final m in ModoLista.values) m: m.rotulo},
+    aoMudar: (v) => aoMudar(prefs.copyWith(modo: v)),
+  ),
+];
 
 class _Conteudo extends ConsumerWidget {
   const _Conteudo({

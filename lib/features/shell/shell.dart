@@ -1,5 +1,6 @@
 import 'package:cabaz_mensal/core/tema.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 /// Ponto único de corte entre telemóvel e ecrã largo.
@@ -281,13 +282,16 @@ class _AppShellState extends State<AppShell> {
   }
 }
 
-/// Estrutura comum das páginas: título, ☰ em ecrã estreito, ações e FAB.
-class Pagina extends StatelessWidget {
+/// Estrutura comum das páginas: cabeçalho azul (☰ em ecrã estreito, ações,
+/// título, filtros e pesquisa), corpo, FAB e rodapé.
+class Pagina extends StatefulWidget {
   const Pagina({
     super.key,
     required this.titulo,
     required this.corpo,
     this.acoes = const [],
+    this.filtros = const [],
+    this.pesquisa,
     this.botao,
     this.rodape,
   });
@@ -295,60 +299,170 @@ class Pagina extends StatelessWidget {
   final String titulo;
   final Widget corpo;
   final List<Widget> acoes;
+
+  /// Pílulas do cabeçalho ([FiltroPilula]).
+  final List<Widget> filtros;
+
+  /// Campo de pesquisa do cabeçalho ([CampoPesquisa]).
+  final Widget? pesquisa;
   final Widget? botao;
 
   /// Rodapé fixo; o botão flutuante fica sempre por cima dele.
   final Widget? rodape;
 
+  /// Abaixo desta altura o cabeçalho rola com o conteúdo em vez de o esmagar
+  /// (telemóvel deitado, teclado aberto).
+  static const alturaMinima = 500.0;
+
+  @override
+  State<Pagina> createState() => _PaginaState();
+}
+
+class _PaginaState extends State<Pagina> {
+  // Mantém o cabeçalho (e o foco da pesquisa) quando muda de fixo para a
+  // rolar, por exemplo ao abrir o teclado.
+  final _cabecalho = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final escopo = ShellScope.of(context);
-    final abrirMenu = escopo?.abrirMenu;
     final faixa = escopo?.faixa;
-    final cores = CoresCabaz.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        // O AppBar dá ao flexibleSpace uma altura solta: sem o expand, o
-        // DecoratedBox (sem filho) ficava com altura 0.
-        flexibleSpace: SizedBox.expand(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [cores.gradienteInicio, cores.gradienteFim],
-              ),
+    final cabecalho = CabecalhoPagina(
+      key: _cabecalho,
+      titulo: widget.titulo,
+      abrirMenu: escopo?.abrirMenu,
+      acoes: widget.acoes,
+      filtros: widget.filtros,
+      pesquisa: widget.pesquisa,
+    );
+    // A faixa fica por baixo do cabeçalho (nunca por baixo da barra de estado).
+    final corpo = SafeArea(
+      top: false,
+      child: faixa == null
+          ? widget.corpo
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                faixa,
+                Expanded(child: widget.corpo),
+              ],
             ),
-          ),
+    );
+    return Scaffold(
+      floatingActionButton: widget.botao,
+      bottomNavigationBar: widget.rodape,
+      body: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light,
+        child: LayoutBuilder(
+          builder: (context, c) => c.maxHeight >= Pagina.alturaMinima
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    cabecalho,
+                    Expanded(child: corpo),
+                  ],
+                )
+              : NestedScrollView(
+                  headerSliverBuilder: (_, _) => [
+                    SliverToBoxAdapter(child: cabecalho),
+                  ],
+                  body: corpo,
+                ),
         ),
-        leading: abrirMenu == null
-            ? null
-            : Center(
-                child: IconButton(
-                  icon: const Icon(Icons.menu),
-                  tooltip: 'Menu',
-                  onPressed: abrirMenu,
-                  style: estiloBotaoSobreGradiente(cores),
+      ),
+    );
+  }
+}
+
+/// Cabeçalho em gradiente da [Pagina], com cantos arredondados em baixo e a
+/// margem de cima do sistema por dentro (o azul cobre a barra de estado).
+class CabecalhoPagina extends StatelessWidget {
+  const CabecalhoPagina({
+    super.key,
+    required this.titulo,
+    required this.abrirMenu,
+    required this.acoes,
+    required this.filtros,
+    required this.pesquisa,
+  });
+
+  final String titulo;
+  final VoidCallback? abrirMenu;
+  final List<Widget> acoes;
+  final List<Widget> filtros;
+  final Widget? pesquisa;
+
+  @override
+  Widget build(BuildContext context) {
+    final cores = CoresCabaz.of(context);
+    final tema = Theme.of(context);
+    final linhaCima = abrirMenu != null || acoes.isNotEmpty;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [cores.gradienteInicio, cores.gradienteFim],
+        ),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16, linhaCima ? 4 : 16, 16, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (linhaCima)
+                // Ações brancas: o PopupMenuButton usa o IconTheme e o
+                // IconButton o IconButtonTheme.
+                IconTheme.merge(
+                  data: IconThemeData(color: cores.sobreGradiente),
+                  child: IconButtonTheme(
+                    data: IconButtonThemeData(
+                      style: IconButton.styleFrom(
+                        foregroundColor: cores.sobreGradiente,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        if (abrirMenu != null)
+                          IconButton(
+                            icon: const Icon(Icons.menu),
+                            tooltip: 'Menu',
+                            onPressed: abrirMenu,
+                            style: estiloBotaoSobreGradiente(cores),
+                          ),
+                        const Spacer(),
+                        ...acoes,
+                      ],
+                    ),
+                  ),
+                ),
+              Padding(
+                padding: EdgeInsets.only(top: linhaCima ? 8 : 0),
+                child: Semantics(
+                  header: true,
+                  child: Text(
+                    titulo,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: tema.textTheme.headlineSmall?.copyWith(
+                      color: cores.sobreGradiente,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
-        title: Text(titulo),
-        actions: acoes,
-      ),
-      floatingActionButton: botao,
-      bottomNavigationBar: rodape,
-      // A faixa fica por baixo do título (nunca por baixo da barra de estado).
-      body: SafeArea(
-        top: false,
-        child: faixa == null
-            ? corpo
-            : Column(
-                children: [
-                  faixa,
-                  Expanded(child: corpo),
-                ],
-              ),
+              if (filtros.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Wrap(spacing: 8, children: filtros),
+              ],
+              if (pesquisa case final p?) ...[const SizedBox(height: 8), p],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -368,39 +482,5 @@ class ConteudoCentrado extends StatelessWidget {
       constraints: BoxConstraints(maxWidth: largura),
       child: child,
     ),
-  );
-}
-
-/// Filtros no topo e a lista por baixo. Com pouca altura (telemóvel deitado,
-/// teclado aberto) os filtros sobem com a lista em vez de a esmagarem.
-class FiltrosEConteudo extends StatelessWidget {
-  const FiltrosEConteudo({
-    super.key,
-    required this.filtros,
-    required this.conteudo,
-  });
-
-  final Widget filtros;
-
-  /// Normalmente uma lista com scroll (sem controlador próprio).
-  final Widget conteudo;
-
-  /// Abaixo desta altura os filtros deixam de ficar fixos.
-  static const alturaMinima = 420.0;
-
-  @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, c) => c.maxHeight >= alturaMinima
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              filtros,
-              Expanded(child: conteudo),
-            ],
-          )
-        : NestedScrollView(
-            headerSliverBuilder: (_, _) => [SliverToBoxAdapter(child: filtros)],
-            body: conteudo,
-          ),
   );
 }

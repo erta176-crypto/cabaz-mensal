@@ -13,4 +13,5 @@ Opção A. Valores em `docs/planning/fase-6.md` (secção 0.3) e `lib/core/tema.
 - Todas as cores continuam em `lib/core/tema.dart`: o `ColorScheme` (todos os papéis, claro e escuro) e o `ThemeExtension` `CoresCabaz` (gradiente do cabeçalho, verde de "dentro do limite", parte vazia das barras).
 - "Quase no limite" usa `tertiary` (âmbar); "ultrapassado" usa `error`/`errorContainer`.
 - `test/tema_test.dart` garante contraste ≥ 4,5:1 nos pares de texto e ≥ 3:1 nas barras, em claro e escuro.
+- Os filtros do cabeçalho (pílulas e pesquisa) usam `fundoFiltro`/`textoFiltro`, claros nos dois temas, para contrastarem com o gradiente.
 - As cores das lojas continuam a vir da base (`lojas.cor`).
