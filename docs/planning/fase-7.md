@@ -86,18 +86,18 @@ iOS; OCR na web; talão em várias fotografias; recortar/endireitar a fotografia
 
 **Testes**: fixture fictícia `test/fixtures/taloes/mercadona.txt` (como sairia do OCR): linhas com e sem preço unitário, TOTAL com um dígito perdido (o total vem da linha COMPRA e bate), linha estranha → "a rever"; `lerTalao` reconhece a loja; os leitores existentes não reconhecem o Mercadona e vice-versa.
 
-## T3 · Texto da fotografia (aparelho) [ ]
+## T3 · Texto da fotografia (aparelho) [x]
 **Pacotes:** `google_mlkit_text_recognition: 0.17.1`, `image_picker: ^1.2.4` (`pubspec.yaml`, ficheiro partilhado).
 
 **Novo `lib/import/taloes/texto_foto.dart`**:
 - `typedef OcrDaFoto = Future<List<CaixaOcr>> Function(String caminho)` e `caixasDaFoto` (ML Kit, `TextRecognizer(script: latin)`, fechado no fim).
 - `caixasEmFaixas(String caminho)`: `dart:ui` descodifica a imagem, corta as faixas, amplia-as e passa cada uma ao ML Kit em memória (`toByteData(rawRgba)` → `InputImage.fromBitmap`, sem ficheiros); devolve as caixas em coordenadas da imagem.
-- A geometria fica em funções puras, testadas no PC: `faixasDa(largura, altura)` (altura ≈ 0,9 × largura, 120 px de sobreposição, escala até ≈1440 px de largura; a última com menos de 32 px junta-se à anterior — limite do ML Kit visto na prova) e `caixasDaFaixa(caixas, faixa)` (passa para coordenadas da imagem e só guarda as caixas com o centro fora da sobreposição).
+- A geometria fica em funções puras, testadas no PC: `faixasDa(largura, altura)` (altura ≈ 0,9 × largura, 120 px de sobreposição, escala até ≈1440 px de largura; como cada faixa só acaba depois da sobreposição, a última tem sempre mais de 120 px — o ML Kit recusa menos de 32; a faixa curta da prova vinha de um ciclo que continuava depois de cobrir a imagem) e `caixasDaFaixa(caixas, faixa)` (passa para coordenadas da imagem e só guarda as caixas com o centro fora da sobreposição).
 - Medir o tempo por fotografia (inteira e em faixas) e registá-lo na T6.
 
 **Novo `lib/import/taloes/ler_fotos.dart`** (como `ler_pdfs.dart`): para cada fotografia, D3 (inteira → `linhasDasCaixas` → `normalizarOcr` → `lerTalao`; se preciso, faixas) e devolve `(ficheiro, texto)` para `analisarTaloes`; as que falham ficam como não reconhecidas ("Fotografia ilegível" / "Formato de talão não reconhecido").
 
-**Testes**: `faixasDa` (imagem baixa → uma faixa; alta → faixas sobrepostas que cobrem tudo; resto < 32 px junta-se à anterior); `caixasDaFaixa` (deslocamento e escala certos; uma caixa na sobreposição só conta numa faixa); `ler_fotos` com um `OcrDaFoto` falso: inteira que bate não chama as faixas; inteira que não bate usa as faixas; nenhuma bate → fica a com menos estranhas; erro do OCR → não reconhecida. `test/taloes/fotos_reais_test.dart` (saltado sem `dados-privados/`): com o JSON da prova, Mercadona inteira e Lidl em faixas batem.
+**Testes**: `faixasDa` (imagem baixa → uma faixa; alta → faixas sobrepostas que cobrem tudo; nenhuma faixa com menos de 32 px em muitos tamanhos; imagem estreita não fica em ciclo); `caixasDaFaixa` (deslocamento e escala certos; uma caixa na sobreposição só conta numa faixa); `ler_fotos` com um `OcrDaFoto` falso: inteira que bate não chama as faixas; inteira que não bate usa as faixas; nenhuma bate → fica a com menos estranhas; erro do OCR → não reconhecida. `test/taloes/fotos_reais_test.dart` (saltado sem `dados-privados/`): com o JSON da prova, Mercadona inteira e Lidl em faixas batem.
 
 ## T4 · Correção na pré-visualização [ ]
 **`importar_taloes.dart`**: `analisarTaloes` divide-se em ler (texto → `TalaoLido`) e `analisarTalao(ficheiro, TalaoLido, …)`, para voltar a analisar um talão editado sem reler o texto. `TalaoLido` ganha `copyWith`.

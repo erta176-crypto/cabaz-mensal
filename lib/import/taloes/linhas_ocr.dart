@@ -84,3 +84,69 @@ String normalizarOcr(String texto) => texto
           .trim(),
     )
     .join('\n');
+
+/// Uma faixa horizontal da imagem para o OCR: [y] e [altura] em píxeis da
+/// imagem; [escala] é a ampliação dada ao ML Kit. Só contam as caixas com o
+/// centro entre [de] e [ate] (o resto é sobreposição com a faixa vizinha).
+class Faixa {
+  const Faixa({
+    required this.y,
+    required this.altura,
+    required this.escala,
+    required this.de,
+    required this.ate,
+  });
+
+  final double y;
+  final double altura;
+  final double escala;
+  final double de;
+  final double ate;
+}
+
+/// Largura que se dá ao ML Kit: a letra pequena das capturas só se lê assim.
+const _larguraOcr = 1440.0;
+
+/// Sobreposição entre faixas, para nenhuma linha ficar cortada a meio.
+const _sobra = 120.0;
+
+/// Faixas de altura ≈ 0,9 × largura, sobrepostas, que cobrem a imagem toda.
+/// Como cada faixa só acaba depois da sobreposição, a última tem sempre mais
+/// de 120 px (o ML Kit recusa menos de 32).
+List<Faixa> faixasDa(int largura, int altura) {
+  final escala = max(1.0, _larguraOcr / largura);
+  final alto = max((largura * 0.9).floorToDouble(), 2 * _sobra);
+  final faixas = <Faixa>[];
+  var y = 0.0;
+  while (true) {
+    final h = min(alto, altura - y);
+    final ultima = y + h >= altura;
+    faixas.add(
+      Faixa(
+        y: y,
+        altura: h,
+        escala: escala,
+        de: y == 0 ? 0 : y + _sobra / 2,
+        ate: ultima ? altura.toDouble() : y + h - _sobra / 2,
+      ),
+    );
+    if (ultima) return faixas;
+    y += alto - _sobra;
+  }
+}
+
+/// Caixas lidas numa faixa (ampliada) → coordenadas da imagem, só as que
+/// pertencem à faixa.
+List<CaixaOcr> caixasDaFaixa(List<CaixaOcr> caixas, Faixa f) => [
+  for (final c in caixas)
+    if (f.y + (c.cima + c.baixo) / 2 / f.escala case final centro
+        when centro >= f.de && centro < f.ate)
+      CaixaOcr(
+        texto: c.texto,
+        esquerda: c.esquerda / f.escala,
+        cima: f.y + c.cima / f.escala,
+        direita: c.direita / f.escala,
+        baixo: f.y + c.baixo / f.escala,
+        angulo: c.angulo,
+      ),
+];
