@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
-Widget _app(String inicial, {Widget? acaoMenu}) {
+Widget _app(
+  String inicial, {
+  Widget? acaoMenu,
+  Brightness brilho = Brightness.light,
+}) {
   final router = GoRouter(
     initialLocation: inicial,
     routes: [
@@ -28,7 +32,7 @@ Widget _app(String inicial, {Widget? acaoMenu}) {
     ],
   );
   return MaterialApp.router(
-    theme: construirTema(Brightness.light, fontesGoogle: false),
+    theme: construirTema(brilho, fontesGoogle: false),
     routerConfig: router,
   );
 }
@@ -143,4 +147,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(NavigationBar), findsNothing);
   });
+
+  for (final brilho in Brightness.values) {
+    testWidgets('cabeçalho em gradiente do CoresCabaz (${brilho.name})', (
+      tester,
+    ) async {
+      await _tamanho(tester, 400);
+      await tester.pumpWidget(_app('/lista', brilho: brilho));
+      await tester.pumpAndSettle();
+      final cores = brilho == Brightness.light
+          ? CoresCabaz.claro
+          : CoresCabaz.escuro;
+
+      final caixa = tester.widget<DecoratedBox>(
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.byWidgetPredicate(
+            (w) =>
+                w is DecoratedBox &&
+                w.decoration is BoxDecoration &&
+                (w.decoration as BoxDecoration).gradient is LinearGradient,
+          ),
+        ),
+      );
+      final gradiente =
+          (caixa.decoration as BoxDecoration).gradient! as LinearGradient;
+      expect(gradiente.colors, [cores.gradienteInicio, cores.gradienteFim]);
+
+      final titulo = tester.widget<RichText>(
+        find
+            .descendant(
+              of: find.byType(AppBar),
+              matching: find.byType(RichText),
+            )
+            .first,
+      );
+      expect(titulo.text.style?.color, cores.sobreGradiente);
+
+      expect(
+        tester.getSize(find.widgetWithIcon(IconButton, Icons.menu)).width,
+        greaterThanOrEqualTo(48),
+      );
+    });
+  }
 }

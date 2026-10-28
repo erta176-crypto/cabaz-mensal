@@ -103,7 +103,7 @@ Letras, tamanhos, ordem e conteúdo dos ecrãs; filtros dentro do cabeçalho (D4
 
 **Testes (`test/tema_test.dart`)**: substituir os 4 valores violeta pelos azuis; os pares de contraste da 0.3 nos dois temas (≥ 4,5:1 para texto, ≥ 3:1 para as barras sobre a `pista`); `CoresCabaz.of` funciona nos dois temas e `lerp` entre claro e escuro devolve as pontas em 0 e 1.
 
-## T2 · Cabeçalho azul em gradiente em todos os ecrãs [ ]
+## T2 · Cabeçalho azul em gradiente em todos os ecrãs [x]
 **`Pagina` (`lib/features/shell/shell.dart`)**
 - `AppBar(backgroundColor: Colors.transparent, flexibleSpace: DecoratedBox(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [gradienteInicio, gradienteFim])))`; título e ações a `sobreGradiente` (vêm do `appBarTheme`).
 - Botão do menu (☰): `IconButton.styleFrom(backgroundColor: sobreGradiente com 16 % de opacidade, shape: RoundedRectangleBorder(raio 12))`, área de toque ≥ 48 px.

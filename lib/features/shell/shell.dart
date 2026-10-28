@@ -1,3 +1,4 @@
+import 'package:cabaz_mensal/core/tema.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -267,15 +268,37 @@ class Pagina extends StatelessWidget {
     final escopo = ShellScope.of(context);
     final abrirMenu = escopo?.abrirMenu;
     final faixa = escopo?.faixa;
+    final cores = CoresCabaz.of(context);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [cores.gradienteInicio, cores.gradienteFim],
+            ),
+          ),
+        ),
         leading: abrirMenu == null
             ? null
-            : IconButton(
-                icon: const Icon(Icons.menu),
-                tooltip: 'Menu',
-                onPressed: abrirMenu,
+            : Center(
+                child: IconButton(
+                  icon: const Icon(Icons.menu),
+                  tooltip: 'Menu',
+                  onPressed: abrirMenu,
+                  style: IconButton.styleFrom(
+                    backgroundColor: cores.sobreGradiente.withValues(
+                      alpha: 0.16,
+                    ),
+                    minimumSize: const Size.square(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
               ),
         title: Text(titulo),
         actions: acoes,

@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-28. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**6 · Tema azul:** plano aprovado a 2026-10-28; T1 (paleta e CoresCabaz) feita, próxima T2 ([`planning/fase-6.md`](planning/fase-6.md)). Depois: **7 · Talões por fotografia (OCR)** (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
+**6 · Tema azul:** plano aprovado a 2026-10-28; T1 (paleta) e T2 (cabeçalho em gradiente) feitas, próxima T3 ([`planning/fase-6.md`](planning/fase-6.md)). Depois: **7 · Talões por fotografia (OCR)** (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
 
 ## Feito
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
@@ -22,7 +22,7 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Executar a Fase 6 (tema azul; T2 → T5).
+1. Executar a Fase 6 (tema azul; T3 → T5).
 2. Fase 7: talões por fotografia.
 3. Depois: P1 da comparação de preços (primeiro conector).
 
