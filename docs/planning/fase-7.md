@@ -129,7 +129,8 @@ iOS; OCR na web; talão em várias fotografias; recortar/endireitar a fotografia
 - `mapa.md` (ficheiros novos), `ESTADO.md`, decisão `0012-ocr-no-aparelho.md` (D1–D3), plano marcado.
 
 **Feito (2026-10-28):** web e APK release compilam (APK 91,3 → 121,8 MB). O APK release falhava no R8 e depois lia todas as fotografias como ilegíveis: corrigido com `android/app/proguard-rules.pro` (decisão 0012). No telemóvel: captura de ecrã do Lidl pela galeria lida certo, linhas ligadas aos artigos e talão repetido marcado como "Já importado"; um talão importado.
-**Por fazer:** Pingo Doce e E.Leclerc em papel (D8, sem talões à mão); fotografia com o telemóvel deitado; diálogos com letra ×2 e deitado; escuro; tempo por fotografia.
+Escuro verificado. Deitado com o teclado aberto, os diálogos de correção só mostravam o título e depois só os botões: passam a rolar inteiros (título, campos e botões) com margens pequenas, com testes nas medidas do aparelho; verificado no telemóvel. Os diálogos da Fase 5 com o mesmo problema ficam em `notas.md`.
+**Por fazer (sem talões à mão):** Pingo Doce e E.Leclerc em papel (D8); fotografia com o telemóvel deitado (rotação EXIF); tempo por fotografia.
 
 ## Portão da Fase 7
 1. `dart format`, `flutter analyze`, `flutter test` verdes, com a saída real; `flutter build web` e `flutter build apk --release` compilam.
