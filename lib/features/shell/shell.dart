@@ -144,45 +144,81 @@ class _AppShellState extends State<AppShell> {
     final atual = indiceDestino(widget.localizacao);
     final largo = MediaQuery.sizeOf(context).width >= larguraEcraLargo;
 
-    final menu = NavigationDrawer(
-      selectedIndex: atual,
-      onDestinationSelected: _ir,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(28, 20, 16, 16),
-          child: Row(
-            children: [
-              Icon(
-                Icons.shopping_basket,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
+    final cores = CoresCabaz.of(context);
+    final esquema = Theme.of(context).colorScheme;
+    // O gradiente vai até ao topo: o NavigationDrawer deixa de receber a
+    // margem de cima (SafeArea) e o cabeçalho põe-na por dentro. No ecrã
+    // largo a margem da direita (barra do sistema) é do conteúdo, não do menu.
+    final menu = MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      removeRight: largo,
+      child: NavigationDrawer(
+        selectedIndex: atual,
+        onDestinationSelected: _ir,
+        header: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [cores.gradienteInicio, cores.gradienteFim],
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              MediaQuery.paddingOf(context).top + 8,
+              12,
+              8,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: esquema.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(Icons.shopping_basket, color: esquema.primary),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Cabaz Mensal',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: cores.sobreGradiente,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                ?widget.acaoMenu,
+              ],
+            ),
+          ),
+        ),
+        children: [
+          const SizedBox(height: 12),
+          for (final d in destinos) ...[
+            if (d.caminho == '/importar')
+              const Divider(indent: 28, endIndent: 28),
+            NavigationDrawerDestination(
+              icon: Icon(d.icone),
+              selectedIcon: Icon(d.iconeSelecionado),
+              // Largura fixa: o rótulo corta com "…" em vez de transbordar.
+              label: SizedBox(
+                width: 196,
                 child: Text(
-                  'Cabaz Mensal',
-                  style: Theme.of(context).textTheme.titleLarge,
+                  d.rotulo,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              ?widget.acaoMenu,
-            ],
-          ),
-        ),
-        for (final d in destinos)
-          NavigationDrawerDestination(
-            icon: Icon(d.icone),
-            selectedIcon: Icon(d.iconeSelecionado),
-            // Largura fixa: o rótulo corta com "…" em vez de transbordar.
-            label: SizedBox(
-              width: 196,
-              child: Text(
-                d.rotulo,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
             ),
-          ),
-      ],
+          ],
+        ],
+      ),
     );
 
     if (largo) {
@@ -191,15 +227,10 @@ class _AppShellState extends State<AppShell> {
         body: Row(
           children: [
             // Telemóvel deitado: a margem da esquerda (recorte da câmara)
-            // soma-se aos 300 px, porque o NavigationDrawer tira-a; a da
-            // direita (barra do sistema) é do conteúdo, não do menu.
+            // soma-se aos 300 px, porque o NavigationDrawer tira-a.
             SizedBox(
               width: 300 + MediaQuery.paddingOf(context).left,
-              child: MediaQuery.removePadding(
-                context: context,
-                removeRight: true,
-                child: menu,
-              ),
+              child: menu,
             ),
             const VerticalDivider(width: 1),
             Expanded(
@@ -227,18 +258,24 @@ class _AppShellState extends State<AppShell> {
       // porque não tem nenhum destino para marcar como selecionado.
       bottomNavigationBar: noBarra < 0
           ? null
-          : NavigationBar(
-              selectedIndex: noBarra,
-              onDestinationSelected: (i) =>
-                  _ir(destinos.indexOf(destinosBarraInferior[i])),
-              destinations: [
-                for (final d in destinosBarraInferior)
-                  NavigationDestination(
-                    icon: Icon(d.icone),
-                    selectedIcon: Icon(d.iconeSelecionado),
-                    label: d.rotuloCurto,
-                  ),
-              ],
+          : DecoratedBox(
+              // O tema da NavigationBar não tem contorno.
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: esquema.outlineVariant)),
+              ),
+              child: NavigationBar(
+                selectedIndex: noBarra,
+                onDestinationSelected: (i) =>
+                    _ir(destinos.indexOf(destinosBarraInferior[i])),
+                destinations: [
+                  for (final d in destinosBarraInferior)
+                    NavigationDestination(
+                      icon: Icon(d.icone),
+                      selectedIcon: Icon(d.iconeSelecionado),
+                      label: d.rotuloCurto,
+                    ),
+                ],
+              ),
             ),
     );
   }
@@ -289,15 +326,7 @@ class Pagina extends StatelessWidget {
                   icon: const Icon(Icons.menu),
                   tooltip: 'Menu',
                   onPressed: abrirMenu,
-                  style: IconButton.styleFrom(
-                    backgroundColor: cores.sobreGradiente.withValues(
-                      alpha: 0.16,
-                    ),
-                    minimumSize: const Size.square(48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  style: estiloBotaoSobreGradiente(cores),
                 ),
               ),
         title: Text(titulo),

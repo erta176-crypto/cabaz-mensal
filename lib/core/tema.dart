@@ -125,6 +125,15 @@ class CoresCabaz extends ThemeExtension<CoresCabaz> {
       Object.hash(gradienteInicio, gradienteFim, sobreGradiente, ok, pista);
 }
 
+/// Botões sobre o gradiente (☰ e sol/lua): fundo branco a 16 %, raio 12,
+/// área de toque de 48 px.
+ButtonStyle estiloBotaoSobreGradiente(CoresCabaz cores) => IconButton.styleFrom(
+  foregroundColor: cores.sobreGradiente,
+  backgroundColor: cores.sobreGradiente.withValues(alpha: 0.16),
+  minimumSize: const Size.square(48),
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+);
+
 ColorScheme _esquema(Brightness b) {
   if (b == Brightness.light) {
     return const ColorScheme(

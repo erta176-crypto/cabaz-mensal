@@ -112,7 +112,7 @@ Letras, tamanhos, ordem e conteúdo dos ecrãs; filtros dentro do cabeçalho (D4
 
 **Testes (`test/shell_test.dart`)**: a `Pagina` tem um `DecoratedBox` com o gradiente das cores do `CoresCabaz` (claro e escuro); o título é desenhado com `sobreGradiente`; o botão ☰ tem ≥ 48 px; os testes de transbordo existentes continuam verdes.
 
-## T3 · Gaveta e barra inferior [ ]
+## T3 · Gaveta e barra inferior [x]
 **Gaveta (`AppShell`)**
 - Cabeçalho passa a `NavigationDrawer.header`: `DecoratedBox` com o gradiente; `padding` em cima = margem de cima original (`MediaQuery.paddingOf(context).top`) + 8; o `NavigationDrawer` fica dentro de `MediaQuery.removePadding(removeTop: true)` (D5).
 - Conteúdo do cabeçalho: quadrado 42×42 branco (`surface` do tema claro → no escuro `surfaceContainerLow`), raio 12, com o cesto em `primary`; "Cabaz Mensal" em `titleLarge` negrito, cor `sobreGradiente`; `BotaoTema` com o mesmo estilo do botão ☰ (fundo branco a 16 %, raio 12).

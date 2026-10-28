@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/tema.dart';
 import '../../data/providers.dart';
 import '../../domain/preferencias.dart';
 
@@ -14,6 +15,7 @@ class BotaoTema extends ConsumerWidget {
     final escuro = Theme.of(context).brightness == Brightness.dark;
     return IconButton(
       icon: Icon(escuro ? Icons.light_mode : Icons.dark_mode),
+      style: estiloBotaoSobreGradiente(CoresCabaz.of(context)),
       tooltip: escuro ? 'Mudar para modo claro' : 'Mudar para modo escuro',
       onPressed: () => ref
           .read(temaProvider.notifier)

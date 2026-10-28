@@ -190,4 +190,94 @@ void main() {
       );
     });
   }
+
+  testWidgets('gaveta: separador entre Artigos e Importar e os 6 navegam', (
+    tester,
+  ) async {
+    await _tamanho(tester, 400);
+    await tester.pumpWidget(_app('/lista'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+
+    final separador = find.descendant(
+      of: find.byType(NavigationDrawer),
+      matching: find.byType(Divider),
+    );
+    expect(separador, findsOneWidget);
+    final y = tester.getCenter(separador).dy;
+    expect(y, greaterThan(tester.getCenter(find.text(destinos[3].rotulo)).dy));
+    expect(y, lessThan(tester.getCenter(find.text(destinos[4].rotulo)).dy));
+
+    for (final d in destinos.reversed) {
+      if (find.byType(NavigationDrawer).evaluate().isEmpty) {
+        await tester.tap(find.byIcon(Icons.menu));
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(
+        find.descendant(
+          of: find.byType(NavigationDrawer),
+          matching: find.text(d.rotulo),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('pagina ${d.caminho}'), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      final gaveta = tester.widget<NavigationDrawer>(
+        find.byType(NavigationDrawer),
+      );
+      expect(gaveta.selectedIndex, destinos.indexOf(d), reason: d.caminho);
+    }
+  });
+
+  testWidgets('gaveta: cabeçalho em gradiente cobre a margem de cima', (
+    tester,
+  ) async {
+    await _tamanho(tester, 400);
+    tester.view.padding = const FakeViewPadding(top: 24);
+    await tester.pumpWidget(_app('/lista'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+
+    final cabecalho = find.descendant(
+      of: find.byType(NavigationDrawer),
+      matching: find.byWidgetPredicate(
+        (w) =>
+            w is DecoratedBox &&
+            w.decoration is BoxDecoration &&
+            (w.decoration as BoxDecoration).gradient is LinearGradient,
+      ),
+    );
+    expect(cabecalho, findsOneWidget);
+    expect(tester.getTopLeft(cabecalho).dy, 0);
+    expect(
+      tester.getTopLeft(find.text('Cabaz Mensal')).dy,
+      greaterThanOrEqualTo(24),
+    );
+  });
+
+  testWidgets('barra inferior com contorno de cima outlineVariant', (
+    tester,
+  ) async {
+    await _tamanho(tester, 400);
+    await tester.pumpWidget(_app('/lista'));
+    await tester.pumpAndSettle();
+
+    final caixa = tester.widget<DecoratedBox>(
+      find
+          .ancestor(
+            of: find.byType(NavigationBar),
+            matching: find.byType(DecoratedBox),
+          )
+          .first,
+    );
+    final borda = (caixa.decoration as BoxDecoration).border! as Border;
+    final esquema = construirTema(
+      Brightness.light,
+      fontesGoogle: false,
+    ).colorScheme;
+    expect(borda.top, BorderSide(color: esquema.outlineVariant));
+  });
 }
