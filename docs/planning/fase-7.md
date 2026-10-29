@@ -130,7 +130,9 @@ iOS; OCR na web; talão em várias fotografias; recortar/endireitar a fotografia
 
 **Feito (2026-10-28):** web e APK release compilam (APK 91,3 → 121,8 MB). O APK release falhava no R8 e depois lia todas as fotografias como ilegíveis: corrigido com `android/app/proguard-rules.pro` (decisão 0012). No telemóvel: captura de ecrã do Lidl pela galeria lida certo, linhas ligadas aos artigos e talão repetido marcado como "Já importado"; um talão importado.
 Escuro verificado. Deitado com o teclado aberto, os diálogos de correção só mostravam o título e depois só os botões: passam a rolar inteiros (título, campos e botões) com margens pequenas, com testes nas medidas do aparelho; verificado no telemóvel. Os diálogos da Fase 5 com o mesmo problema ficam em `notas.md`.
-**Por fazer (sem talões à mão):** Pingo Doce e E.Leclerc em papel (D8); fotografia com o telemóvel deitado (rotação EXIF); tempo por fotografia.
+**E.Leclerc em papel (D8, 2026-10-29):** o leitor era só do PDF ("Talão sem data"). OCR real tirado com uma prova temporária (worktree e `applicationId` à parte, caixas em `dados-privados/ocr-prova/`): IVA numa linha à parte ou colado, ano da linha "Caixa" estragado, preço unitário ilegível, quantidade em falta, `»` nas secções, "artigns". O leitor passou a aceitar o papel (fixture fictícia `leclerc_papel.txt`); os PDFs reais continuam 91/91. Das duas fotografias do mesmo talão, uma bate (em faixas, 28 linhas); a outra fica a rever (valores estragados pelo OCR, corrige-se na pré-visualização). No papel o local fica vazio (a localidade sai estragada; os repetidos não usam o local).
+**Tempo por fotografia (no telemóvel):** inteira 1,6–2,3 s; em faixas 3,4 s.
+**Por fazer:** Pingo Doce em papel (D8); fotografia com o telemóvel deitado (as duas tiradas tinham orientação EXIF 1, por isso a rotação ainda não foi posta à prova).
 
 ## Portão da Fase 7
 1. `dart format`, `flutter analyze`, `flutter test` verdes, com a saída real; `flutter build web` e `flutter build apk --release` compilam.
