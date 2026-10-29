@@ -95,6 +95,63 @@ void main() {
     });
   });
 
+  // Texto do OCR de um talão em papel (fictício, com os erros vistos nas
+  // fotografias reais): IVA numa linha à parte ou colado, ano da linha
+  // "Caixa" estragado, preço unitário ilegível, quantidade em falta.
+  group('E.Leclerc em papel (OCR)', () {
+    final texto = _f('leclerc_papel');
+    final t = lerLeclerc(texto)!;
+
+    test('loja pelo cabeçalho estragado; ano da linha dd/mm/aa', () {
+      expect(t.loja, 'E.Leclerc');
+      expect(t.local, isNull); // a localidade vem estragada
+      expect(t.data, DateTime(2026, 10, 24));
+      expect(t.numero, isNull);
+    });
+
+    test('linhas sem as linhas do IVA, com o IVA colado e sem quantidade', () {
+      expect(t.linhas.map((l) => l.texto), [
+        'CAFE SOLUVEL 100G',
+        'AZEITE VIRGEM 750HL',
+        'BOLACHAS AVEIA 200G',
+        'CHAMPO SUAVE 900HL',
+        'DETERGENTE ROUPA',
+      ]);
+      final azeite = t.linhas[1];
+      expect(
+        (azeite.quantidade, azeite.precoUnitCent, azeite.brutoCent),
+        (2, 589, 1178),
+      );
+      expect(t.linhas.last.quantidade, 1);
+      expect(t.linhas[0].seccao, 'NERCEARIA');
+      expect(t.linhas.last.seccao, 'D.P.H');
+      expect(t.naoReconhecidas, isEmpty);
+      expect((t.totalCent, t.bate), (2663, true));
+    });
+
+    test('valor ilegível fica por reconhecer e não bate', () {
+      final m = lerLeclerc(texto.replaceFirst('200G 1.49 1', '200G .49 1'))!;
+      expect(m.naoReconhecidas, ['6 BOLACHAS AVEIA 200G .49 1']);
+      expect(m.bate, isFalse);
+    });
+
+    test('total com "artigos" estragado pelo OCR', () {
+      final m = lerLeclerc(texto.replaceFirst('5 artigos', '5 artigns'))!;
+      expect((m.totalCent, m.bate), (2663, true));
+    });
+
+    test('sem a linha "Caixa" → sem data', () {
+      expect(
+        () => lerLeclerc(texto.replaceFirst(RegExp(r'Caixa .*\n'), '')),
+        throwsA(isA<FormatException>()),
+      );
+    });
+
+    test('lerTalao reconhece o papel', () {
+      expect(lerTalao(texto)!.loja, 'E.Leclerc');
+    });
+  });
+
   group('lerTalao', () {
     test('escolhe o leitor pela loja', () {
       expect(lerTalao(_f('lidl'))!.loja, 'Lidl');

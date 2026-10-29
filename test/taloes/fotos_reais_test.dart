@@ -56,4 +56,32 @@ void main() {
     // O Mercadona lê-se inteiro; as capturas do Lidl só em faixas.
     expect(faixasPedidas, ['lidl1.png', 'lidl2.png']);
   }, skip: saltar);
+
+  // Duas fotografias do mesmo talão do E.Leclerc em papel (T6 da Fase 7).
+  test('E.Leclerc em papel: uma bate, a outra fica a rever', () async {
+    final LeitorOcr ocr = (
+      inteira: (c) async => _caixas('$c.json'),
+      emFaixas: (c) async => _caixas('faixas-$c.json'),
+    );
+    final r = await lerFotos([
+      for (final f in ['IMG_20261029_042727.jpg', 'IMG_20261029_042759.jpg'])
+        (nome: f, caminho: f),
+    ], ocr);
+    expect(r.ilegiveis, isEmpty);
+    final [boa, ma] = [for (final l in r.lidos) lerTalao(l.texto)!];
+    for (final t in [boa, ma]) {
+      // ignore: avoid_print
+      print(
+        '${t.loja}: ${t.linhas.length} linhas, '
+        '${t.naoReconhecidas.length} por reconhecer, bate=${t.bate}',
+      );
+      expect((t.loja, t.data), ('E.Leclerc', DateTime(2026, 10, 24)));
+    }
+    expect(boa.bate, isTrue);
+    expect(boa.naoReconhecidas, isEmpty);
+    // Valores estragados pelo OCR (".95", "1.8"): corrige-se na
+    // pré-visualização.
+    expect(ma.bate, isFalse);
+    expect(ma.naoReconhecidas, isNotEmpty);
+  }, skip: saltar);
 }
