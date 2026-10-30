@@ -55,7 +55,7 @@ Confirmado no pub.dev:
 - `lib/core/desbloqueio.dart`: interface pequena `Desbloqueio` (`disponivel()`, `pedir()`), com a implementação do `local_auth` e um provider que se substitui nos testes, no mesmo padrão do `ocrFotosProvider`.
 - Compilar o APK release e confirmar que o R8 não precisa de regras novas (lição da Fase 7: verificar em release).
 
-## T3 · Definições: ligar o bloqueio [ ]
+## T3 · Definições: ligar o bloqueio [x]
 - Interruptor "Bloquear com impressão digital ou PIN": só aparece no Android e quando `disponivel()` é verdadeiro.
 - Ligar exige um `pedir()` com êxito; desligar não pede nada.
 - `BloqueioNotifier` guarda a escolha em `estado` (chave `bloqueio`), como o tema.

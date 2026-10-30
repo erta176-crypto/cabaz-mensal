@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/desbloqueio.dart';
 import '../../data/providers.dart';
 import '../../data/repositorios.dart';
 import '../../domain/preferencias.dart';
@@ -139,6 +140,10 @@ class DefinicoesPage extends ConsumerWidget {
                 ],
               ),
             ),
+            if (ref.watch(desbloqueioDisponivelProvider).value ?? false) ...[
+              const SizedBox(height: 16),
+              const _CartaoBloqueio(),
+            ],
             const SizedBox(height: 16),
             Card(
               child: Padding(
@@ -225,6 +230,36 @@ class DefinicoesPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Bloqueio com biometria ou PIN do telemóvel (Fase 8, D4): só aparece onde
+/// o aparelho o permite.
+class _CartaoBloqueio extends ConsumerWidget {
+  const _CartaoBloqueio();
+
+  Future<void> _mudar(BuildContext context, WidgetRef ref, bool ligar) async {
+    final bloqueio = ref.read(bloqueioProvider.notifier);
+    if (!ligar) return bloqueio.desligar();
+    final mensagens = ScaffoldMessenger.of(context);
+    try {
+      await bloqueio.ligar();
+    } on ErroDesbloqueio catch (e) {
+      mensagens.showSnackBar(SnackBar(content: Text(e.mensagem)));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => Card(
+    child: SwitchListTile(
+      secondary: const Icon(Icons.fingerprint),
+      title: const Text('Bloquear com impressão digital ou PIN'),
+      subtitle: const Text(
+        'Ao abrir a app e ao voltar a ela depois de 5 minutos.',
+      ),
+      value: ref.watch(bloqueioProvider).value ?? false,
+      onChanged: (v) => _mudar(context, ref, v),
+    ),
+  );
 }
 
 class _ConfirmarApagar extends StatefulWidget {

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show ProviderListenable;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../core/desbloqueio.dart';
 import '../domain/estatisticas.dart';
 import '../domain/modelos.dart';
 import '../domain/orcamento.dart';
@@ -106,6 +107,35 @@ class TemaNotifier extends Notifier<ModoTema> {
     _escolhido = true;
     state = m;
     await ref.read(baseLocalProvider).gravarEstado('tema', m.name);
+  }
+}
+
+// ---- Bloqueio (só neste aparelho) -----------------------------------------
+
+final bloqueioProvider = AsyncNotifierProvider<BloqueioNotifier, bool>(
+  BloqueioNotifier.new,
+);
+
+/// Bloqueio com biometria ou PIN ligado neste aparelho (Fase 8, D4), na
+/// tabela `estado` (chave `bloqueio`). Sair da conta desliga-o (`limparTudo`
+/// só guarda o tema).
+class BloqueioNotifier extends AsyncNotifier<bool> {
+  @override
+  Future<bool> build() async =>
+      await ref.read(baseLocalProvider).lerEstado('bloqueio') == 'sim';
+
+  /// Só liga depois de um desbloqueio com êxito, para ninguém ficar fora da
+  /// app. Devolve se ficou ligado; lança [ErroDesbloqueio].
+  Future<bool> ligar() async {
+    if (!await ref.read(desbloqueioProvider).pedir()) return false;
+    await ref.read(baseLocalProvider).gravarEstado('bloqueio', 'sim');
+    state = const AsyncData(true);
+    return true;
+  }
+
+  Future<void> desligar() async {
+    await ref.read(baseLocalProvider).gravarEstado('bloqueio', null);
+    state = const AsyncData(false);
   }
 }
 

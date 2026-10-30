@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-30. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**8 · Entrada (mostrar palavra-passe, bloqueio com biometria):** plano aprovado a 2026-10-30 ([`planning/fase-8.md`](planning/fase-8.md)); T1 e T2 feitas (mostrar a palavra-passe; `local_auth` 3.0.2 e Android preparado, `lib/core/desbloqueio.dart`); T3 a seguir.
+**8 · Entrada (mostrar palavra-passe, bloqueio com biometria):** plano aprovado a 2026-10-30 ([`planning/fase-8.md`](planning/fase-8.md)); T1 e T2 feitas (mostrar a palavra-passe; `local_auth` 3.0.2 e Android preparado, `lib/core/desbloqueio.dart`); T3 feita (interruptor nas Definições, `BloqueioNotifier`; sair da conta desliga o bloqueio); T4 a seguir.
 
 **7 · Talões por fotografia (OCR):** plano aprovado a 2026-10-28 ([`planning/fase-7.md`](planning/fase-7.md)); T1 a T5 feitas; T6 em curso: APK release instalado e a ler fotografias (regras do R8, decisão 0012), diálogos corrigidos para o telemóvel deitado; E.Leclerc em papel lido (leitor tolerante ao OCR); Pingo Doce em papel em espera de uma fotografia original da câmara (as capturas da galeria não chegam; ver T6); falta também uma fotografia deitada (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
 

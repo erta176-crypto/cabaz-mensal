@@ -77,3 +77,8 @@ bool semDesbloqueio(LocalAuthExceptionCode codigo) {
 final desbloqueioProvider = Provider<Desbloqueio>(
   (_) => DesbloqueioDoAparelho(),
 );
+
+/// Se o interruptor das Definições aparece (D4).
+final desbloqueioDisponivelProvider = FutureProvider<bool>(
+  (ref) => ref.watch(desbloqueioProvider).disponivel(),
+);
