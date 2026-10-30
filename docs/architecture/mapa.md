@@ -44,11 +44,12 @@
 
 ## `lib/features/`: um diretório por ecrã
 - `shell`: navegação com corte a 800 px e faixa de sincronização; `Pagina` com `CabecalhoPagina` (gradiente com ☰, ações, título, filtros e pesquisa; fixo, ou a rolar com a lista abaixo de 500 px de altura); `filtro_pilula.dart` (`FiltroPilula`, `CampoPesquisa`); `tema_controlos.dart` (botão sol/lua no menu lateral e menu Tema das Definições).
-- `entrada`
+- `entrada`: email e palavra-passe (com botão para a mostrar).
+- `bloqueio`: `CamadaBloqueio`, no `builder` do `MaterialApp.router`, por cima de todas as rotas (Fase 8): com sessão e bloqueio ligado, bloqueia ao abrir e ao voltar depois de 5 min (`AppLifecycleListener`, `agoraProvider`); ecrã com "Desbloquear" (pede logo) e "Sair".
 - `lista`: Lista do mês e Concluir compra.
 - `artigos`: Artigos, categorias e lojas; `ver_artigo.dart` (Ver artigo com preços por loja e evolução do preço, aberto a partir de Artigos, Lista, Painel e detalhe da compra).
 - `importar_exportar`: pré-visualização e arrastar e largar na web; "Talões (fotografia)" só no Android (câmara e galeria com o `image_picker`, OCR com `ocrFotosProvider`, fotografia recuperada com `retrieveLostData`, cópias temporárias apagadas ao importar ou cancelar); "Talões (PDF)" com `previsualizacao_taloes.dart` (um cartão por talão, estado e linhas; corrigir, apagar e acrescentar linhas, linhas por reconhecer, total e data, ver a fotografia).
-- `definicoes`
+- `definicoes`: conta, sincronização, `sairDaConta` (também usado pelo ecrã de bloqueio), interruptor do bloqueio (só onde o aparelho o permite), tema, gestos.
 - `painel`: Painel e estatísticas (filtros de período e loja, números, gráficos; aviso quando os dados vêm da cache); `orcamento_cartao.dart` (cartão do orçamento do mês e diálogo "Editar orçamento").
 - `historico`: Histórico só de consulta (filtros, pesquisa por artigo, alias, EAN ou texto do talão, lista por mês) e detalhe da compra (ao lado a partir de 800 px).
 - `estatisticas`: componentes de gráficos partilhados pelo Painel e pelo Ver artigo (`corDaLoja`, `BarrasHorizontais` sem `fl_chart`, `GraficoMeses` e `GraficoPreco` com `fl_chart`).

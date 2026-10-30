@@ -6,6 +6,7 @@ import 'core/router.dart';
 import 'core/tema.dart';
 import 'data/providers.dart';
 import 'domain/preferencias.dart';
+import 'features/bloqueio/camada_bloqueio.dart';
 
 class CabazMensalApp extends ConsumerWidget {
   const CabazMensalApp({super.key});
@@ -26,6 +27,8 @@ class CabazMensalApp extends ConsumerWidget {
       supportedLocales: const [Locale('pt', 'PT')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       routerConfig: ref.watch(routerProvider),
+      // Por cima de todas as rotas (Fase 8).
+      builder: (_, filho) => CamadaBloqueio(child: filho!),
     );
   }
 }

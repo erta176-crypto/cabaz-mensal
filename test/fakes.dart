@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cabaz_mensal/core/desbloqueio.dart';
 import 'package:cabaz_mensal/data/repositorios.dart';
 import 'package:cabaz_mensal/domain/modelos.dart';
 
@@ -139,5 +140,25 @@ class FakeAuthRepository implements AuthRepository {
   Future<void> sair() async {
     _sessao = false;
     _eventos.add(false);
+  }
+}
+
+/// Desbloqueio falso: [resposta] é o resultado de cada pedido; com [erro],
+/// o pedido lança-o.
+class FakeDesbloqueio implements Desbloqueio {
+  FakeDesbloqueio({this.disponivelNoAparelho = true, this.resposta = true});
+  final bool disponivelNoAparelho;
+  bool resposta;
+  ErroDesbloqueio? erro;
+  int pedidos = 0;
+
+  @override
+  Future<bool> disponivel() async => disponivelNoAparelho;
+
+  @override
+  Future<bool> pedir() async {
+    pedidos++;
+    if (erro case final e?) throw e;
+    return resposta;
   }
 }

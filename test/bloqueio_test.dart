@@ -12,23 +12,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes.dart';
 
-/// Desbloqueio falso: [resposta] é o resultado de cada pedido.
-class FakeDesbloqueio implements Desbloqueio {
-  FakeDesbloqueio({this.disponivelNoAparelho = true, this.resposta = true});
-  final bool disponivelNoAparelho;
-  bool resposta;
-  int pedidos = 0;
-
-  @override
-  Future<bool> disponivel() async => disponivelNoAparelho;
-
-  @override
-  Future<bool> pedir() async {
-    pedidos++;
-    return resposta;
-  }
-}
-
 void main() {
   late BaseLocal base;
 

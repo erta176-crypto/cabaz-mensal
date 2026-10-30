@@ -64,7 +64,7 @@ Confirmado no pub.dev:
   - um desbloqueio cancelado não liga o bloqueio;
   - na web o interruptor não aparece.
 
-## T4 · Ecrã de bloqueio [ ]
+## T4 · Ecrã de bloqueio [x]
 - Por cima de todas as rotas (no `builder` do `MaterialApp.router`): se há sessão e o bloqueio está ligado, a app arranca bloqueada.
 - Um `AppLifecycleListener` guarda a hora em que a app sai para segundo plano. Ao voltar, bloqueia se passaram 5 minutos ou mais (D3). A hora vem de um relógio injetável nos testes.
 - No ecrã: o ícone e o nome da app, "Desbloquear", que pede logo ao aparecer, e "Sair" (D5). Para `LocalAuthException`, como o bloqueio temporário, mostra uma mensagem curta em português.

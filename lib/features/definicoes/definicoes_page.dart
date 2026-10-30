@@ -11,43 +11,49 @@ import '../shell/tema_controlos.dart';
 
 const palavraConfirmacao = 'APAGAR';
 
+/// Sair da conta (Definições e ecrã de bloqueio): avisa se há alterações por
+/// enviar e limpa os dados deste aparelho.
+Future<void> sairDaConta(BuildContext context, WidgetRef ref) async {
+  // Depois de sair, o router troca de página: o ref pode já não servir.
+  final sync = ref.read(syncRepositoryProvider);
+  final contentor = ProviderScope.containerOf(context, listen: false);
+  final estado = ref.read(estadoSyncProvider).value ?? const EstadoSync();
+  final porEnviar = estado.pendentes + estado.comErro;
+  if (porEnviar > 0) {
+    final sair = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sair com alterações por enviar?'),
+        content: Text(
+          'Há $porEnviar ${porEnviar == 1 ? 'alteração' : 'alterações'} '
+          'que ainda não chegaram ao servidor. Se saíres agora, perdem-se.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Sair e perder'),
+          ),
+        ],
+      ),
+    );
+    if (sair != true) return;
+  }
+  // Os dados ficam no servidor; o dispositivo não guarda nada de outra conta.
+  await ref.read(authRepositoryProvider).sair();
+  await sync.limparLocal();
+  // limparTudo apagou a chave `bloqueio`.
+  contentor.invalidate(bloqueioProvider);
+}
+
 class DefinicoesPage extends ConsumerWidget {
   const DefinicoesPage({super.key});
-
-  Future<void> _sair(BuildContext context, WidgetRef ref) async {
-    final estado = ref.read(estadoSyncProvider).value ?? const EstadoSync();
-    final porEnviar = estado.pendentes + estado.comErro;
-    if (porEnviar > 0) {
-      final sair = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Sair com alterações por enviar?'),
-          content: Text(
-            'Há $porEnviar ${porEnviar == 1 ? 'alteração' : 'alterações'} '
-            'que ainda não chegaram ao servidor. Se saíres agora, perdem-se.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Sair e perder'),
-            ),
-          ],
-        ),
-      );
-      if (sair != true) return;
-    }
-    // Os dados ficam no servidor; o dispositivo não guarda nada de outra conta.
-    final sync = ref.read(syncRepositoryProvider);
-    await ref.read(authRepositoryProvider).sair();
-    await sync.limparLocal();
-  }
 
   Future<void> _apagarTudo(BuildContext context, WidgetRef ref) async {
     final confirmado = await showDialog<bool>(
@@ -135,7 +141,7 @@ class DefinicoesPage extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.logout),
                     title: const Text('Sair'),
-                    onTap: () => _sair(context, ref),
+                    onTap: () => sairDaConta(context, ref),
                   ),
                 ],
               ),
