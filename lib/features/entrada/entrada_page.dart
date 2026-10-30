@@ -15,6 +15,7 @@ class _EntradaPageState extends ConsumerState<EntradaPage> {
   final _email = TextEditingController();
   final _palavraPasse = TextEditingController();
   bool _ocupado = false;
+  bool _verPalavraPasse = false;
   String? _erro;
   String? _aviso;
 
@@ -101,10 +102,23 @@ class _EntradaPageState extends ConsumerState<EntradaPage> {
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _palavraPasse,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Palavra-passe',
+                            suffixIcon: IconButton(
+                              tooltip: _verPalavraPasse
+                                  ? 'Esconder palavra-passe'
+                                  : 'Mostrar palavra-passe',
+                              icon: Icon(
+                                _verPalavraPasse
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: () => setState(
+                                () => _verPalavraPasse = !_verPalavraPasse,
+                              ),
+                            ),
                           ),
-                          obscureText: true,
+                          obscureText: !_verPalavraPasse,
                           autofillHints: const [AutofillHints.password],
                           validator: (v) => v == null || v.length < 6
                               ? 'Mínimo de 6 caracteres.'

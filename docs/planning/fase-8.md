@@ -42,7 +42,7 @@ Confirmado no pub.dev:
 | D5 | O ecrã de bloqueio tem dois botões: "Desbloquear", que pede o desbloqueio logo ao aparecer, e "Sair". O "Sair" termina a sessão e volta à entrada com email e palavra-passe, e é a saída para um bloqueio temporário ou para um telemóvel sem bloqueio de ecrã. Cancelar ou falhar mantém a app bloqueada. |
 | D6 | Na web não há bloqueio; o "mostrar a palavra-passe" funciona em todo o lado. |
 
-## T1 · Mostrar a palavra-passe [ ]
+## T1 · Mostrar a palavra-passe [x]
 - No campo da palavra-passe, um `IconButton` com o ícone de olho alterna `obscureText`, com a dica "Mostrar palavra-passe" ou "Esconder palavra-passe".
 - Teste de widget: o texto começa escondido e o toque mostra-o e volta a escondê-lo.
 
