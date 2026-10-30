@@ -75,7 +75,7 @@ Confirmado no pub.dev:
   - o "Sair" termina a sessão;
   - sem sessão ou com o bloqueio desligado, a app não bloqueia.
 
-## T5 · Verificação no telemóvel, docs e fecho [ ]
+## T5 · Verificação no telemóvel, docs e fecho [x]
 - APK release instalado com `adb install -r`, para manter os dados.
 - Verificar no telemóvel:
   - ligar o bloqueio;
@@ -93,6 +93,24 @@ Confirmado no pub.dev:
   - a decisão `0013-bloqueio-local.md` (D1–D3);
   - tirar o pedido de `notas.md`;
   - marcar o plano.
+
+**Feito (2026-10-30):**
+- Testes: 441 a passar e 1 saltado; `analyze` sem avisos.
+- `flutter build web` e `flutter build apk --release` compilam.
+- APK release: 121,8 MB → 122,4 MB.
+- Instalado no telemóvel com `adb install -r`, com os dados mantidos.
+- Verificado pelo utilizador no telemóvel, tudo a funcionar:
+  - o ecrã de arranque;
+  - ligar o bloqueio;
+  - abrir a app;
+  - impressão digital, PIN e cancelar;
+  - sair durante menos e durante mais de 5 minutos;
+  - "Sair";
+  - mostrar a palavra-passe;
+  - deitado e no escuro.
+- Os testes apanharam um erro antes da instalação: o `Navigator` do ecrã de bloqueio partilhava o `HeroController` da app. Ficou corrigido com `HeroControllerScope.none`.
+
+**Por fazer no portão:** ver na web que o "mostrar palavra-passe" funciona e que não há interruptor de bloqueio.
 
 ## Portão da Fase 8
 1. `dart format`, `flutter analyze` e `flutter test` verdes, com a saída real; `flutter build web` e `flutter build apk --release` compilam.

@@ -3,7 +3,7 @@
 *Atualizado em 2026-10-30. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**8 · Entrada (mostrar palavra-passe, bloqueio com biometria):** plano aprovado a 2026-10-30 ([`planning/fase-8.md`](planning/fase-8.md)); T1 e T2 feitas (mostrar a palavra-passe; `local_auth` 3.0.2 e Android preparado, `lib/core/desbloqueio.dart`); T3 feita (interruptor nas Definições, `BloqueioNotifier`; sair da conta desliga o bloqueio); T4 feita (ecrã de bloqueio por cima das rotas, `lib/features/bloqueio/`); T5 (verificação no telemóvel) a seguir.
+**8 · Entrada (mostrar palavra-passe, bloqueio com biometria):** plano aprovado a 2026-10-30 ([`planning/fase-8.md`](planning/fase-8.md)); T1 a T5 feitas e verificadas no telemóvel (decisão 0013). Falta o portão: ver na web e o utilizador confirmar; depois o push.
 
 **7 · Talões por fotografia (OCR):** plano aprovado a 2026-10-28 ([`planning/fase-7.md`](planning/fase-7.md)); T1 a T5 feitas; T6 em curso: APK release instalado e a ler fotografias (regras do R8, decisão 0012), diálogos corrigidos para o telemóvel deitado; E.Leclerc em papel lido (leitor tolerante ao OCR); Pingo Doce em papel em espera de uma fotografia original da câmara (as capturas da galeria não chegam; ver T6); falta também uma fotografia deitada (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
 
@@ -25,9 +25,16 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Executar a Fase 8 (T1 → T5).
-2. Fechar a Fase 7 quando houver talão do Pingo Doce em papel e fotografia deitada.
-3. Depois: P1 da comparação de preços (primeiro conector).
+Ao retomar:
+1. **Portão da Fase 8:**
+   - ver na web, com `flutter run -d chrome`, que o "mostrar palavra-passe" funciona e que não há interruptor de bloqueio;
+   - correr a verificação;
+   - o utilizador confirma o portão e só então se faz o push. Este push leva também os commits da Fase 7, que ainda não foram publicados.
+2. **Fase 7, portão por fechar:**
+   - Pingo Doce em papel: precisa de uma fotografia original da câmara, com o talão esticado;
+   - uma fotografia tirada com o telemóvel deitado (rotação EXIF).
+   - Sem talão, há duas hipóteses a decidir: fechar a Fase 7 com o Pingo Doce em papel como limitação em `notas.md`, ou mantê-la aberta.
+3. **Depois:** o P1 da comparação de preços (primeiro conector), ou um ponto de `notas.md`, por exemplo os diálogos da Fase 5 com o telemóvel deitado ou atualizar pacotes.
 
 ## Pendentes sem fase
 - Ligar a "Leaked Password Protection" no Supabase (Authentication → Policies). É o único aviso que os advisors ainda dão.
