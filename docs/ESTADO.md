@@ -3,6 +3,8 @@
 *Atualizado em 2026-10-30. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
+**8 · Entrada (mostrar palavra-passe, bloqueio com biometria):** plano aprovado a 2026-10-30 ([`planning/fase-8.md`](planning/fase-8.md)); T1 em curso.
+
 **7 · Talões por fotografia (OCR):** plano aprovado a 2026-10-28 ([`planning/fase-7.md`](planning/fase-7.md)); T1 a T5 feitas; T6 em curso: APK release instalado e a ler fotografias (regras do R8, decisão 0012), diálogos corrigidos para o telemóvel deitado; E.Leclerc em papel lido (leitor tolerante ao OCR); Pingo Doce em papel em espera de uma fotografia original da câmara (as capturas da galeria não chegam; ver T6); falta também uma fotografia deitada (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
 
 ## Feito
@@ -23,8 +25,9 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-1. Executar a Fase 7 (T1 → T6).
-2. Depois: P1 da comparação de preços (primeiro conector).
+1. Executar a Fase 8 (T1 → T5).
+2. Fechar a Fase 7 quando houver talão do Pingo Doce em papel e fotografia deitada.
+3. Depois: P1 da comparação de preços (primeiro conector).
 
 ## Pendentes sem fase
 - Ligar a "Leaked Password Protection" no Supabase (Authentication → Policies). É o único aviso que os advisors ainda dão.
