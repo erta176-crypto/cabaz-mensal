@@ -4,6 +4,7 @@
 
 ## `lib/core/`
 - `tema.dart`: paleta azul (decisão 0011): `ColorScheme` claro e escuro e o `ThemeExtension` `CoresCabaz` (gradiente do cabeçalho, verde de "dentro do limite", parte vazia das barras, fundo e texto dos filtros do cabeçalho; `CoresCabaz.of(context)`); `estiloBotaoSobreGradiente` (☰ e sol/lua).
+- `desbloqueio.dart`: `Desbloqueio` (`disponivel`, `pedir`) com o `local_auth` (biometria ou PIN do telemóvel, só Android; Fase 8); `semDesbloqueio` traduz os códigos de erro; `desbloqueioProvider` substitui-se nos testes.
 
 ## `lib/domain/`: modelos e regras puras
 - `dinheiro.dart`: dinheiro sempre em cêntimos inteiros e pesos em gramas.

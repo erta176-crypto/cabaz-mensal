@@ -46,7 +46,7 @@ Confirmado no pub.dev:
 - No campo da palavra-passe, um `IconButton` com o ícone de olho alterna `obscureText`, com a dica "Mostrar palavra-passe" ou "Esconder palavra-passe".
 - Teste de widget: o texto começa escondido e o toque mostra-o e volta a escondê-lo.
 
-## T2 · Pacote e Android [ ]
+## T2 · Pacote e Android [x]
 - Juntar `local_auth: ^3.0.2` ao `pubspec.yaml`. Confirmar que resolve sem mudar outras versões.
 - Alterações no Android:
   - `MainActivity` passa a herdar de `FlutterFragmentActivity`;
