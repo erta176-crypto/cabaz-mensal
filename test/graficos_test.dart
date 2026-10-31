@@ -61,6 +61,16 @@ void main() {
     });
   });
 
+  // Uma só regra para a cor da loja (Lista, Artigos, Painel, Histórico).
+  test('corDeHex: só #rrggbb', () {
+    expect(corDeHex('#eb6834'), const Color(0xFFEB6834));
+    expect(corDeHex('#EB6834'), const Color(0xFFEB6834));
+    expect(corDeHex('eb6834'), isNull);
+    expect(corDeHex('#fff'), isNull);
+    expect(corDeHex('#eb68341'), isNull);
+    expect(corDeHex(null), isNull);
+  });
+
   group('BarrasHorizontais', () {
     testWidgets('mostra rótulos e valores formatados', (t) async {
       await _mostrar(

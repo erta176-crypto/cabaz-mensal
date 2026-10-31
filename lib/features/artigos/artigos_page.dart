@@ -7,6 +7,7 @@ import '../../data/providers.dart';
 import '../../data/repositorios.dart';
 import '../../domain/modelos.dart';
 import '../../domain/texto.dart';
+import '../estatisticas/cores.dart';
 import '../shell/filtro_pilula.dart';
 import '../shell/shell.dart';
 import 'dialogos.dart';
@@ -524,12 +525,6 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
       },
     );
   }
-}
-
-Color? corDeHex(String? hex) {
-  if (hex == null) return null;
-  final v = int.tryParse(hex.replaceFirst('#', ''), radix: 16);
-  return v == null ? null : Color(0xFF000000 | v);
 }
 
 /// Pesquisa de Artigos: pelo nome (sem acentos) ou pelo código de barras.

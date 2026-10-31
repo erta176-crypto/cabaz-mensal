@@ -9,7 +9,7 @@ import '../../domain/estatisticas.dart';
 import '../../domain/modelos.dart';
 import '../../domain/orcamento.dart';
 import '../../domain/preferencias.dart';
-import '../artigos/artigos_page.dart' show corDeHex;
+import '../estatisticas/cores.dart';
 import '../shell/filtro_pilula.dart';
 import '../shell/shell.dart';
 import 'adicionar_artigo.dart';
@@ -319,8 +319,7 @@ class _Conteudo extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 7,
-                  backgroundColor:
-                      corDeHex(s.loja.cor) ?? tema.colorScheme.primary,
+                  backgroundColor: corDaLoja(s.loja, tema.colorScheme),
                 ),
                 const SizedBox(width: 10),
                 Text(s.loja.nome, style: tema.textTheme.titleLarge),

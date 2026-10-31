@@ -52,7 +52,7 @@
 - `definicoes`: conta, sincronização, `sairDaConta` (também usado pelo ecrã de bloqueio), interruptor do bloqueio (só onde o aparelho o permite), tema, gestos.
 - `painel`: Painel e estatísticas (filtros de período e loja, números, gráficos; aviso quando os dados vêm da cache); `orcamento_cartao.dart` (cartão do orçamento do mês e diálogo "Editar orçamento").
 - `historico`: Histórico só de consulta (filtros, pesquisa por artigo, alias, EAN ou texto do talão, lista por mês) e detalhe da compra (ao lado a partir de 800 px).
-- `estatisticas`: componentes de gráficos partilhados pelo Painel e pelo Ver artigo (`corDaLoja`, `BarrasHorizontais` sem `fl_chart`, `GraficoMeses` e `GraficoPreco` com `fl_chart`).
+- `estatisticas`: componentes de gráficos partilhados pelo Painel e pelo Ver artigo (`corDeHex` e `corDaLoja`, regra única da cor da loja `#rrggbb`, usada também na Lista e em Artigos; `BarrasHorizontais` sem `fl_chart`, `GraficoMeses` e `GraficoPreco` com `fl_chart`).
 
 ## `supabase/migrations/`
 - `fase0`: tabelas, RLS, `importar_seed`.
