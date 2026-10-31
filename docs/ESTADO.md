@@ -6,6 +6,7 @@
 Nenhuma em curso. Próxima por escolher (ver "Próximo").
 
 ## Feito
+- **Notas · diálogos deitado:** "Ligar a um artigo" e "Nome do artigo novo" cabem com o telemóvel deitado e o teclado aberto (rolam inteiros; a lista encolhe com o espaço livre). Falta ver no telemóvel (2026-10-31).
 - **Notas · cor da loja:** uma só regra (`corDeHex`, `#rrggbb`) em `estatisticas/cores.dart`, usada na Lista, Artigos, Painel e Histórico (2026-10-31).
 - **Fase 8 · Entrada (mostrar palavra-passe, bloqueio com biometria):** concluída e publicada (portão a 2026-10-31; [`planning/fase-8.md`](planning/fase-8.md)). Botão para ver a palavra-passe; bloqueio local com a biometria ou o PIN do telemóvel (`local_auth`, decisão 0013), ao abrir e ao voltar depois de 5 min, ligado nas Definições (só Android). Os testes apanharam um erro: o `Navigator` do ecrã de bloqueio partilhava o `HeroController` da app.
 - **Fase 7 · Talões por fotografia (OCR):** concluída e publicada (portão a 2026-10-31; [`planning/fase-7.md`](planning/fase-7.md)). OCR no aparelho (ML Kit, só Android, decisão 0012), as quatro lojas (leitor novo do Mercadona; E.Leclerc e Pingo Doce também em papel), correção das linhas na pré-visualização. No telemóvel: o APK release precisava de regras do R8; os diálogos não cabiam deitado com o teclado; as provas com `flutter test` no telemóvel desinstalavam a app real (agora só APK `.prova`).

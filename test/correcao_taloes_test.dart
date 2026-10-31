@@ -254,16 +254,33 @@ void main() {
 
   // Telemóvel deitado com o teclado aberto (medido no aparelho): barra de
   // estado de 30 dp e teclado de 250 dp, sobram ≈110 dp. O campo com o foco
-  // fica à vista; o Guardar alcança-se rolando.
-  for (final (nome, dialogo, campo) in [
-    ('linha', DialogoLinha(linha: _lidl().linhas.first), 'Texto do talão'),
+  // fica à vista; o botão (e a lista do "Ligar") alcança-se rolando.
+  final artigos = [
+    for (var i = 0; i < 20; i++)
+      Artigo(
+        id: 'a$i',
+        nome: 'Artigo $i',
+        categoriaId: null,
+        unidade: Unidade.un,
+      ),
+  ];
+  for (final (nome, dialogo, campo, botao) in [
+    (
+      'linha',
+      DialogoLinha(linha: _lidl().linhas.first),
+      'Texto do talão',
+      'Guardar',
+    ),
     (
       'total',
       DialogoTotal(totalCent: 1477, data: DateTime(2026, 10, 5)),
       'Total pago (€)',
+      'Guardar',
     ),
+    ('nome', const DialogoNome(nome: 'Leite meio gordo'), 'Nome', 'Guardar'),
+    ('ligar', DialogoLigar(artigos: artigos), 'Pesquisar', 'Cancelar'),
   ]) {
-    testWidgets('diálogo da $nome deitado com teclado: campo e Guardar à '
+    testWidgets('diálogo da $nome deitado com teclado: campo e $botao à '
         'vista', (t) async {
       t.view.physicalSize = const Size(873, 393);
       t.view.devicePixelRatio = 1;
@@ -293,9 +310,15 @@ void main() {
       }
 
       aVista(find.widgetWithText(TextField, campo));
-      await t.ensureVisible(find.text('Guardar'));
+      if (nome == 'ligar') {
+        // Rola o diálogo (não a lista) até à lista: o 1.º artigo fica inteiro.
+        await t.ensureVisible(find.byType(ListView));
+        await t.pumpAndSettle();
+        aVista(find.text('Artigo 0'));
+      }
+      await t.ensureVisible(find.text(botao));
       await t.pumpAndSettle();
-      aVista(find.text('Guardar'));
+      aVista(find.text(botao));
     });
   }
 }

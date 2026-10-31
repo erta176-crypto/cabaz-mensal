@@ -125,13 +125,13 @@ class PrevisualizacaoTaloes extends StatelessWidget {
           case 'ligar':
             final a = await showDialog<Artigo>(
               context: context,
-              builder: (_) => _DialogoLigar(artigos: artigos),
+              builder: (_) => DialogoLigar(artigos: artigos),
             );
             if (a != null) escolher!(chave, LigarArtigo(a.id));
           case 'nome':
             final n = await showDialog<String>(
               context: context,
-              builder: (_) => _DialogoNome(nome: nome),
+              builder: (_) => DialogoNome(nome: nome),
             );
             if (n != null && n.trim().isNotEmpty) {
               escolher!(
@@ -391,15 +391,15 @@ class PrevisualizacaoTaloes extends StatelessWidget {
 }
 
 /// Escolher um artigo existente, com pesquisa sem acentos (nome ou EAN).
-class _DialogoLigar extends StatefulWidget {
-  const _DialogoLigar({required this.artigos});
+class DialogoLigar extends StatefulWidget {
+  const DialogoLigar({super.key, required this.artigos});
   final List<Artigo> artigos;
 
   @override
-  State<_DialogoLigar> createState() => _DialogoLigarState();
+  State<DialogoLigar> createState() => _DialogoLigarState();
 }
 
-class _DialogoLigarState extends State<_DialogoLigar> {
+class _DialogoLigarState extends State<DialogoLigar> {
   String _termo = '';
 
   @override
@@ -409,56 +409,55 @@ class _DialogoLigarState extends State<_DialogoLigar> {
       for (final a in widget.artigos)
         if (a.ativo && artigoCorresponde(a, termo)) a,
     ]..sort((a, b) => a.nome.compareTo(b.nome));
-    return AlertDialog(
-      title: const Text('Ligar a um artigo'),
-      content: SizedBox(
-        width: 420,
-        height: 420,
-        child: Column(
-          children: [
-            TextField(
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Pesquisar',
-                prefixIcon: Icon(Icons.search),
-              ),
-              onChanged: (v) => setState(() => _termo = v),
+    // A lista encolhe com a altura livre (o teclado tira-a); com pouca,
+    // fica com ≈3 linhas e o diálogo rola inteiro.
+    final livre =
+        MediaQuery.sizeOf(context).height -
+        MediaQuery.viewInsetsOf(context).bottom -
+        MediaQuery.paddingOf(context).vertical;
+    return _dialogoCorrecao(
+      context,
+      titulo: 'Ligar a um artigo',
+      campos: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: 'Pesquisar',
+              prefixIcon: Icon(Icons.search),
             ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView(
-                children: [
-                  for (final a in achados.take(50))
-                    ListTile(
-                      dense: true,
-                      title: Text(a.nome),
-                      onTap: () => Navigator.pop(context, a),
-                    ),
-                ],
-              ),
+            onChanged: (v) => setState(() => _termo = v),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: (livre - 220).clamp(144.0, 356.0),
+            child: ListView(
+              children: [
+                for (final a in achados.take(50))
+                  ListTile(
+                    dense: true,
+                    title: Text(a.nome),
+                    onTap: () => Navigator.pop(context, a),
+                  ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
-        ),
-      ],
     );
   }
 }
 
-class _DialogoNome extends StatefulWidget {
-  const _DialogoNome({required this.nome});
+class DialogoNome extends StatefulWidget {
+  const DialogoNome({super.key, required this.nome});
   final String nome;
 
   @override
-  State<_DialogoNome> createState() => _DialogoNomeState();
+  State<DialogoNome> createState() => _DialogoNomeState();
 }
 
-class _DialogoNomeState extends State<_DialogoNome> {
+class _DialogoNomeState extends State<DialogoNome> {
   late final _campo = TextEditingController(text: widget.nome);
 
   @override
@@ -468,27 +467,16 @@ class _DialogoNomeState extends State<_DialogoNome> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Nome do artigo novo'),
-    content: SizedBox(
-      width: 420,
-      child: TextField(
-        controller: _campo,
-        autofocus: true,
-        decoration: const InputDecoration(labelText: 'Nome'),
-        onSubmitted: (v) => Navigator.pop(context, v),
-      ),
+  Widget build(BuildContext context) => _dialogoCorrecao(
+    context,
+    titulo: 'Nome do artigo novo',
+    aoGuardar: () => Navigator.pop(context, _campo.text),
+    campos: TextField(
+      controller: _campo,
+      autofocus: true,
+      decoration: const InputDecoration(labelText: 'Nome'),
+      onSubmitted: (v) => Navigator.pop(context, v),
     ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
-      ),
-      TextButton(
-        onPressed: () => Navigator.pop(context, _campo.text),
-        child: const Text('Guardar'),
-      ),
-    ],
   );
 }
 
@@ -764,14 +752,14 @@ class _DialogoTotalState extends State<DialogoTotal> {
   }
 }
 
-/// Diálogo de correção com Cancelar e Guardar. Deitado e com o teclado
-/// aberto sobram ≈110 dp: rola tudo (título, campos e botões) e as margens
-/// de cima e de baixo são pequenas.
+/// Diálogo de correção com Cancelar e Guardar (sem [aoGuardar], só
+/// Cancelar). Deitado e com o teclado aberto sobram ≈110 dp: rola tudo
+/// (título, campos e botões) e as margens de cima e de baixo são pequenas.
 Widget _dialogoCorrecao(
   BuildContext context, {
   required String titulo,
   required Widget campos,
-  required VoidCallback aoGuardar,
+  VoidCallback? aoGuardar,
 }) => AlertDialog(
   scrollable: true,
   insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
@@ -792,7 +780,8 @@ Widget _dialogoCorrecao(
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancelar'),
             ),
-            TextButton(onPressed: aoGuardar, child: const Text('Guardar')),
+            if (aoGuardar != null)
+              TextButton(onPressed: aoGuardar, child: const Text('Guardar')),
           ],
         ),
       ],
