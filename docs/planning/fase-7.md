@@ -122,7 +122,7 @@ iOS; OCR na web; talão em várias fotografias; recortar/endireitar a fotografia
 
 **Testes**: widget com `OcrDaFoto` e escolha de imagens falsos (injetados como o `LerTextoPdf`): os botões só aparecem no Android (`debugDefaultTargetPlatformOverride`) e nunca na web; uma fotografia lida aparece na pré-visualização; duas fotografias com o mesmo nome dão dois cartões; uma fotografia recuperada (`retrieveLostData`) é lida ao abrir; cancelar limpa.
 
-## T6 · Verificação no telemóvel, docs e fecho [ ]
+## T6 · Verificação no telemóvel, docs e fecho [x]
 - No telemóvel: as 3 imagens de exemplo (galeria) e **fotografias novas tuas de talões em papel do Pingo Doce e do E.Leclerc** (D8); câmara e galeria; fotografia tirada com o telemóvel ao alto e deitado (rotação EXIF, 0.4); diálogos de edição com letra ×2 e com o telemóvel deitado; claro e escuro.
 - Se Pingo Doce/E.Leclerc em papel não forem reconhecidos: leitor de papel nesta tarefa (fixture fictícia, mesmo padrão da T2) ou, se for grande, `notas.md` e decidimos.
 - Tamanho do APK antes e depois.
@@ -134,7 +134,9 @@ Escuro verificado. Deitado com o teclado aberto, os diálogos de correção só 
 **Tempo por fotografia (no telemóvel):** inteira 1,6–2,3 s; em faixas 3,4 s.
 **Pingo Doce em papel (D8, 2026-10-30), em espera:** duas imagens do mesmo talão, ambas capturas de ecrã da galeria (720×1600 e 352×1035, recortada à direita). O OCR lê-as (1,4–2,1 s), mas o leitor não as reconhece. Há três causas: o cabeçalho "Pingo Doce - Distribui…" sai estragado; com o papel dobrado, os valores da direita ficam na linha de cima ("TAKE-AWAY 2,89" / "D WRAP SNOCK VEG"); na recortada faltam algarismos ("2,8", "23/10/202"). Não se adapta o leitor a imagens destas. Falta uma fotografia original da câmara, com o talão esticado e inteiro; depois adapta-se o leitor com uma fixture fictícia. Uma importação anterior deu "Fotografia ilegível", mas o OCR não se reproduziu nem em debug nem em release. As provas no telemóvel passam a ser só uma APK `.prova` instalada com `adb install -r`, nunca `flutter test` ou `flutter drive`: o `flutter test` desinstalava a app real.
 **Pingo Doce e Lidl em papel (D8, 2026-10-31):** fotografias da câmara (1099×3814 e 1115×4012, orientação EXIF 1); OCR inteira 1,2–1,6 s, faixas 3,4–4,3 s. O leitor do Pingo Doce passou a aceitar o papel (fixture fictícia `pingo_doce_papel.txt`): cabeçalho estragado ("Pingo Doce- Distritbuição"), "x" minúsculo e a poupança numa linha à parte, antes ou depois do texto; no papel fica sem local (a primeira linha é o logótipo). O talão real fica reconhecido (4 linhas, poupança ligada ao artigo), mas não bate: o OCR leu "1,59" em vez de "1,69", e corrige-se na pré-visualização. O Lidl em papel já era lido; a normalização passou a aceitar "2x 1,19." (sem espaço e com ponto no fim), e o talão bate (17 linhas). Os PDFs reais continuam 91/91.
-**Por fazer:** fotografia com o telemóvel deitado (as duas tiradas tinham orientação EXIF 1, por isso a rotação ainda não foi posta à prova).
+**Fecho (2026-10-31):**
+- Os dois talões entraram pela galeria. O Pingo Doce foi corrigido na pré-visualização ("1,59" → "1,69") e a correção chegou à compra importada: no servidor ficou com total 8,80 €, linha a 1,69 € e poupança de 0,41 €.
+- Uma fotografia tirada com o telemóvel deitado foi reconhecida. Foi tirada com "Tirar fotografia"; a cópia temporária é apagada depois de importar, por isso não se viu o valor EXIF.
 
 ## Portão da Fase 7
 1. `dart format`, `flutter analyze`, `flutter test` verdes, com a saída real; `flutter build web` e `flutter build apk --release` compilam.

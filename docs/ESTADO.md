@@ -5,7 +5,7 @@
 ## Fase atual
 **8 · Entrada (mostrar palavra-passe, bloqueio com biometria):** plano aprovado a 2026-10-30 ([`planning/fase-8.md`](planning/fase-8.md)); T1 a T5 feitas e verificadas no telemóvel (decisão 0013). Falta o portão: ver na web e o utilizador confirmar; depois o push.
 
-**7 · Talões por fotografia (OCR):** plano aprovado a 2026-10-28 ([`planning/fase-7.md`](planning/fase-7.md)); T1 a T5 feitas; T6 em curso: APK release instalado e a ler fotografias (regras do R8, decisão 0012), diálogos corrigidos para o telemóvel deitado; E.Leclerc em papel lido (leitor tolerante ao OCR); Pingo Doce e Lidl em papel lidos (2026-10-31; um algarismo estragado pelo OCR corrige-se na pré-visualização); falta só uma fotografia deitada (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
+**7 · Talões por fotografia (OCR):** plano aprovado a 2026-10-28 ([`planning/fase-7.md`](planning/fase-7.md)); T1 a T5 feitas; T6 em curso: APK release instalado e a ler fotografias (regras do R8, decisão 0012), diálogos corrigidos para o telemóvel deitado; E.Leclerc em papel lido (leitor tolerante ao OCR); Pingo Doce e Lidl em papel lidos (2026-10-31; um algarismo estragado pelo OCR corrige-se na pré-visualização); fotografia deitada reconhecida; T6 feita (2026-10-31); falta o portão (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
 
 ## Feito
 - **Fase 6 · Tema azul:** concluída e publicada (portão a 2026-10-28; [`planning/fase-6.md`](planning/fase-6.md)). Paleta azul e `CoresCabaz` (decisão 0011, substitui a 0008), cabeçalho alto em gradiente com os filtros em pílulas e a pesquisa (D6, revoga a D4), gaveta e barra inferior, cartões e orçamento com verde/âmbar/vermelho e percentagem. No portão: o gradiente do cabeçalho tinha altura 0, as pílulas no escuro tinham pouco contraste e os cartões do Painel tinham alturas diferentes na mesma linha — corrigidos com testes.
@@ -30,7 +30,7 @@ Ao retomar:
    - ver na web, com `flutter run -d chrome`, que o "mostrar palavra-passe" funciona e que não há interruptor de bloqueio;
    - correr a verificação;
    - o utilizador confirma o portão e só então se faz o push. Este push leva também os commits da Fase 7, que ainda não foram publicados.
-2. **Fase 7, portão por fechar:** falta uma fotografia tirada com o telemóvel deitado (rotação EXIF); depois, o portão da Fase 7.
+2. **Portão da Fase 7:** T1 a T6 feitas; confirmar junto com o da Fase 8 (mesmo push).
 3. **Depois:** o P1 da comparação de preços (primeiro conector), ou um ponto de `notas.md`, por exemplo os diálogos da Fase 5 com o telemóvel deitado ou atualizar pacotes.
 
 ## Pendentes sem fase
