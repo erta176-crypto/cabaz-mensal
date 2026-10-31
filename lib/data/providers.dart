@@ -239,16 +239,45 @@ final registosPrecoProvider = StreamProvider.autoDispose
           ref.watch(artigosRepositoryProvider).observarRegistos(artigoId),
     );
 
+/// Pedidos que precisam de rede (Painel, Histórico, linhas da compra): com
+/// erro ou com dados da cache ([daCache]), voltam a pedir sozinhos quando a
+/// sincronização vê a rede voltar (`online` passa de false a true). Com
+/// dados frescos, a rede ir e voltar não faz nada.
+Future<T> refazerQuandoVoltarARede<T>(
+  Ref ref,
+  Future<T> pedido, {
+  bool Function(T)? daCache,
+}) async {
+  var refazer = false;
+  ref.listen(estadoSyncProvider.select((e) => e.value?.online), (antes, agora) {
+    if (refazer && antes == false && agora == true) ref.invalidateSelf();
+  });
+  try {
+    final r = await pedido;
+    refazer = daCache?.call(r) ?? false;
+    return r;
+  } catch (_) {
+    refazer = true;
+    rethrow;
+  }
+}
+
 final painelProvider = FutureProvider.autoDispose
     .family<ResultadoPainel, FiltroCompras>(
-      (ref, filtro) => ref.watch(estatisticasRepositoryProvider).painel(filtro),
+      (ref, filtro) => refazerQuandoVoltarARede(
+        ref,
+        ref.watch(estatisticasRepositoryProvider).painel(filtro),
+        daCache: (r) => r.guardadoEm != null,
+      ),
     );
 
 /// Linhas de uma compra (só com rede).
 final linhasCompraProvider = FutureProvider.autoDispose
     .family<List<LinhaCompra>, String>(
-      (ref, compraId) =>
-          ref.watch(estatisticasRepositoryProvider).linhas(compraId),
+      (ref, compraId) => refazerQuandoVoltarARede(
+        ref,
+        ref.watch(estatisticasRepositoryProvider).linhas(compraId),
+      ),
     );
 
 final orcamentosProvider = StreamProvider<List<Orcamento>>(

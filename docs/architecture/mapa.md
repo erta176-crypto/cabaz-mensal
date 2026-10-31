@@ -17,7 +17,7 @@
 
 ## `lib/data/`: a única pasta que fala com o Supabase e com o drift
 - `repositorios.dart`: as interfaces (inclui `OrcamentosRepository`, implementado em `local/repositorios_locais.dart` sobre a tabela sincronizada `orcamentos`).
-- `providers.dart`: os providers Riverpod; `temaProvider` (tema deste aparelho, chave `tema` na tabela `estado`); `bloqueioProvider` (bloqueio com biometria ligado neste aparelho, chave `bloqueio`; ligar pede um desbloqueio; sair da conta apaga-o).
+- `providers.dart`: os providers Riverpod; `temaProvider` (tema deste aparelho, chave `tema` na tabela `estado`); `bloqueioProvider` (bloqueio com biometria ligado neste aparelho, chave `bloqueio`; ligar pede um desbloqueio; sair da conta apaga-o). `refazerQuandoVoltarARede`: o Painel, o Histórico e as linhas da compra, com erro ou dados da cache, voltam a pedir quando `online` passa de false a true.
 - `local/`: base drift genérica (tabela `registos` com JSON por linha, fila `pendentes`, `estado`) e os repositórios locais.
 - `sync/`: a sincronização ([`sincronizacao.md`](sincronizacao.md)).
   - `escrita.dart`: grava na cache e põe na fila.

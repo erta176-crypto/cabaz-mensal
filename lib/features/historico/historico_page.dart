@@ -26,15 +26,18 @@ typedef _ChaveHistorico = ({
 
 final _comprasHistoricoProvider = FutureProvider.autoDispose
     .family<List<CompraResumo>, _ChaveHistorico>(
-      (ref, c) => ref
-          .watch(estatisticasRepositoryProvider)
-          .compras(
-            c.filtro,
-            artigoIds: c.artigosChave.isEmpty
-                ? null
-                : c.artigosChave.split(','),
-            texto: c.texto,
-          ),
+      (ref, c) => refazerQuandoVoltarARede(
+        ref,
+        ref
+            .watch(estatisticasRepositoryProvider)
+            .compras(
+              c.filtro,
+              artigoIds: c.artigosChave.isEmpty
+                  ? null
+                  : c.artigosChave.split(','),
+              texto: c.texto,
+            ),
+      ),
     );
 
 /// Histórico: compras antigas, só para consulta (precisa de rede).
