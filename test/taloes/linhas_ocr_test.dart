@@ -80,6 +80,9 @@ void main() {
       expect(normalizarOcr('2 X 0,89'), '2 x 0,89');
       expect(normalizarOcr('2 X0,89'), '2 x 0,89');
       expect(normalizarOcr('3 x0, 85'), '3 x 0,85');
+      expect(normalizarOcr('2x 1,19.'), '2 x 1,19');
+      // Texto do artigo, não quantidade.
+      expect(normalizarOcr('AGUA 6X1,5L 1,99 A'), 'AGUA 6X1,5L 1,99 A');
     });
 
     test('EUR/Kg', () {

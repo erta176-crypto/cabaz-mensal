@@ -1,10 +1,13 @@
-/// Leitor dos talões do Pingo Doce (texto do pdfrx). Regras em
-/// docs/planning/fase-5.md, secção 0.3.
+/// Leitor dos talões do Pingo Doce: texto do pdfrx (PDF) e do OCR (papel).
+/// Regras em docs/planning/fase-5.md, secção 0.3.
 library;
 
 import 'talao.dart';
 
-final _comX = RegExp(r'^[A-Z] (.+?) (\d+,\d{3}) X (\d+,\d{2}) (\d+,\d{2})$');
+// No papel o OCR estraga o cabeçalho ("Pingo Doce- Distritbuição").
+final _cabecalho = RegExp(r'Pingo Doce\W{0,3}Distri');
+// No papel o "X" sai minúsculo (normalizarOcr).
+final _comX = RegExp(r'^[A-Z] (.+?) (\d+,\d{3}) [Xx] (\d+,\d{2}) (\d+,\d{2})$');
 final _simples = RegExp(r'^[A-Z] (.+?) (\d+,\d{2})$');
 
 /// Antes de "Descontos Extra": desconto do artigo anterior; depois: da compra.
@@ -13,12 +16,42 @@ final _seccao = RegExp(r'^[A-ZÀ-Ý0-9 /.,&+-]+$');
 final _data = RegExp(r'Data de emiss\S*:\s*(\d{2})/(\d{2})/(\d{4})');
 final _numero = RegExp(r'Fatura Simplificada (FS \S+)');
 final _total = RegExp(r'^TOTAL A PAGAR (\S+)$');
+final _soDesconto = RegExp(r'^\(\d+,\d{2}\)$');
+final _minuscula = RegExp('[a-zà-ÿ]');
+final _temValor = RegExp(r'\d+,\d{2}');
+
+/// No papel o valor de um desconto sai às vezes numa linha à parte, antes ou
+/// depois do texto ("(0,41)" e "Poupança Imediata"): junta-os numa linha,
+/// como no PDF. O texto de um desconto tem minúsculas (as secções e os
+/// artigos não); "Descontos Extra" é um marcador e não se junta.
+List<String> _juntarDescontos(List<String> ls) {
+  bool texto(String l) =>
+      _minuscula.hasMatch(l) &&
+      !_temValor.hasMatch(l) &&
+      l != 'Descontos Extra';
+  final r = <String>[];
+  for (var i = 0; i < ls.length; i++) {
+    final seguinte = i + 1 < ls.length ? ls[i + 1] : null;
+    if (seguinte == null) {
+      r.add(ls[i]);
+    } else if (_soDesconto.hasMatch(ls[i]) && texto(seguinte)) {
+      r.add('$seguinte ${ls[i]}');
+      i++;
+    } else if (texto(ls[i]) && _soDesconto.hasMatch(seguinte)) {
+      r.add('${ls[i]} $seguinte');
+      i++;
+    } else {
+      r.add(ls[i]);
+    }
+  }
+  return r;
+}
 
 /// null se o texto não é de um talão do Pingo Doce. Lança [FormatException]
 /// se é, mas falta a data ou o total.
 TalaoLido? lerPingoDoce(String texto) {
-  if (!texto.contains('Pingo Doce - Distribui')) return null;
-  final ls = linhasDe(texto);
+  if (!_cabecalho.hasMatch(texto)) return null;
+  final ls = _juntarDescontos(linhasDe(texto));
 
   final dataM = ls.map(_data.firstMatch).nonNulls.firstOrNull;
   if (dataM == null) throw const FormatException('Talão sem data');

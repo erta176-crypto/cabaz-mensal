@@ -4,8 +4,8 @@ import 'package:cabaz_mensal/import/taloes/pingo_doce.dart';
 import 'package:cabaz_mensal/import/taloes/talao.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-String _fixture() =>
-    File('test/fixtures/taloes/pingo_doce.txt')
+String _fixture([String nome = 'pingo_doce']) =>
+    File('test/fixtures/taloes/$nome.txt')
         .readAsStringSync()
         .replaceAll('\r\n', '\n');
 
@@ -88,5 +88,44 @@ void main() {
       ),
       throwsFormatException,
     );
+  });
+
+  // Texto do OCR de um talão em papel (fictício, com os erros vistos na
+  // fotografia real): logótipo antes do cabeçalho, "Distritbuição" sem espaço
+  // antes do hífen, "x" minúsculo e a poupança numa linha à parte, antes ou
+  // depois do texto.
+  group('Pingo Doce em papel (OCR)', () {
+    final papel = _fixture('pingo_doce_papel');
+    final p = lerPingoDoce(papel)!;
+
+    test('reconhece o cabeçalho estragado; sem local; data', () {
+      expect(p.loja, 'Pingo Doce');
+      expect(p.local, isNull); // a primeira linha é o logótipo
+      expect(p.data, DateTime(2026, 10, 31));
+    });
+
+    test('peso com "x" minúsculo', () {
+      final pera = p.linhas[2];
+      expect(pera.texto, 'PERA ROCHA');
+      expect((pera.pesoG, pera.precoUnitCent, pera.brutoCent), (406, 699, 284));
+    });
+
+    test('poupança numa linha à parte, antes ou depois do texto', () {
+      expect(p.linhas.map((l) => l.descontoCent), [0, 0, 41, 20]);
+      expect(p.linhas.last.seccao, 'PRODUTOS PESSOAIS');
+      expect(p.naoReconhecidas, isEmpty);
+      expect((p.totalCent, p.bate), (850, true));
+    });
+
+    test('"Descontos Extra" não se junta a um valor solto', () {
+      final m = lerPingoDoce(
+        papel.replaceFirst(
+          'Resumo\n',
+          'Descontos Extra\n(1,00)\nSaldo Pingo Doce\nResumo\n',
+        ),
+      )!;
+      expect(m.descontoCompraCent, 100);
+      expect(m.naoReconhecidas, isEmpty);
+    });
   });
 }

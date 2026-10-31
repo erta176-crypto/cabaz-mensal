@@ -84,4 +84,30 @@ void main() {
     expect(ma.bate, isFalse);
     expect(ma.naoReconhecidas, isNotEmpty);
   }, skip: saltar);
+
+  // Pingo Doce e Lidl em papel, fotografias da câmara (T6 da Fase 7).
+  test('Pingo Doce e Lidl em papel: reconhecidos', () async {
+    final LeitorOcr ocr = (
+      inteira: (c) async => _caixas('$c.json'),
+      emFaixas: (c) async => _caixas('faixas-$c.json'),
+    );
+    final r = await lerFotos([
+      for (final f in ['IMG_20261031_150523.jpg', 'IMG_20261031_150546.jpg'])
+        (nome: f, caminho: f),
+    ], ocr);
+    expect(r.ilegiveis, isEmpty);
+    final [pingo, lidl] = [for (final l in r.lidos) lerTalao(l.texto)!];
+    for (final t in [pingo, lidl]) {
+      // ignore: avoid_print
+      print(
+        '${t.loja}: ${t.linhas.length} linhas, '
+        '${t.naoReconhecidas.length} por reconhecer, bate=${t.bate}',
+      );
+      expect(t.naoReconhecidas, isEmpty);
+    }
+    expect((pingo.loja, pingo.data), ('Pingo Doce', DateTime(2026, 10, 31)));
+    // Um algarismo estragado pelo OCR: corrige-se na pré-visualização.
+    expect(pingo.bate, isFalse);
+    expect((lidl.loja, lidl.bate), ('Lidl', true));
+  }, skip: saltar);
 }

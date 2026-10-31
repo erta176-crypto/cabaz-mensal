@@ -64,14 +64,16 @@ String linhasDasCaixas(List<CaixaOcr> caixas) {
 }
 
 final _virgula = RegExp(r'(\d), (\d)');
-final _vezes = RegExp(r'(\d) [xX] ?(\d+,\d)');
+// Duas casas decimais: "AGUA 6X1,5L" é texto do artigo e fica igual.
+final _vezes = RegExp(r'(\d) ?[xX] ?(\d+,\d{2})\b');
 final _kg = RegExp(r'EUR/K[gG]');
 final _pontoNoValor = RegExp(r'(\d+)\.(\d{2}) ([A-Z])$');
+final _pontoFinal = RegExp(r'(\d,\d{2})\.$');
 final _espacos = RegExp(r'\s+');
 
-/// Erros típicos do OCR em números e unidades: "1, 09", "2 X0,89",
-/// "EUR/Kg", "3.70 D". Só mexe em números com vírgula decimal (o E.Leclerc
-/// usa ponto e "X" maiúsculo, e fica igual).
+/// Erros típicos do OCR em números e unidades: "1, 09", "2 X0,89", "2x 1,19",
+/// "EUR/Kg", "3.70 D", "1,19." no fim. Só mexe em números com vírgula
+/// decimal (o E.Leclerc usa ponto e "X" maiúsculo, e fica igual).
 String normalizarOcr(String texto) => texto
     .split('\n')
     .map(
@@ -81,7 +83,8 @@ String normalizarOcr(String texto) => texto
           .replaceAll(_kg, 'EUR/kg')
           .replaceAllMapped(_pontoNoValor, (m) => '${m[1]},${m[2]} ${m[3]}')
           .replaceAll(_espacos, ' ')
-          .trim(),
+          .trim()
+          .replaceAllMapped(_pontoFinal, (m) => m[1]!),
     )
     .join('\n');
 
