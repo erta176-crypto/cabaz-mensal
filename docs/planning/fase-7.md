@@ -1,6 +1,6 @@
 # Fase 7 · Talões por fotografia (OCR)
 
-**Estado:** aprovado a 2026-10-28 (revisto no mesmo dia, secção 0.4), com as decisões D1–D8. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída; portão confirmado a 2026-10-31. Plano aprovado a 2026-10-28 (revisto no mesmo dia, secção 0.4), com as decisões D1–D8. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** importar talões a partir de uma fotografia (câmara ou galeria, só no Android) das quatro lojas, com o mesmo caminho dos PDFs (Fase 5) e com correção das linhas na pré-visualização.
 

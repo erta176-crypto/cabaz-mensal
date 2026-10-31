@@ -1,13 +1,13 @@
 # Estado do projeto
 
-*Atualizado em 2026-10-30. Manter curto; o detalhe está nos ficheiros ligados.*
+*Atualizado em 2026-10-31. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**8 · Entrada (mostrar palavra-passe, bloqueio com biometria):** plano aprovado a 2026-10-30 ([`planning/fase-8.md`](planning/fase-8.md)); T1 a T5 feitas e verificadas no telemóvel (decisão 0013). Falta o portão: ver na web e o utilizador confirmar; depois o push.
-
-**7 · Talões por fotografia (OCR):** plano aprovado a 2026-10-28 ([`planning/fase-7.md`](planning/fase-7.md)); T1 a T5 feitas; T6 em curso: APK release instalado e a ler fotografias (regras do R8, decisão 0012), diálogos corrigidos para o telemóvel deitado; E.Leclerc em papel lido (leitor tolerante ao OCR); Pingo Doce e Lidl em papel lidos (2026-10-31; um algarismo estragado pelo OCR corrige-se na pré-visualização); fotografia deitada reconhecida; T6 feita (2026-10-31); falta o portão (as quatro lojas, câmara e galeria só no Android, correção na pré-visualização; 3 fotos de exemplo em `dados-privados/talões/fotos/`).
+Nenhuma em curso. Próxima por escolher (ver "Próximo").
 
 ## Feito
+- **Fase 8 · Entrada (mostrar palavra-passe, bloqueio com biometria):** concluída e publicada (portão a 2026-10-31; [`planning/fase-8.md`](planning/fase-8.md)). Botão para ver a palavra-passe; bloqueio local com a biometria ou o PIN do telemóvel (`local_auth`, decisão 0013), ao abrir e ao voltar depois de 5 min, ligado nas Definições (só Android). Os testes apanharam um erro: o `Navigator` do ecrã de bloqueio partilhava o `HeroController` da app.
+- **Fase 7 · Talões por fotografia (OCR):** concluída e publicada (portão a 2026-10-31; [`planning/fase-7.md`](planning/fase-7.md)). OCR no aparelho (ML Kit, só Android, decisão 0012), as quatro lojas (leitor novo do Mercadona; E.Leclerc e Pingo Doce também em papel), correção das linhas na pré-visualização. No telemóvel: o APK release precisava de regras do R8; os diálogos não cabiam deitado com o teclado; as provas com `flutter test` no telemóvel desinstalavam a app real (agora só APK `.prova`).
 - **Fase 6 · Tema azul:** concluída e publicada (portão a 2026-10-28; [`planning/fase-6.md`](planning/fase-6.md)). Paleta azul e `CoresCabaz` (decisão 0011, substitui a 0008), cabeçalho alto em gradiente com os filtros em pílulas e a pesquisa (D6, revoga a D4), gaveta e barra inferior, cartões e orçamento com verde/âmbar/vermelho e percentagem. No portão: o gradiente do cabeçalho tinha altura 0, as pílulas no escuro tinham pouco contraste e os cartões do Painel tinham alturas diferentes na mesma linha — corrigidos com testes.
 - **Fase 0 · Fundações:** concluída e publicada ([`planning/fase-0.md`](planning/fase-0.md)).
 - **Fase 1A · Lista e offline:** concluída e publicada ([`planning/fase-1a.md`](planning/fase-1a.md)).
@@ -25,13 +25,9 @@
 - Feitos: Entrada, Lista do mês, Concluir compra, Artigos, categorias e lojas, Importar e exportar, Definições, Painel e estatísticas, Histórico (com detalhe da compra), Ver artigo com evolução do preço.
 
 ## Próximo
-Ao retomar:
-1. **Portão da Fase 8:**
-   - ver na web, com `flutter run -d chrome`, que o "mostrar palavra-passe" funciona e que não há interruptor de bloqueio;
-   - correr a verificação;
-   - o utilizador confirma o portão e só então se faz o push. Este push leva também os commits da Fase 7, que ainda não foram publicados.
-2. **Portão da Fase 7:** T1 a T6 feitas; confirmar junto com o da Fase 8 (mesmo push).
-3. **Depois:** o P1 da comparação de preços (primeiro conector), ou um ponto de `notas.md`, por exemplo os diálogos da Fase 5 com o telemóvel deitado ou atualizar pacotes.
+Escolher entre:
+- o P1 da comparação de preços (primeiro conector; [`comparacao-precos/`](comparacao-precos/));
+- um ponto de [`planning/notas.md`](planning/notas.md), por exemplo os diálogos da Fase 5 com o telemóvel deitado ou atualizar pacotes.
 
 ## Pendentes sem fase
 - Ligar a "Leaked Password Protection" no Supabase (Authentication → Policies). É o único aviso que os advisors ainda dão.

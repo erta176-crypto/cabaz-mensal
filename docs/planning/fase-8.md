@@ -1,6 +1,6 @@
 # Fase 8 · Entrada: mostrar a palavra-passe e bloqueio com biometria
 
-**Estado:** aprovado a 2026-10-30, com as decisões D1–D6. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída; portão confirmado a 2026-10-31. Plano aprovado a 2026-10-30, com as decisões D1–D6. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** pedido do utilizador de 2026-10-27 (`notas.md`):
 - no ecrã de entrada, um botão para ver a palavra-passe;
