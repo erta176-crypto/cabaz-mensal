@@ -88,7 +88,7 @@ void main() {
       expect(r.contagens['artigos'], 693);
       expect(r.contagens['lojas'], 3);
       expect(r.totalCent, 465226);
-      for (final l in r.lojas) {
+      for (final l in r.lojas!) {
         expect(l.ok, isTrue, reason: 'total da loja ${l.slug}');
       }
 

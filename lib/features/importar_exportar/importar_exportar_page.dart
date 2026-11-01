@@ -348,27 +348,50 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
     _analisarTaloes();
   });
 
+  /// Falha da RPC de escrita: as RPCs são transacionais, por isso só um
+  /// [ErroSemResposta] deixa dúvida sobre o que ficou gravado.
+  void _falhaNaRpc(Object e) {
+    if (!mounted) return;
+    if (e is ErroSemResposta) {
+      _mostrar(e.mensagem);
+      _cancelarPrevia();
+      setState(() => _versaoResumo++);
+    } else {
+      _mostrar('A importação falhou e nada foi alterado: $e');
+    }
+  }
+
   Future<void> _gravarTaloes() async {
     final taloes = _taloes!;
     setState(() => _ocupado = true);
     try {
       final (:lote, :aliases) = loteDosTaloes(taloes, _escolhas, _catalogo());
-      await ref.read(dadosRepositoryProvider).importarLote(lote.toJson());
-      await ref.read(syncRepositoryProvider).recarregarTudo();
-      // Depois de recarregar (que limpa a cache): os artigos já existem no
-      // servidor e os aliases vão pela fila, como as outras escritas.
-      final artigos = ref.read(artigosRepositoryProvider);
-      for (final a in aliases) {
-        await artigos.guardarAlias(a.lojaId, a.texto, a.artigoId);
+      try {
+        await ref.read(dadosRepositoryProvider).importarLote(lote.toJson());
+      } catch (e) {
+        _falhaNaRpc(e);
+        return;
       }
+      // A RPC respondeu: os dados estão gravados.
       if (!mounted) return;
-      final n = lote.compras.length;
-      _mostrar(
-        'Importados $n ${n == 1 ? 'talão' : 'talões'} '
-        '(${lote.linhas.length} linhas).',
-      );
       _cancelarPrevia();
       setState(() => _versaoResumo++);
+      try {
+        await ref.read(syncRepositoryProvider).recarregarTudo();
+        // Depois de recarregar (que limpa a cache): os artigos já existem no
+        // servidor e os aliases vão pela fila, como as outras escritas.
+        final artigos = ref.read(artigosRepositoryProvider);
+        for (final a in aliases) {
+          await artigos.guardarAlias(a.lojaId, a.texto, a.artigoId);
+        }
+        final n = lote.compras.length;
+        _mostrar(
+          'Importados $n ${n == 1 ? 'talão' : 'talões'} '
+          '(${lote.linhas.length} linhas).',
+        );
+      } catch (e) {
+        _mostrar('Os dados foram gravados, mas não foi possível atualizar: $e');
+      }
     } catch (e) {
       _mostrar('A importação falhou e nada foi alterado: $e');
     } finally {
@@ -514,16 +537,24 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
     final previa = _previa!;
     setState(() => _ocupado = true);
     try {
-      await ref
-          .read(dadosRepositoryProvider)
-          .importarLote(previa.lote.toJson());
-      await ref.read(syncRepositoryProvider).recarregarTudo();
+      try {
+        await ref
+            .read(dadosRepositoryProvider)
+            .importarLote(previa.lote.toJson());
+      } catch (e) {
+        _falhaNaRpc(e);
+        return;
+      }
+      // A RPC respondeu: os dados estão gravados.
       if (!mounted) return;
-      _mostrar('Importadas ${previa.aImportar} linhas.');
       _cancelarPrevia();
       setState(() => _versaoResumo++);
-    } catch (e) {
-      _mostrar('A importação falhou e nada foi alterado: $e');
+      try {
+        await ref.read(syncRepositoryProvider).recarregarTudo();
+        _mostrar('Importadas ${previa.aImportar} linhas.');
+      } catch (e) {
+        _mostrar('Os dados foram gravados, mas não foi possível atualizar: $e');
+      }
     } finally {
       if (mounted) setState(() => _ocupado = false);
     }
@@ -626,14 +657,22 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
       );
       final resultado = await ImportadorSeed(dados: dados)
           .importar(seed, substituir: substituir);
-      // A cache local volta a puxar tudo o que o servidor tem agora.
-      await ref.read(syncRepositoryProvider).recarregarTudo();
       if (!mounted) return;
       setState(() {
         _resultado = resultado;
         _versaoResumo++;
         _estado = null;
       });
+      try {
+        // A cache local volta a puxar tudo o que o servidor tem agora.
+        await ref.read(syncRepositoryProvider).recarregarTudo();
+      } catch (e) {
+        if (mounted) {
+          _mostrar(
+            'Os dados foram gravados, mas não foi possível atualizar: $e',
+          );
+        }
+      }
     } on SeedInvalido catch (e) {
       if (!mounted) return;
       setState(() => _estado = null);
@@ -641,7 +680,11 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _estado = null);
-      _mostrar('A importação falhou e nada foi alterado: $e');
+      _mostrar(
+        e is ErroSemResposta
+            ? e.mensagem
+            : 'A importação falhou e nada foi alterado: $e',
+      );
     } finally {
       if (mounted) setState(() => _ocupado = false);
     }
@@ -1142,7 +1185,16 @@ class ResumoImportacao extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Divider(),
-            for (final l in r.lojas)
+            if (r.lojas == null)
+              const ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.info_outline),
+                title: Text(
+                  'Cópia gravada; não foi possível verificar os totais por '
+                  'loja. Vê o resumo mais tarde.',
+                ),
+              ),
+            for (final l in r.lojas ?? const <VerificacaoLoja>[])
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: marca(l.ok),

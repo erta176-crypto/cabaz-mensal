@@ -251,7 +251,7 @@ void main() {
       expect(r.totalOk, isTrue);
       expect(r.comprasRever, 1);
       expect(
-        {for (final l in r.lojas) l.slug: l.ok},
+        {for (final l in r.lojas!) l.slug: l.ok},
         {'lidl': true, 'pingo-doce': true},
       );
       expect(r.tudoOk, isTrue);
@@ -264,10 +264,10 @@ void main() {
         SeedFicheiro.lerTexto(jsonEncode(j)),
         substituir: false,
       );
-      final lidl = r.lojas.firstWhere((l) => l.slug == 'lidl');
+      final lidl = r.lojas!.firstWhere((l) => l.slug == 'lidl');
       expect(lidl.ok, isFalse);
       expect(lidl.esperadoCent, 181);
-      expect(r.lojas.firstWhere((l) => l.slug == 'pingo-doce').ok, isTrue);
+      expect(r.lojas!.firstWhere((l) => l.slug == 'pingo-doce').ok, isTrue);
       expect(r.tudoOk, isFalse);
     });
 
@@ -338,6 +338,17 @@ void main() {
       expect(r.contagens['aliases'], 3);
     });
 
+    test(
+      'RPC com êxito e resumoPorLoja a falhar: sem verificação, sem erro',
+      () async {
+        final importadorFalha = ImportadorSeed(dados: _ResumoFalha(base));
+        final r = await importadorFalha.importar(seed, substituir: false);
+        expect(r.contagens['compras'], 3);
+        expect(r.lojas, isNull);
+        expect(r.tudoOk, isTrue);
+      },
+    );
+
     test('exportar e voltar a importar mantém o código de barras', () async {
       final j = jsonDecode(lerFixture()) as Map<String, dynamic>;
       (j['artigos'] as List)[2]['ean'] = '4006381333931';
@@ -359,4 +370,12 @@ void main() {
       expect(relido.artigos.where((a) => a.ean != null), hasLength(1));
     });
   });
+}
+
+class _ResumoFalha extends FakeDadosRepository {
+  _ResumoFalha(super.base);
+
+  @override
+  Future<List<ResumoLoja>> resumoPorLoja() async =>
+      throw const ErroDados('Sem rede: x');
 }

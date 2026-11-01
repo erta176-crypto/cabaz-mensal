@@ -45,7 +45,7 @@
   - Nas escritas, um `TimeoutException` passa a `ErroSemResposta`.
 - Teste: um pedido que nunca responde, com um limite curto injetado, dá `ErroSemResposta` na escrita e "sem rede" na leitura. Um pedido que lança um erro de rede, na leitura, dá "sem rede".
 
-## T3 · Importações: mensagens certas e sem duplicar [ ]
+## T3 · Importações: mensagens certas e sem duplicar [x]
 - Em `_gravarTaloes`, `_gravarLote` e `_importarJson`, separar a RPC do que vem depois (D2):
   - RPC com êxito → fechar a pré-visualização, `_versaoResumo++`, e só então `recarregarTudo()` e os aliases;
   - erro depois da RPC → "Os dados foram gravados, mas …";

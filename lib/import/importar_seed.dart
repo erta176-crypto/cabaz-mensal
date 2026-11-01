@@ -243,7 +243,9 @@ class ResultadoImportacao {
   });
 
   final ContagensImportacao contagens;
-  final List<VerificacaoLoja> lojas;
+
+  /// null: a cópia ficou gravada mas a verificação por loja não foi feita.
+  final List<VerificacaoLoja>? lojas;
   final int totalCent;
   final int? totalEsperadoCent;
   final int comprasRever;
@@ -251,7 +253,8 @@ class ResultadoImportacao {
   bool? get totalOk =>
       totalEsperadoCent == null ? null : totalEsperadoCent == totalCent;
 
-  bool get tudoOk => totalOk != false && lojas.every((l) => l.ok != false);
+  bool get tudoOk =>
+      totalOk != false && (lojas?.every((l) => l.ok != false) ?? true);
 }
 
 /// Compara o resumo do servidor (view resumo_por_loja) com os totais de
@@ -307,10 +310,16 @@ class ImportadorSeed {
       payload.toJson(),
       substituir: substituir,
     );
-    final resumo = await dados.resumoPorLoja();
+    // A cópia já está gravada: uma falha a ler o resumo não a desfaz.
+    List<VerificacaoLoja>? lojas;
+    try {
+      lojas = verificarControlo(ficheiro.controlo, await dados.resumoPorLoja());
+    } catch (_) {
+      lojas = null;
+    }
     return ResultadoImportacao(
       contagens: contagens,
-      lojas: verificarControlo(ficheiro.controlo, resumo),
+      lojas: lojas,
       totalCent: contagens['total_cent'],
       totalEsperadoCent: ficheiro.controlo?.totalCent,
       comprasRever: contagens['compras_rever'],
