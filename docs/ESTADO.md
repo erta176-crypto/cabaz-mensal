@@ -1,9 +1,9 @@
 # Estado do projeto
 
-*Atualizado em 2026-10-31. Manter curto; o detalhe está nos ficheiros ligados.*
+*Atualizado em 2026-11-01. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-Nenhuma em curso. Próxima por escolher (ver "Próximo").
+**Fase 9 · Correções:** plano aprovado a 2026-11-01, por executar ([`planning/fase-9.md`](planning/fase-9.md)). Cópia JSON com loja eliminada, mensagens das importações, limites de tempo no Supabase, CI da web, abrir no Painel, cores da web. Só Dart e CI. Depois: o P1 da comparação de preços.
 
 ## Feito
 - **Notas · rede volta:** Painel, Histórico e detalhe da compra voltam a pedir sozinhos quando a rede volta (com erro ou dados da cache); verificado no telemóvel (2026-10-31).
