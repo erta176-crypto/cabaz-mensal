@@ -16,14 +16,14 @@
 - `estatisticas.dart`: períodos e filtros do Painel, `DadosPainel` (resultado da RPC `painel`), `CompraResumo` (RPC `historico_compras`), `mesesCompletos`, `categoriasTopo`, `porMes`.
 
 ## `lib/data/`: a única pasta que fala com o Supabase e com o drift
-- `repositorios.dart`: as interfaces (inclui `OrcamentosRepository`, implementado em `local/repositorios_locais.dart` sobre a tabela sincronizada `orcamentos`).
+- `repositorios.dart`: as interfaces e os erros `ErroDados` e `ErroSemResposta` (escrita que passou do tempo; a operação pode ter ficado gravada) (inclui `OrcamentosRepository`, implementado em `local/repositorios_locais.dart` sobre a tabela sincronizada `orcamentos`).
 - `providers.dart`: os providers Riverpod; `temaProvider` (tema deste aparelho, chave `tema` na tabela `estado`); `bloqueioProvider` (bloqueio com biometria ligado neste aparelho, chave `bloqueio`; ligar pede um desbloqueio; sair da conta apaga-o). `refazerQuandoVoltarARede`: o Painel, o Histórico e as linhas da compra, com erro ou dados da cache, voltam a pedir quando `online` passa de false a true.
 - `local/`: base drift genérica (tabela `registos` com JSON por linha, fila `pendentes`, `estado`) e os repositórios locais.
 - `sync/`: a sincronização ([`sincronizacao.md`](sincronizacao.md)).
   - `escrita.dart`: grava na cache e põe na fila.
   - `sincronizador.dart`: envio e receção.
   - `servidor_supabase.dart`: a ligação ao Supabase.
-- `supabase/`: autenticação, consultas de compras e dados (importar, exportar, apagar, resumo).
+- `supabase/`: autenticação, consultas de compras e dados (importar, exportar, apagar, resumo). `base.dart`: tradução de erros e os auxiliares de tempo `lerComRede` e `escreverComLimite`.
   - `supabase_estatisticas.dart`: RPC `painel` (com cache do último resultado na tabela `estado`, chave `painel:<período>:<loja|todas>`) e `historico_compras` e linhas de uma compra (só com rede). Cada pedido tem um limite de 10 s; esgotado, conta como sem rede (decidido no portão da Fase 2: no Android, sem ligação, o pedido podia ficar preso).
 
 ## `lib/import/`: importação sem interface, testável

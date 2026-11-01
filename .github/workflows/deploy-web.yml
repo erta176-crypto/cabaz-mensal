@@ -27,6 +27,13 @@ jobs:
 
       - run: flutter pub get
 
+      - name: Análise
+        run: flutter analyze
+
+      # O teste de integração com o seed real faz skip no CI.
+      - name: Testes
+        run: flutter test
+
       - name: Configuração a partir dos secrets
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

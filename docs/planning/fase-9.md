@@ -1,6 +1,6 @@
 # Fase 9 · Correções (cópia JSON, importações, limites de tempo, CI)
 
-**Estado:** plano aprovado a 2026-11-01, com as decisões D1–D6. Só Dart e CI: sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** T1–T7 feitas a 2026-11-01; falta o portão (telemóvel e web). Plano aprovado a 2026-11-01, com as decisões D1–D6. Só Dart e CI: sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** corrigir os erros confirmados na revisão do código de 2026-11-01, antes do P1 da comparação de preços.
 
@@ -61,18 +61,18 @@
   - Teste no `ImportadorSeed`: a RPC com êxito e `resumoPorLoja` a lançar → resultado com as contagens e `lojas == null`, sem exceção.
 - O mesmo tratamento no "Apagar todos os dados" (`apagarTudo`): com `ErroSemResposta`, a mensagem da D4.
 
-## T4 · CI: verificar antes de publicar a web [ ]
+## T4 · CI: verificar antes de publicar a web [x]
 - `deploy-web.yml`: `flutter analyze` e `flutter test` antes do `flutter build web`, como no `build-apk.yml`.
 
-## T5 · Abrir no Painel [ ]
+## T5 · Abrir no Painel [x]
 - `lib/core/router.dart`: `initialLocation`, o redirect depois da entrada e a rota `/` passam para `/painel`.
 - Teste: com sessão, a app abre no Painel; sem sessão, vai para `/entrar`; depois de entrar, vai para o Painel.
 
-## T6 · Cores da web [ ]
+## T6 · Cores da web [x]
 - `web/manifest.json` e as chaves `web:` do `pubspec.yaml`: `theme_color` `#0B57D0` e `background_color` `#FFFFFF`. Ver se o `web/index.html` tem alguma `theme-color` antiga.
 - Não mexer no `adaptive_icon_background` nem no `colors.xml` (D6).
 
-## T7 · Documentação [ ]
+## T7 · Documentação [x]
 - `notas.md`: a keystore própria e a cor do ícone (D6). Também como comportamento conhecido: se a rede cair a meio do `recarregarTudo()`, a cache fica vazia até à próxima tentativa (ver 0.1).
 - `sincronizacao.md`: os limites de tempo (D3) e a regra da D4.
 - `mapa.md`: o `ErroSemResposta`.

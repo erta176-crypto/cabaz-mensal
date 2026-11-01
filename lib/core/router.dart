@@ -31,21 +31,30 @@ class _OuvinteSessao extends ChangeNotifier {
   }
 }
 
+/// Onde a app abre (e para onde vai depois de entrar): o primeiro destino do
+/// menu.
+const rotaInicial = '/painel';
+
+/// Regra do redirect: sem sessão só se vê a entrada; com sessão, a entrada
+/// leva à [rotaInicial]. null = ficar onde está.
+String? redirecionar({required bool temSessao, required String local}) {
+  final naEntrada = local == '/entrar';
+  if (!temSessao) return naEntrada ? null : '/entrar';
+  if (naEntrada) return rotaInicial;
+  return null;
+}
+
 // Usa a estratégia de URL por hash (por omissão no Flutter web): atualizar a
 // página (F5) no GitHub Pages não dá 404. Não chamar usePathUrlStrategy.
 GoRouter criarRouter(AuthRepository auth) {
   final ouvinte = _OuvinteSessao(auth.observarSessao());
   return GoRouter(
-    initialLocation: '/lista',
+    initialLocation: rotaInicial,
     refreshListenable: ouvinte,
-    redirect: (context, estado) {
-      final naEntrada = estado.matchedLocation == '/entrar';
-      if (!auth.temSessao) return naEntrada ? null : '/entrar';
-      if (naEntrada) return '/lista';
-      return null;
-    },
+    redirect: (context, estado) =>
+        redirecionar(temSessao: auth.temSessao, local: estado.matchedLocation),
     routes: [
-      GoRoute(path: '/', redirect: (_, _) => '/lista'),
+      GoRoute(path: '/', redirect: (_, _) => rotaInicial),
       GoRoute(path: '/entrar', builder: (_, _) => const EntradaPage()),
       ShellRoute(
         builder: (context, estado, filho) => AppShell(

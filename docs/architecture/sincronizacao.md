@@ -21,5 +21,10 @@ A app funciona sem rede. Toda a escrita passa pela cache local (drift) e por uma
 - A chave `tema` em `estado` é do aparelho: não sincroniza e `limparTudo` mantém-na.
 - A cache do Painel (`estado`, chaves `painel:%`) não sincroniza; é apagada por `limparCache` (reinício) e por `limparTudo` (sair).
 
+## Limites de tempo (pedidos ao Supabase)
+- Leituras curtas (`contarCompras`, `comprasDaLoja`, `locaisUsados`, `temDados`, `resumoPorLoja`, `resumoDados`, `comprasExistentes`) e cada página do `buscarTudo`: 10 s. Esgotado ou erro de rede → "sem rede" (`lerComRede`).
+- RPCs de escrita (`importar`, `importarLote`, `apagarTudo`): 60 s. Esgotado → `ErroSemResposta` (`escreverComLimite`). O `.timeout()` só faz o cliente deixar de esperar: o Postgres pode acabar a transação, por isso a interface diz "a operação pode ter ficado gravada" e fecha a pré-visualização, em vez de deixar repetir.
+- Importações: se a RPC responde com êxito, os dados contam como gravados; erros a seguir (recarregar, aliases, resumo por loja) dizem "Os dados foram gravados, mas …".
+
 ## Testes
 `test/sync/`: servidor falso em memória e drift em memória.
