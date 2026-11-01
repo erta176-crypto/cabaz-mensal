@@ -32,7 +32,7 @@
 | D5 | A app abre no Painel (`/painel`), em linha com a ordem do menu. |
 | D6 | Ficam fora desta fase, registadas em `notas.md`: a keystore própria para o release (hoje o APK do CI tem uma chave debug diferente da local, e o `adb install -r` não o instala por cima) e a cor do ícone adaptativo (`#FAF6F0`), que depende do desenho de `assets/icon/`. |
 
-## T1 · Cópia JSON com loja eliminada [ ]
+## T1 · Cópia JSON com loja eliminada [x]
 - Primeiro, um teste que reproduz o erro e falha: numa loja sem compras, com um preço manual e um alias, eliminar a loja, correr `montarExportacao` e ler o resultado com `SeedFicheiro.lerTexto`. Hoje é recusado.
 - `LocalLojasRepository.eliminar`: apagar também os `aliases` (`chaveDe('aliases', …)`) e os `registos_preco` da loja, como já faz com os `itens_lista`.
 - `montarExportacao`: um conjunto `lojasAtivas` que filtra `aliases`, `listas` e `precos`. O `controlo.aliases` e o `controlo.itens_lista` passam a contar as listas filtradas.

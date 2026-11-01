@@ -81,6 +81,14 @@ class LocalLojasRepository implements LojasRepository {
     for (final i in itens.where((i) => i['loja_id'] == id)) {
       await _escrita.apagar('itens_lista', chaveDe('itens_lista', i));
     }
+    final aliases = await _base.lerTabela('aliases');
+    for (final a in aliases.where((a) => a['loja_id'] == id)) {
+      await _escrita.apagar('aliases', chaveDe('aliases', a));
+    }
+    final precos = await _base.lerTabela('registos_preco');
+    for (final p in precos.where((p) => p['loja_id'] == id)) {
+      await _escrita.apagar('registos_preco', p['id'] as String);
+    }
     await _escrita.apagar('lojas', id);
   }
 }

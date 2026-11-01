@@ -3,7 +3,7 @@
 *Atualizado em 2026-11-01. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Fase 9 · Correções:** plano aprovado a 2026-11-01, por executar ([`planning/fase-9.md`](planning/fase-9.md)). Cópia JSON com loja eliminada, mensagens das importações, limites de tempo no Supabase, CI da web, abrir no Painel, cores da web. Só Dart e CI. Depois: o P1 da comparação de preços.
+**Fase 9 · Correções:** plano aprovado a 2026-11-01, em curso: T1 feita (cópia JSON com loja eliminada), T2–T7 por fazer ([`planning/fase-9.md`](planning/fase-9.md)). Cópia JSON com loja eliminada, mensagens das importações, limites de tempo no Supabase, CI da web, abrir no Painel, cores da web. Só Dart e CI. Depois: o P1 da comparação de preços.
 
 ## Feito
 - **Notas · rede volta:** Painel, Histórico e detalhe da compra voltam a pedir sozinhos quando a rede volta (com erro ou dados da cache); verificado no telemóvel (2026-10-31).

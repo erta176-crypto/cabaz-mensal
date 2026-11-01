@@ -19,6 +19,12 @@ Map<String, dynamic> montarExportacao(
   ];
   final artigosAtivos = {for (final a in t('artigos')) a['id']};
   final categoriasAtivas = {for (final c in t('categorias')) c['id']};
+  final lojasAtivas = {for (final l in t('lojas')) l['id']};
+  // Dados de uma loja apagada (órfãos) não entram: a cópia seria recusada.
+  List<Map<String, dynamic>> deLojasAtivas(String nome) => [
+    for (final l in t(nome))
+      if (lojasAtivas.contains(l['loja_id'])) l,
+  ];
   Object? artigo(Object? id) => artigosAtivos.contains(id) ? id : null;
 
   // As lojas são identificadas pelo slug, como no ficheiro original.
@@ -39,8 +45,10 @@ Map<String, dynamic> montarExportacao(
   }
 
   // Os preços 'talao' são recriados a partir das linhas na importação.
-  final precos = t('registos_preco')
+  final precos = deLojasAtivas('registos_preco')
       .where((p) => p['origem'] != 'talao' && artigo(p['artigo_id']) != null);
+  final aliases = deLojasAtivas('aliases');
+  final itensLista = deLojasAtivas('itens_lista');
 
   return {
     'versao': 2,
@@ -73,7 +81,7 @@ Map<String, dynamic> montarExportacao(
         },
     ],
     'aliases': [
-      for (final a in t('aliases'))
+      for (final a in aliases)
         if (artigo(a['artigo_id']) != null)
           {
             'artigo_id': a['artigo_id'],
@@ -109,7 +117,7 @@ Map<String, dynamic> montarExportacao(
         },
     ],
     'listas': [
-      for (final i in t('itens_lista'))
+      for (final i in itensLista)
         if (artigo(i['artigo_id']) != null)
           {
             'loja_id': slug(i['loja_id']),
@@ -133,8 +141,8 @@ Map<String, dynamic> montarExportacao(
       'linhas': t('linhas_compra').length,
       'artigos': t('artigos').length,
       'categorias': t('categorias').length,
-      'aliases': t('aliases').length,
-      'itens_lista': t('itens_lista').length,
+      'aliases': aliases.length,
+      'itens_lista': itensLista.length,
       'precos': precos.length,
       'total_cent': total,
       'total_por_loja_cent': totalPorLoja,
