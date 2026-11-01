@@ -43,8 +43,9 @@ class SupabaseAuthRepository implements AuthRepository {
 
 /// Consultas sobre compras antigas (só com rede).
 class SupabaseConsultasCompras implements ConsultasCompras {
-  SupabaseConsultasCompras(this._c);
+  SupabaseConsultasCompras(this._c, {this.limite = limiteLeituraPadrao});
   final SupabaseClient _c;
+  final Duration limite;
 
   @override
   Future<int> contarCompras() => _comRede(() => _c.from('compras').count());
@@ -65,22 +66,31 @@ class SupabaseConsultasCompras implements ConsultasCompras {
     return locais;
   });
 
-  Future<T> _comRede<T>(Future<T> Function() f) async {
-    try {
-      return await comErrosTraduzidos(f);
-    } on ErroDados {
-      rethrow;
-    } catch (_) {
-      throw const ErroDados(
-        'Sem rede: não foi possível consultar as compras no servidor.',
-      );
-    }
-  }
+  Future<T> _comRede<T>(Future<T> Function() f) => lerComRede(
+    f,
+    limite: limite,
+    semRede: 'Sem rede: não foi possível consultar as compras no servidor.',
+  );
 }
 
 class SupabaseDadosRepository implements DadosRepository {
-  SupabaseDadosRepository(this._c);
+  SupabaseDadosRepository(
+    this._c, {
+    this.limiteLeitura = limiteLeituraPadrao,
+    this.limiteEscrita = limiteEscritaPadrao,
+  });
   final SupabaseClient _c;
+  final Duration limiteLeitura;
+  final Duration limiteEscrita;
+
+  Future<T> _ler<T>(Future<T> Function() f) => lerComRede(
+    f,
+    limite: limiteLeitura,
+    semRede: 'Sem rede: não foi possível consultar o servidor.',
+  );
+
+  Future<T> _escrever<T>(Future<T> Function() f) =>
+      escreverComLimite(f, limite: limiteEscrita);
 
   static const tabelas = [
     'lojas',
@@ -94,7 +104,7 @@ class SupabaseDadosRepository implements DadosRepository {
   ];
 
   @override
-  Future<bool> temDados() => comErrosTraduzidos(() async {
+  Future<bool> temDados() => _ler(() async {
     for (final t in ['lojas', 'artigos', 'compras']) {
       if (await _c.from(t).count() > 0) return true;
     }
@@ -105,7 +115,7 @@ class SupabaseDadosRepository implements DadosRepository {
   Future<ContagensImportacao> importar(
     Map<String, dynamic> payload, {
     required bool substituir,
-  }) => comErrosTraduzidos(() async {
+  }) => _escrever(() async {
     final r = await _c.rpc(
       'importar_seed',
       params: {'payload': payload, 'substituir': substituir},
@@ -118,23 +128,24 @@ class SupabaseDadosRepository implements DadosRepository {
   });
 
   @override
-  Future<Map<String, List<Map<String, dynamic>>>> lerTudo() =>
-      comErrosTraduzidos(() async {
-        return {for (final t in tabelas) t: await buscarTudo(_c, t)};
-      });
+  Future<Map<String, List<Map<String, dynamic>>>> lerTudo() => _ler(() async {
+    return {
+      for (final t in tabelas)
+        t: await buscarTudo(_c, t, limite: limiteLeitura),
+    };
+  });
 
   @override
-  Future<void> apagarTudo() =>
-      comErrosTraduzidos(() => _c.rpc('apagar_todos_dados'));
+  Future<void> apagarTudo() => _escrever(() => _c.rpc('apagar_todos_dados'));
 
   @override
-  Future<List<ResumoLoja>> resumoPorLoja() => comErrosTraduzidos(() async {
+  Future<List<ResumoLoja>> resumoPorLoja() => _ler(() async {
     final r = await _c.from('resumo_por_loja').select().order('nome');
     return r.map(ResumoLoja.fromMap).toList();
   });
 
   @override
-  Future<ResumoDados> resumoDados() => comErrosTraduzidos(() async {
+  Future<ResumoDados> resumoDados() => _ler(() async {
     final lojas = await resumoPorLoja();
     return ResumoDados(
       nCompras: await _c.from('compras').count(),
@@ -145,7 +156,7 @@ class SupabaseDadosRepository implements DadosRepository {
 
   @override
   Future<Map<String, int>> importarLote(Map<String, dynamic> payload) =>
-      comErrosTraduzidos(() async {
+      _escrever(() async {
         final r = await _c.rpc('importar_lote', params: {'payload': payload});
         return {
           for (final MapEntry(:key, :value) in (r as Map).entries)
@@ -155,11 +166,12 @@ class SupabaseDadosRepository implements DadosRepository {
 
   @override
   Future<List<({String lojaId, String data, String? local, int totalCent})>>
-  comprasExistentes() => comErrosTraduzidos(() async {
+  comprasExistentes() => _ler(() async {
     final linhas = await buscarTudo(
       _c,
       'compras',
       colunas: 'id, loja_id, data, local, total_cent',
+      limite: limiteLeitura,
     );
     return [
       for (final c in linhas)

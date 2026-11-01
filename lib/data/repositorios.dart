@@ -294,3 +294,13 @@ class ErroDados implements Exception {
   @override
   String toString() => mensagem;
 }
+
+/// Uma escrita no servidor passou do tempo: o pedido pode ter sido
+/// concluído na mesma, por isso não se deve repetir sem confirmar.
+class ErroSemResposta extends ErroDados {
+  const ErroSemResposta()
+    : super(
+        'O servidor não respondeu a tempo; a operação pode ter ficado '
+        'gravada. Confirma no resumo antes de repetir.',
+      );
+}

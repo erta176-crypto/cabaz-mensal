@@ -38,7 +38,7 @@
 - `montarExportacao`: um conjunto `lojasAtivas` que filtra `aliases`, `listas` e `precos`. O `controlo.aliases` e o `controlo.itens_lista` passam a contar as listas filtradas.
 - Um teste para os órfãos que já existem: um preço com `loja_id` de uma loja apagada não entra na cópia, e a cópia é aceite.
 
-## T2 · Limites de tempo nos pedidos ao Supabase [ ]
+## T2 · Limites de tempo nos pedidos ao Supabase [x]
 - `ErroSemResposta` (D4) em `lib/data/repositorios.dart`.
 - Os limites da D3, no mesmo padrão de `supabase_estatisticas.dart` (`.timeout(limite)` dentro de `comErrosTraduzidos`).
   - Nas leituras dos dois repositórios, um `TimeoutException` ou um erro de rede passa a "sem rede", como no `_comRede`. As leituras do `SupabaseDadosRepository` passam a usar o mesmo auxiliar. O `_comRede` sai do `SupabaseConsultasCompras` e vai para `base.dart`, com a mensagem como parâmetro.

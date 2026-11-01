@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../repositorios.dart';
@@ -5,11 +7,16 @@ import '../repositorios.dart';
 /// O PostgREST devolve no máximo 1000 linhas por pedido; lemos por páginas.
 const _tamanhoPagina = 1000;
 
+/// Limites de tempo dos pedidos ao servidor.
+const limiteLeituraPadrao = Duration(seconds: 10);
+const limiteEscritaPadrao = Duration(seconds: 60);
+
 Future<List<Map<String, dynamic>>> buscarTudo(
   SupabaseClient cliente,
   String tabela, {
   String colunas = '*',
   String ordem = 'id',
+  Duration limite = limiteLeituraPadrao,
 }) async {
   final todas = <Map<String, dynamic>>[];
   var inicio = 0;
@@ -18,7 +25,8 @@ Future<List<Map<String, dynamic>>> buscarTudo(
         .from(tabela)
         .select(colunas)
         .order(ordem)
-        .range(inicio, inicio + _tamanhoPagina - 1);
+        .range(inicio, inicio + _tamanhoPagina - 1)
+        .timeout(limite);
     todas.addAll(pagina);
     if (pagina.length < _tamanhoPagina) return todas;
     inicio += _tamanhoPagina;
@@ -78,5 +86,34 @@ Future<T> comErrosTraduzidos<T>(Future<T> Function() f) async {
     final t = traduzirErro(e);
     if (identical(t, e)) rethrow;
     throw t;
+  }
+}
+
+/// Leitura com limite de tempo: qualquer falha que não seja um [ErroDados]
+/// (rede, tempo esgotado) passa a [semRede].
+Future<T> lerComRede<T>(
+  Future<T> Function() f, {
+  required String semRede,
+  Duration limite = limiteLeituraPadrao,
+}) async {
+  try {
+    return await comErrosTraduzidos(() => f().timeout(limite));
+  } on ErroDados {
+    rethrow;
+  } catch (_) {
+    throw ErroDados(semRede);
+  }
+}
+
+/// Escrita com limite de tempo: esgotado, lança [ErroSemResposta], porque o
+/// servidor pode ter acabado a transação depois de o cliente desistir.
+Future<T> escreverComLimite<T>(
+  Future<T> Function() f, {
+  Duration limite = limiteEscritaPadrao,
+}) async {
+  try {
+    return await comErrosTraduzidos(() => f().timeout(limite));
+  } on TimeoutException {
+    throw const ErroSemResposta();
   }
 }
