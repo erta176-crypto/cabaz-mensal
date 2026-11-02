@@ -3,9 +3,10 @@
 *Atualizado em 2026-11-01. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Fase 9 · Correções:** T1–T7 feitas e verificadas por testes (2026-11-01); **falta só o portão** no telemóvel e na web ([`planning/fase-9.md`](planning/fase-9.md)): abrir no Painel; eliminar loja de teste com preço manual → cópia JSON válida; importar talões e ver a mensagem. Depois do portão: push e o P1 da comparação de preços.
+Nenhuma em curso: a Fase 9 está concluída. Próxima por escolher (ver Próximo).
 
 ## Feito
+- **Fase 9 · Correções:** concluída (portão a 2026-11-02; [`planning/fase-9.md`](planning/fase-9.md)). Cópia JSON com loja eliminada, `ErroSemResposta` e limites de tempo no Supabase, mensagens certas nas importações, CI da web com análise e testes, abertura no Painel, cores da web. Verificado no telemóvel.
 - **Notas · rede volta:** Painel, Histórico e detalhe da compra voltam a pedir sozinhos quando a rede volta (com erro ou dados da cache); verificado no telemóvel (2026-10-31).
 - **Notas · diálogos deitado:** "Ligar a um artigo" e "Nome do artigo novo" cabem com o telemóvel deitado e o teclado aberto (rolam inteiros; a lista encolhe com o espaço livre); verificado no telemóvel (2026-10-31).
 - **Notas · cor da loja:** uma só regra (`corDeHex`, `#rrggbb`) em `estatisticas/cores.dart`, usada na Lista, Artigos, Painel e Histórico (2026-10-31).

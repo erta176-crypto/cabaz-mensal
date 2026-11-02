@@ -1,6 +1,6 @@
 # Fase 9 · Correções (cópia JSON, importações, limites de tempo, CI)
 
-**Estado:** T1–T7 feitas a 2026-11-01; falta o portão (telemóvel e web). Plano aprovado a 2026-11-01, com as decisões D1–D6. Só Dart e CI: sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída; portão verificado a 2026-11-02. Plano aprovado a 2026-11-01, com as decisões D1–D6. Só Dart e CI: sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** corrigir os erros confirmados na revisão do código de 2026-11-01, antes do P1 da comparação de preços.
 
