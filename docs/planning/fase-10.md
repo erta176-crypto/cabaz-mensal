@@ -38,7 +38,7 @@ Corridos pelo utilizador, com uma palavra-passe só para esta chave:
 - `build-apk.yml`: descodificar a chave para fora do repositório, escrever `android/key.properties` e, depois do build, comparar o SHA-256 com o de 0.1 (com o `apksigner`, porque o `keytool -printcert -jarfile` não lê as assinaturas v2 e v3).
 - O `deploy-web.yml` não muda.
 
-## T4 · Ícone [ ]
+## T4 · Ícone [x]
 - Recolorir as duas imagens (D4, D5) e ver o resultado antes de gerar.
 - `pubspec.yaml`: `adaptive_icon_background: "#0B57D0"`.
 - `dart run flutter_launcher_icons`. Confirmar no diff que muda `colors.xml`, os `mipmap-*` e `web/icons/`, e que o `web/manifest.json` mantém as cores da Fase 9.
