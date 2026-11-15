@@ -87,14 +87,16 @@ flutter test
 flutter build apk --release --dart-define-from-file=env/local.json
 ```
 
-O ficheiro fica em `build/app/outputs/flutter-apk/app-release.apk`. Nesta fase é assinado com a chave de debug.
+O ficheiro fica em `build/app/outputs/flutter-apk/app-release.apk`. É assinado com a chave de `android/key.properties` (ver abaixo); sem esse ficheiro o APK sai por assinar e não se instala.
 
-### Mais tarde: keystore própria (não a commites)
+### Chave de release (decisão 0014; não a commites)
 
-1. `keytool -genkey -v -keystore %USERPROFILE%\cabaz-mensal.jks -keyalg RSA -keysize 2048 -validity 10000 -alias cabaz`
-2. Cria `android/key.properties`, que não deve ser commitado: acrescenta-o ao `.gitignore`. Deve ter `storePassword`, `keyPassword`, `keyAlias` e `storeFile`.
-3. Em `android/app/build.gradle.kts`, lê esse ficheiro e define um `signingConfig` de release (ver <https://docs.flutter.dev/deployment/android#sign-the-app>).
-4. No CI, guarda a keystore em base64 e as palavras-passe como secrets do GitHub.
+1. Copia a chave de debug para um ficheiro próprio, com palavra-passe nova (só letras e números). Na origem a palavra-passe é `android`:
+   `keytool -importkeystore -srckeystore %USERPROFILE%\.android\debug.keystore -srcstorepass android -destkeystore %USERPROFILE%\cabaz-mensal.jks -deststoretype PKCS12`
+2. Confirma que abre, escrevendo a palavra-passe: `keytool -list -keystore %USERPROFILE%\cabaz-mensal.jks` (sem o aviso `integrity ... NOT been verified`).
+3. Cria `android/key.properties` (já está no `.gitignore`) com `storeFile` (com `/`), `storePassword`, `keyAlias=androiddebugkey` e `keyPassword`, as duas palavras-passe iguais e sem espaços no fim.
+4. O `build.gradle.kts` lê esse ficheiro. Confere a assinatura do APK: `apksigner verify --print-certs app-release.apk` deve dar o SHA-256 `e2bfab75bf8cf399b0e25f0df50de2e9281514bf2b6c95bc83469463b1de8f47`.
+5. No CI, os secrets `RELEASE_KEYSTORE_BASE64` (o `.jks` em base64) e `RELEASE_KEYSTORE_PASSWORD`.
 
 ## Publicar
 

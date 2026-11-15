@@ -3,7 +3,7 @@
 *Atualizado em 2026-11-01. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-Nenhuma em curso: a Fase 9 está concluída. Próxima por escolher (ver Próximo).
+**Fase 10 · Assinatura do release e ícone azul:** T1–T5 feitas (2026-11-15; [`planning/fase-10.md`](planning/fase-10.md)); falta o portão: depois do push, o APK do CI (artefacto `cabaz-mensal-apk`) tem de instalar por cima do local com `adb install -r`. Depois: o P1 da comparação de preços.
 
 ## Feito
 - **Fase 9b · Limite de tempo por página:** a cópia JSON, a exportação de compras e a abertura de talões deixam de dar "Sem rede" por o conjunto das páginas passar de 10 s ([`planning/fase-9b.md`](planning/fase-9b.md); 2026-11-15).

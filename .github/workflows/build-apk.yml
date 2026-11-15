@@ -39,9 +39,27 @@ jobs:
           jq -n --arg url "$SUPABASE_URL" --arg key "$SUPABASE_ANON_KEY" \
             '{SUPABASE_URL: $url, SUPABASE_ANON_KEY: $key}' > env/ci.json
 
-      # Assinatura de debug nesta fase (ver README para criar uma keystore própria).
+      # A mesma chave do build local, para o adb install -r funcionar por cima (decisão 0014).
+      - name: Chave de release a partir dos secrets
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+        run: |
+          echo "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/cabaz-mensal.jks"
+          {
+            echo "storeFile=$RUNNER_TEMP/cabaz-mensal.jks"
+            echo "storePassword=$RELEASE_KEYSTORE_PASSWORD"
+            echo "keyAlias=androiddebugkey"
+            echo "keyPassword=$RELEASE_KEYSTORE_PASSWORD"
+          } > android/key.properties
+
       - name: Build APK
         run: flutter build apk --release --dart-define-from-file=env/ci.json
+
+      - name: Confirmar a chave do APK
+        run: |
+          apksigner="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)apksigner"
+          "$apksigner" verify --print-certs build/app/outputs/flutter-apk/app-release.apk             | grep "SHA-256 digest: e2bfab75bf8cf399b0e25f0df50de2e9281514bf2b6c95bc83469463b1de8f47"
 
       - uses: actions/upload-artifact@v4
         with:

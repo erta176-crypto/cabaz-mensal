@@ -1,6 +1,6 @@
 # Fase 10 · Assinatura do release e ícone azul
 
-**Estado:** plano aprovado a 2026-11-02. Sem migração SQL, sem pacotes novos e sem alterações em `lib/`. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** T1–T5 feitas a 2026-11-15; falta o portão (APK do CI por cima do local). Sem migração SQL, sem pacotes novos e sem alterações em `lib/`. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** o APK do CI instala-se por cima do local com `adb install -r`, sem desinstalar nada; o ícone deixa de ter a paleta antiga.
 
@@ -22,18 +22,18 @@
 | D4 | Ícone: cesto branco sobre fundo `#0B57D0`. As ripas ficam da cor do fundo (no primeiro plano, transparentes). |
 | D5 | As imagens novas são recoloridas a partir das atuais, mantendo o desenho e o anti-aliasing. O script não fica no repositório. |
 
-## T1 · Chave própria (utilizador) [ ]
+## T1 · Chave própria (utilizador) [x]
 Corridos pelo utilizador, com uma palavra-passe só para esta chave:
 - Copiar `%USERPROFILE%\.android\debug.keystore` para `%USERPROFILE%\cabaz-mensal.jks`, sem mexer no original.
 - `keytool -storepasswd` na cópia (e `-keypasswd`, se o formato da keystore o pedir; não confirmei qual é).
 - Criar `android/key.properties` com `storeFile`, `storePassword`, `keyAlias` e `keyPassword`.
 - Guardar a chave e a palavra-passe num sítio seguro fora deste PC: sem elas, atualizar a app obriga a desinstalá-la.
 
-## T2 · Gradle [ ]
+## T2 · Gradle [x]
 - `build.gradle.kts`: ler `android/key.properties` e criar o `signingConfig` de release (D2).
 - Confirmar os dois casos: com o ficheiro, o SHA-256 do APK é o de 0.1 (`apksigner verify --print-certs`); sem o ficheiro, não sai um APK instalável.
 
-## T3 · CI [ ]
+## T3 · CI [x]
 - Secrets, criados pelo utilizador **antes do push** (sem eles, o CI falha): `RELEASE_KEYSTORE_BASE64` e `RELEASE_KEYSTORE_PASSWORD`.
 - `build-apk.yml`: descodificar a chave para fora do repositório, escrever `android/key.properties` e, depois do build, comparar o SHA-256 com o de 0.1 (com o `apksigner`, porque o `keytool -printcert -jarfile` não lê as assinaturas v2 e v3).
 - O `deploy-web.yml` não muda.
@@ -45,7 +45,7 @@ Corridos pelo utilizador, com uma palavra-passe só para esta chave:
 - Ver se o `web/favicon.png` é regenerado; se não for, atualizá-lo.
 - Procurar `FAF6F0` e `B4532A` no repositório: em `android/`, `web/` e `pubspec.yaml` não pode sobrar nenhum.
 
-## T5 · Documentação [ ]
+## T5 · Documentação [x]
 - `docs/decisions/0014-chave-de-release.md`: a D1, com a alternativa recusada.
 - `README.md`: substituir "Mais tarde: keystore própria" pelo que passa a existir.
 - `notas.md`: retirar os dois pontos resolvidos.
