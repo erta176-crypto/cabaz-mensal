@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -28,6 +29,22 @@ void main() {
     Pdfrx.cacheDirectoryPath = Directory.systemTemp
         .createTempSync('pdfrx')
         .path;
+    // No Linux (CI), o pdfium_dart procura o PDFium junto do flutter_tester
+    // ou em .dart_tool/native_assets.yaml; o flutter test põe-no em
+    // build/native_assets/<sistema>/ e escreve o caminho neste ficheiro.
+    final assets = File(
+      'build/native_assets/${Platform.operatingSystem}/native_assets.json',
+    );
+    if (assets.existsSync()) {
+      final porAlvo =
+          (jsonDecode(assets.readAsStringSync())
+                  as Map<String, dynamic>)['native-assets']
+              as Map<String, dynamic>;
+      for (final alvo in porAlvo.values.cast<Map<String, dynamic>>()) {
+        final pdfium = alvo['package:pdfium_dart/libpdfium'] as List?;
+        if (pdfium != null) Pdfrx.pdfiumModulePath = pdfium[1] as String;
+      }
+    }
   });
 
   test('lê o texto de um PDF, linha a linha', () async {
