@@ -46,7 +46,11 @@ jobs:
           RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
           RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
         run: |
-          echo "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/cabaz-mensal.jks"
+          jks="$RUNNER_TEMP/cabaz-mensal.jks"
+          echo "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$jks"
+          # Falha já se o secret não for o base64 exato do keystore (só hash e tamanho; nada secreto).
+          echo "Keystore: $(stat -c%s "$jks") bytes (esperado 2618), início $(head -c 4 "$jks" | od -An -tx1)"
+          echo "0bad7e0e2b735850995ef6ec4408eb98a107114a63f5aef8074a256527ba4dba  $jks" | sha256sum -c -
           {
             echo "storeFile=$RUNNER_TEMP/cabaz-mensal.jks"
             echo "storePassword=$RELEASE_KEYSTORE_PASSWORD"
