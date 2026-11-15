@@ -6,6 +6,7 @@
 Nenhuma em curso: a Fase 9 está concluída. Próxima por escolher (ver Próximo).
 
 ## Feito
+- **Fase 9b · Limite de tempo por página:** a cópia JSON, a exportação de compras e a abertura de talões deixam de dar "Sem rede" por o conjunto das páginas passar de 10 s ([`planning/fase-9b.md`](planning/fase-9b.md); 2026-11-15).
 - **Fase 9 · Correções:** concluída (portão a 2026-11-02; [`planning/fase-9.md`](planning/fase-9.md)). Cópia JSON com loja eliminada, `ErroSemResposta` e limites de tempo no Supabase, mensagens certas nas importações, CI da web com análise e testes, abertura no Painel, cores da web. Verificado no telemóvel.
 - **Notas · rede volta:** Painel, Histórico e detalhe da compra voltam a pedir sozinhos quando a rede volta (com erro ou dados da cache); verificado no telemóvel (2026-10-31).
 - **Notas · diálogos deitado:** "Ligar a um artigo" e "Nome do artigo novo" cabem com o telemóvel deitado e o teclado aberto (rolam inteiros; a lista encolhe com o espaço livre); verificado no telemóvel (2026-10-31).

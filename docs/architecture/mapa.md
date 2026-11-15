@@ -23,7 +23,7 @@
   - `escrita.dart`: grava na cache e põe na fila.
   - `sincronizador.dart`: envio e receção.
   - `servidor_supabase.dart`: a ligação ao Supabase.
-- `supabase/`: autenticação, consultas de compras e dados (importar, exportar, apagar, resumo). `base.dart`: tradução de erros e os auxiliares de tempo `lerComRede` e `escreverComLimite`.
+- `supabase/`: autenticação, consultas de compras e dados (importar, exportar, apagar, resumo). `base.dart`: tradução de erros e os auxiliares de tempo `lerComRede`, `escreverComLimite` e `buscarPaginas` (leitura por páginas, com limite por página).
   - `supabase_estatisticas.dart`: RPC `painel` (com cache do último resultado na tabela `estado`, chave `painel:<período>:<loja|todas>`) e `historico_compras` e linhas de uma compra (só com rede). Cada pedido tem um limite de 10 s; esgotado, conta como sem rede (decidido no portão da Fase 2: no Android, sem ligação, o pedido podia ficar preso).
 
 ## `lib/import/`: importação sem interface, testável

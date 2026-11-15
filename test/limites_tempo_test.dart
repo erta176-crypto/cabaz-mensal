@@ -58,4 +58,69 @@ void main() {
       ),
     );
   });
+
+  group('leituras por páginas', () {
+    const pagina = Duration(milliseconds: 25);
+    const limite = Duration(milliseconds: 40);
+
+    // 3 páginas de 2 linhas e uma última de 1; cada página demora 25 ms.
+    Future<List<Map<String, dynamic>>> lerPaginas() => buscarPaginas(
+      (inicio, fim) async {
+        await Future<void>.delayed(pagina);
+        final total = 7;
+        return [
+          for (var i = inicio; i <= fim && i < total; i++) {'n': i},
+        ];
+      },
+      limite: limite,
+      tamanho: 2,
+    );
+
+    test('com limite global, várias páginas lentas dão sem rede', () {
+      expect(
+        lerComRede(lerPaginas, limite: limite, semRede: 'Sem rede: x'),
+        throwsA(isA<ErroDados>().having((e) => e.mensagem, 'm', 'Sem rede: x')),
+      );
+    });
+
+    test('sem limite global, devolve todas as linhas', () async {
+      final r = await lerComRede(
+        lerPaginas,
+        limite: null,
+        semRede: 'Sem rede: x',
+      );
+      expect(r, hasLength(7));
+    });
+
+    test('página que nunca responde dá "sem rede"', () {
+      expect(
+        lerComRede(
+          () => buscarPaginas(
+            (_, _) => Completer<List<Map<String, dynamic>>>().future,
+            limite: limite,
+            tamanho: 2,
+          ),
+          limite: null,
+          semRede: 'Sem rede: x',
+        ),
+        throwsA(isA<ErroDados>().having((e) => e.mensagem, 'm', 'Sem rede: x')),
+      );
+    });
+
+    test('ErroDados de uma página passa tal e qual', () {
+      expect(
+        lerComRede(
+          () => buscarPaginas(
+            (_, _) async => throw const ErroDados('Sessão terminou.'),
+            tamanho: 2,
+          ),
+          limite: null,
+          semRede: 'Sem rede: x',
+        ),
+        throwsA(
+          isA<ErroDados>().having((e) => e.mensagem, 'm', 'Sessão terminou.'),
+        ),
+      );
+    });
+  });
 }

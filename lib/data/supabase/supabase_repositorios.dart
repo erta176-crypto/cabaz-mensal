@@ -89,6 +89,14 @@ class SupabaseDadosRepository implements DadosRepository {
     semRede: 'Sem rede: não foi possível consultar o servidor.',
   );
 
+  /// Leituras por páginas: o limite é de cada página (`buscarTudo`), não do
+  /// conjunto.
+  Future<T> _lerPorPaginas<T>(Future<T> Function() f) => lerComRede(
+    f,
+    limite: null,
+    semRede: 'Sem rede: não foi possível consultar o servidor.',
+  );
+
   Future<T> _escrever<T>(Future<T> Function() f) =>
       escreverComLimite(f, limite: limiteEscrita);
 
@@ -128,12 +136,13 @@ class SupabaseDadosRepository implements DadosRepository {
   });
 
   @override
-  Future<Map<String, List<Map<String, dynamic>>>> lerTudo() => _ler(() async {
-    return {
-      for (final t in tabelas)
-        t: await buscarTudo(_c, t, limite: limiteLeitura),
-    };
-  });
+  Future<Map<String, List<Map<String, dynamic>>>> lerTudo() =>
+      _lerPorPaginas(() async {
+        return {
+          for (final t in tabelas)
+            t: await buscarTudo(_c, t, limite: limiteLeitura),
+        };
+      });
 
   @override
   Future<void> apagarTudo() => _escrever(() => _c.rpc('apagar_todos_dados'));
@@ -166,7 +175,7 @@ class SupabaseDadosRepository implements DadosRepository {
 
   @override
   Future<List<({String lojaId, String data, String? local, int totalCent})>>
-  comprasExistentes() => _ler(() async {
+  comprasExistentes() => _lerPorPaginas(() async {
     final linhas = await buscarTudo(
       _c,
       'compras',

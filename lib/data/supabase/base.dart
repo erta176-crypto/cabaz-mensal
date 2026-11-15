@@ -17,19 +17,26 @@ Future<List<Map<String, dynamic>>> buscarTudo(
   String colunas = '*',
   String ordem = 'id',
   Duration limite = limiteLeituraPadrao,
+}) => buscarPaginas(
+  (inicio, fim) =>
+      cliente.from(tabela).select(colunas).order(ordem).range(inicio, fim),
+  limite: limite,
+);
+
+/// Lê página a página até vir uma incompleta. O limite é de cada página, não
+/// do conjunto.
+Future<List<Map<String, dynamic>>> buscarPaginas(
+  Future<List<Map<String, dynamic>>> Function(int inicio, int fim) pagina, {
+  Duration limite = limiteLeituraPadrao,
+  int tamanho = _tamanhoPagina,
 }) async {
   final todas = <Map<String, dynamic>>[];
   var inicio = 0;
   while (true) {
-    final pagina = await cliente
-        .from(tabela)
-        .select(colunas)
-        .order(ordem)
-        .range(inicio, inicio + _tamanhoPagina - 1)
-        .timeout(limite);
-    todas.addAll(pagina);
-    if (pagina.length < _tamanhoPagina) return todas;
-    inicio += _tamanhoPagina;
+    final linhas = await pagina(inicio, inicio + tamanho - 1).timeout(limite);
+    todas.addAll(linhas);
+    if (linhas.length < tamanho) return todas;
+    inicio += tamanho;
   }
 }
 
@@ -90,14 +97,17 @@ Future<T> comErrosTraduzidos<T>(Future<T> Function() f) async {
 }
 
 /// Leitura com limite de tempo: qualquer falha que não seja um [ErroDados]
-/// (rede, tempo esgotado) passa a [semRede].
+/// (rede, tempo esgotado) passa a [semRede]. Com [limite] null não há limite
+/// para o conjunto (as leituras por páginas limitam cada página).
 Future<T> lerComRede<T>(
   Future<T> Function() f, {
   required String semRede,
-  Duration limite = limiteLeituraPadrao,
+  Duration? limite = limiteLeituraPadrao,
 }) async {
   try {
-    return await comErrosTraduzidos(() => f().timeout(limite));
+    return await comErrosTraduzidos(
+      () => limite == null ? f() : f().timeout(limite),
+    );
   } on ErroDados {
     rethrow;
   } catch (_) {
