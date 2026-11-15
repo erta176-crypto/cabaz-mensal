@@ -1,6 +1,6 @@
 # Fase 11 · Correções vistas no telemóvel (alias sem rede, talão E.Leclerc)
 
-**Estado:** plano por aprovar (2026-11-15). Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-15); T1 feita. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** corrigir dois erros vistos no telemóvel ao verificar a Fase 10, antes de retomar o P1.
 
@@ -8,8 +8,10 @@
 
 ### 0.1 "Guardar alias" fica com erro depois de uma falha de rede
 - No telemóvel, "Alterações por enviar" mostra a alteração "Guardar alias" com erro: `Sessão: ClientException with SocketException: Failed host lookup: '…supabase.co'`, e o banner "1 alteração com erro".
-- Confirmado no código: `classificarErro` (`lib/data/sync/servidor_supabase.dart:114`) põe o prefixo `Sessão:` só nas `AuthException`, e só as trata como transitórias se forem `AuthRetryableFetchException`. Uma falha de DNS não é um erro do servidor: por isso o erro foi tratado como **permanente** logo à primeira (`Sincronizador.enviar`, linha 180) e a alteração deixou de ser tentada sozinha.
-- **Não confirmei** qual é a classe exata que o `supabase_flutter` lança quando a renovação da sessão falha por falta de rede (pode ser uma `AuthException` simples ou uma `AuthUnknownException`). Confirmar no código do pacote em `pubspec.lock` (usar `read_package_uris` ou `rip_grep_packages`) antes de corrigir.
+- ~~Hipótese inicial: `classificarErro` tratava o erro como permanente logo à primeira.~~ Errada.
+- Confirmado no `gotrue` 2.27.3 (`fetch.dart:188-190`): uma falha de rede num pedido de autenticação (incluindo a renovação da sessão) chega como `AuthRetryableFetchException` sem `statusCode`, e `classificarErro` já a tratava como transitória.
+- Causa real: `Sincronizador.enviar` marcava como permanente qualquer erro transitório ao fim de `maxTentativas` (20). Com a espera até 60 s, cerca de 15 min sem rede bastavam. Reproduzido em teste (`aliases_sync_test.dart`).
+- Correção aprovada (2026-11-15, opção B): `ErroSync.semRede`. As falhas sem rede não contam tentativa nem ficam permanentes; os transitórios do servidor (5xx) continuam com o limite de 20.
 - Os aliases não se perdem: ficam na fila e na base local (`docs/planning/fase-9.md`, 0.1). O que falha é o reenvio automático.
 
 ### 0.2 Talão do E.Leclerc "Talão sem data"
@@ -24,11 +26,11 @@
 | D2 | As alterações que já ficaram com este erro voltam a ser tentadas ao carregar em "Tentar agora" (já existe). Não se cria migração de dados. |
 | D3 | O talão real nunca entra no repositório (é público): o teste usa um talão fictício com a mesma estrutura. |
 
-## T1 · Alias: falha de rede continua transitória [ ]
-- Confirmar a classe da exceção (0.1) e dizer qual é.
-- Primeiro um teste que reproduz o erro e falha: `classificarErro` com a exceção de rede de uma renovação de sessão deve dar `transitorio: true`. Se for preciso, um teste do `Sincronizador` com um servidor falso que lança esse erro: a alteração fica na fila, sem erro, e é reenviada quando a rede volta.
-- Correção em `classificarErro`, só no ramo das `AuthException`. Não mexer no resto.
-- Verificar que os testes de sincronização existentes (`test/sync/`) continuam a passar sem alterações.
+## T1 · Alias: falha de rede continua transitória [x] (2026-11-15)
+- Classe confirmada: `AuthRetryableFetchException` sem `statusCode` (ver 0.1).
+- Teste que falhava: 25 envios sem rede → o alias fica na fila sem erro e chega ao servidor quando a rede volta. Testes novos: o 503 continua a ficar com erro à 20.ª tentativa; `classificarErro` distingue sem rede de 5xx e de sessão recusada.
+- Correção: `ErroSync.semRede` (`servidor.dart`), definido em `classificarErro` (ramo `AuthException` e ramo de rede) e respeitado em `Sincronizador.enviar`. O `ServidorFalso` marca "Sem rede" e "Resposta perdida" como `semRede` e tem `indisponivel` (503).
+- Os testes existentes de `test/sync/` passam sem alterações.
 
 ## T2 · Leitor do E.Leclerc [ ]
 - Pedir ao utilizador que ponha o PDF em `dados-privados/talões/` (fora do git) e extrair o texto com a ferramenta do projeto que gera `test/fixtures/taloes/*.txt`.

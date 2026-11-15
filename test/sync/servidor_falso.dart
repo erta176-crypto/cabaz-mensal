@@ -14,6 +14,10 @@ class ServidorFalso implements ServidorSync {
   /// Sem rede: todas as chamadas falham com erro transitório.
   bool online = true;
 
+  /// O servidor responde, mas com um erro transitório (ex.: 503). Conta
+  /// para o limite de tentativas do Sincronizador.
+  bool indisponivel = false;
+
   /// Tabelas onde a escrita é recusada (simula RLS → erro permanente).
   final recusar = <String>{};
 
@@ -39,7 +43,10 @@ class ServidorFalso implements ServidorSync {
 
   void _verificar(String tabela) {
     if (!online) {
-      throw const ErroSync('Sem rede', transitorio: true);
+      throw const ErroSync('Sem rede', transitorio: true, semRede: true);
+    }
+    if (indisponivel) {
+      throw const ErroSync('Erro do servidor: 503', transitorio: true);
     }
     if (recusar.contains(tabela)) {
       throw const ErroSync('Sem permissão (RLS)', transitorio: false);
@@ -49,7 +56,11 @@ class ServidorFalso implements ServidorSync {
   void _depois() {
     if (perderRespostas > 0) {
       perderRespostas--;
-      throw const ErroSync('Resposta perdida', transitorio: true);
+      throw const ErroSync(
+        'Resposta perdida',
+        transitorio: true,
+        semRede: true,
+      );
     }
   }
 
@@ -178,7 +189,9 @@ class ServidorFalso implements ServidorSync {
     String tabela,
     DateTime? desde,
   ) async {
-    if (!online) throw const ErroSync('Sem rede', transitorio: true);
+    if (!online) {
+      throw const ErroSync('Sem rede', transitorio: true, semRede: true);
+    }
     final r =
         [
           for (final o in t(tabela))
@@ -196,7 +209,9 @@ class ServidorFalso implements ServidorSync {
 
   @override
   Future<DateTime> agora() async {
-    if (!online) throw const ErroSync('Sem rede', transitorio: true);
+    if (!online) {
+      throw const ErroSync('Sem rede', transitorio: true, semRede: true);
+    }
     return _relogio;
   }
 

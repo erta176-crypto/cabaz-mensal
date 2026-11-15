@@ -1,9 +1,11 @@
 # Estado do projeto
 
-*Atualizado em 2026-11-01. Manter curto; o detalhe está nos ficheiros ligados.*
+*Atualizado em 2026-11-15. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Fase 10 · Assinatura do release e ícone azul:** T1–T5 feitas (2026-11-15; [`planning/fase-10.md`](planning/fase-10.md)); falta o portão: depois do push, o APK do CI (artefacto `cabaz-mensal-apk`) tem de instalar por cima do local com `adb install -r`. Depois: a Fase 11 (correções vistas no telemóvel: alias que fica com erro sem rede, talão E.Leclerc sem data; [`planning/fase-11.md`](planning/fase-11.md), por aprovar) e o P1 da comparação de preços.
+**Fase 11 · Alias sem rede e talão E.Leclerc:** plano aprovado; T1 feita (falhas sem rede deixam de ficar com erro ao fim de 20 tentativas). Próximo: T2 (leitor do E.Leclerc; precisa do PDF em `dados-privados/talões/`). [`planning/fase-11.md`](planning/fase-11.md)
+
+**Fase 10 · Assinatura e ícone:** enviada (push a 2026-11-15); ícone e cópia JSON verificados no telemóvel. Falta o portão do APK do CI: o CI falha no passo "Testes" desde 28/10 (antes da Fase 10; a análise falhava com o Flutter 3.50 e ficou fixa em 3.47.5). Causa por confirmar: o registo do CI pede login.
 
 ## Feito
 - **Fase 9b · Limite de tempo por página:** a cópia JSON, a exportação de compras e a abertura de talões deixam de dar "Sem rede" por o conjunto das páginas passar de 10 s ([`planning/fase-9b.md`](planning/fase-9b.md); 2026-11-15).

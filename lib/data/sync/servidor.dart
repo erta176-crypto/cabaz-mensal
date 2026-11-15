@@ -30,13 +30,21 @@ abstract interface class ServidorSync {
 }
 
 class ErroSync implements Exception {
-  const ErroSync(this.mensagem, {required this.transitorio});
+  const ErroSync(
+    this.mensagem, {
+    required this.transitorio,
+    this.semRede = false,
+  }) : assert(!semRede || transitorio);
 
   final String mensagem;
 
   /// true: sem rede, timeout, servidor indisponível → tentar mais tarde.
   /// false: erro que se vai repetir (RLS, dados inválidos) → não bloquear a fila.
   final bool transitorio;
+
+  /// O pedido não chegou ao servidor (ou a resposta perdeu-se). Não conta
+  /// para o limite de tentativas: só o servidor pode recusar uma alteração.
+  final bool semRede;
 
   @override
   String toString() => mensagem;

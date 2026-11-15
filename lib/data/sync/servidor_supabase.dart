@@ -133,11 +133,19 @@ ErroSync classificarErro(Object e) {
     return ErroSync('$motivo: ${e.message}', transitorio: transitorio);
   }
   if (e is AuthException) {
+    // O gotrue embrulha as falhas de rede em AuthRetryableFetchException sem
+    // statusCode; com statusCode é um 5xx do servidor.
+    final retryable = e is AuthRetryableFetchException;
     return ErroSync(
       'Sessão: ${e.message}',
-      transitorio: e is AuthRetryableFetchException,
+      transitorio: retryable,
+      semRede: retryable && e.statusCode == null,
     );
   }
   // Falhas de rede (SocketException, ClientException, fetch na web…).
-  return ErroSync('Sem ligação ao servidor ($e)', transitorio: true);
+  return ErroSync(
+    'Sem ligação ao servidor ($e)',
+    transitorio: true,
+    semRede: true,
+  );
 }

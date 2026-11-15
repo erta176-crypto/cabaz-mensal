@@ -177,6 +177,9 @@ class Sincronizador {
         await _executar(p);
         await base.removerPendente(p.id);
       } on ErroSync catch (e) {
+        // Sem rede não conta como tentativa nem fica permanente: o servidor
+        // não chegou a recusar.
+        if (e.semRede) rethrow;
         final permanente = !e.transitorio || p.tentativas + 1 >= maxTentativas;
         await base.marcarTentativa(p.id, erro: permanente ? e.mensagem : null);
         if (!permanente) rethrow;
