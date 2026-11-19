@@ -34,6 +34,7 @@ final _espacadas = RegExp(r'^(?:\S )+\S$');
 // No papel: "E.Leclerc ()", "E.Lerlerc ()"…
 final _logotipo = RegExp(r'^E\.Le\w{3,5}c\b', multiLine: true);
 final _numero = RegExp(r'^\d{10,}\w*$');
+final _espacos = RegExp('[  ]+');
 
 /// null se o texto não é de um talão do E.Leclerc. Lança [FormatException]
 /// se é, mas falta a data ou o total.
@@ -43,7 +44,8 @@ TalaoLido? lerLeclerc(String texto) {
       !_logotipo.hasMatch(texto)) {
     return null;
   }
-  final ls = linhasDe(texto);
+  // Os PDFs desde nov/2026 trazem espaços NBSP e colunas alinhadas com vários.
+  final ls = linhasDe(texto.replaceAll(_espacos, ' '));
   final iCaixa = ls.indexWhere(_caixa.hasMatch);
   if (iCaixa < 0) throw const FormatException('Talão sem data');
   final caixa = _caixa.firstMatch(ls[iCaixa])!;

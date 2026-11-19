@@ -95,6 +95,46 @@ void main() {
     });
   });
 
+  // Talões em PDF desde nov/2026 (fictício, com a mesma estrutura): espaços
+  // NBSP (U+00A0), colunas alinhadas com vários espaços, sem secções e, às
+  // vezes, sem a coluna do IVA à frente.
+  group('E.Leclerc com espaços NBSP', () {
+    final t = lerLeclerc(
+      '''
+H I P E R M E R C A D O
+F I C T I C I A
+I N V E N T A D A S . A .
+Caixa 001-0001 2026-11-07 18:02
+07/11/26 0 01AI0 01K00
+00000000000000001AI001K00
+C/IVA  IVA
+CAFE SOLUVEL 100G                   3.79 1
+AZEITE VIRGEM 750ML
+2 X 5.89€                          11.78 2
+----------
+Total 3 artigos                    15.57
+MB                                 15.57
+Com o cartão E.LECLERC
+'''
+          .replaceAll(' ', ' '),
+    )!;
+
+    test('data, local, linhas e total', () {
+      expect(t.data, DateTime(2026, 11, 7));
+      expect(t.local, 'E.Leclerc Ficticia');
+      expect(t.numero, '00000000000000001AI001K00');
+      expect(t.linhas.map((l) => l.texto), [
+        'CAFE SOLUVEL 100G',
+        'AZEITE VIRGEM 750ML',
+      ]);
+      expect(t.linhas[1].quantidade, 2);
+      expect(t.linhas[1].precoUnitCent, 589);
+      expect(t.totalCent, 1557);
+      expect(t.naoReconhecidas, isEmpty);
+      expect(t.bate, isTrue);
+    });
+  });
+
   // Texto do OCR de um talão em papel (fictício, com os erros vistos nas
   // fotografias reais): IVA numa linha à parte ou colado, ano da linha
   // "Caixa" estragado, preço unitário ilegível, quantidade em falta.

@@ -1,6 +1,6 @@
 # Fase 11 · Correções vistas no telemóvel (alias sem rede, talão E.Leclerc)
 
-**Estado:** aprovado (2026-11-15); T1 feita. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-15); T1 e T2 feitas (falta reimportar no telemóvel). Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** corrigir dois erros vistos no telemóvel ao verificar a Fase 10, antes de retomar o P1.
 
@@ -17,7 +17,7 @@
 ### 0.2 Talão do E.Leclerc "Talão sem data"
 - Importar o PDF "E.Leclerc - Talão do 07.11.2026.pdf" deu "0 talões · 1 não reconhecido: Talão sem data".
 - Confirmado no código: `lerLeclerc` (`lib/import/taloes/leclerc.dart:48` e `:54`) lança "Talão sem data" quando não encontra a linha da caixa ou, depois dela, o ano nas duas linhas seguintes. Este talão é mais recente do que os usados para escrever o leitor (a decisão da Fase 5 diz que foi feito com poucos exemplos).
-- **Não confirmei** o que difere neste talão: não tenho o texto extraído.
+- Causa confirmada (2026-11-19, PDFs de 07.11 e 11.11): o texto do pdfrx traz espaços NBSP (U+00A0) e colunas alinhadas com vários espaços; as expressões do leitor esperam um espaço normal, por isso a linha "Caixa … AAAA-MM-DD HH:MM" não era reconhecida. O de 11.11 também não tem a coluna do IVA nem secções (o leitor já aceita).
 
 ## 1. Decisões
 | # | Decisão |
@@ -32,7 +32,8 @@
 - Correção: `ErroSync.semRede` (`servidor.dart`), definido em `classificarErro` (ramo `AuthException` e ramo de rede) e respeitado em `Sincronizador.enviar`. O `ServidorFalso` marca "Sem rede" e "Resposta perdida" como `semRede` e tem `indisponivel` (503).
 - Os testes existentes de `test/sync/` passam sem alterações.
 
-## T2 · Leitor do E.Leclerc [ ]
+## T2 · Leitor do E.Leclerc [x] (2026-11-19)
+- Feito: teste fictício com NBSP (`lidl_leclerc_test.dart`, falhava com "Talão sem data"); `lerLeclerc` troca NBSP e espaços seguidos por um espaço antes de partir em linhas. Talões reais: E.Leclerc 3/3, Lidl 71/71, Pingo Doce 24/24; análise 98/98. Falta reimportar no telemóvel.
 - Pedir ao utilizador que ponha o PDF em `dados-privados/talões/` (fora do git) e extrair o texto com a ferramenta do projeto que gera `test/fixtures/taloes/*.txt`.
 - Mostrar só a diferença de estrutura que faz falhar a data (não colar valores reais nem nomes de artigos).
 - Primeiro um teste com um talão fictício, com a mesma estrutura, que falha com "Talão sem data".

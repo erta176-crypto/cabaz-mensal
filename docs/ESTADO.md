@@ -1,9 +1,9 @@
 # Estado do projeto
 
-*Atualizado em 2026-11-15. Manter curto; o detalhe está nos ficheiros ligados.*
+*Atualizado em 2026-11-19. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Fase 11 · Alias sem rede e talão E.Leclerc:** plano aprovado; T1 feita (falhas sem rede deixam de ficar com erro ao fim de 20 tentativas). Próximo: T2 (leitor do E.Leclerc; precisa do PDF em `dados-privados/talões/`). [`planning/fase-11.md`](planning/fase-11.md)
+**Fase 11 · Alias sem rede e talão E.Leclerc:** plano aprovado; T1 feita (falhas sem rede deixam de ficar com erro ao fim de 20 tentativas); T2 feita (talões do E.Leclerc com espaços NBSP). Próximo: T3 (documentação) e o portão no telemóvel. [`planning/fase-11.md`](planning/fase-11.md)
 
 **Fase 10 · Assinatura e ícone:** enviada (push a 2026-11-15); ícone e cópia JSON verificados no telemóvel. Falta o portão do APK do CI: o CI falha no passo "Testes" desde 28/10 (antes da Fase 10; a análise falhava com o Flutter 3.50 e ficou fixa em 3.47.5). Causa por confirmar: o registo do CI pede login.
 
