@@ -3,11 +3,10 @@
 *Atualizado em 2026-11-19. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Fase 11 · Alias sem rede e talão E.Leclerc:** plano aprovado; T1 feita (falhas sem rede deixam de ficar com erro ao fim de 20 tentativas); T2 feita (talões do E.Leclerc com espaços NBSP). Próximo: T3 (documentação) e o portão no telemóvel. [`planning/fase-11.md`](planning/fase-11.md)
-
-**Fase 10 · Assinatura e ícone:** enviada (push a 2026-11-15); ícone e cópia JSON verificados no telemóvel. Falta o portão do APK do CI: o CI falha no passo "Testes" desde 28/10 (antes da Fase 10; a análise falhava com o Flutter 3.50 e ficou fixa em 3.47.5). Causa por confirmar: o registo do CI pede login.
+**Fase 11 · Alias sem rede e talão E.Leclerc:** plano aprovado; T1 e T2 feitas (commits locais 46e0651 e 72df2dc, por enviar). Próximo: **T1b** ("Tentar agora" volta a tentar as alterações com erro; opção A aprovada a 2026-11-19), depois T3 e o portão no telemóvel (APK local com `adb install -r`: alias enviado, talão de 07.11 importa). [`planning/fase-11.md`](planning/fase-11.md)
 
 ## Feito
+- **Fase 10 · Assinatura e ícone:** concluída (portão a 2026-11-19; [`planning/fase-10.md`](planning/fase-10.md)). Build APK do CI verde, APK do CI instalado por cima com `adb install -r` sem perder dados. Secrets do CI: comandos na decisão 0014.
 - **Fase 9b · Limite de tempo por página:** a cópia JSON, a exportação de compras e a abertura de talões deixam de dar "Sem rede" por o conjunto das páginas passar de 10 s ([`planning/fase-9b.md`](planning/fase-9b.md); 2026-11-15).
 - **Fase 9 · Correções:** concluída (portão a 2026-11-02; [`planning/fase-9.md`](planning/fase-9.md)). Cópia JSON com loja eliminada, `ErroSemResposta` e limites de tempo no Supabase, mensagens certas nas importações, CI da web com análise e testes, abertura no Painel, cores da web. Verificado no telemóvel.
 - **Notas · rede volta:** Painel, Histórico e detalhe da compra voltam a pedir sozinhos quando a rede volta (com erro ou dados da cache); verificado no telemóvel (2026-10-31).

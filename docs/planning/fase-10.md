@@ -1,6 +1,6 @@
 # Fase 10 · Assinatura do release e ícone azul
 
-**Estado:** T1–T5 feitas a 2026-11-15; falta o portão (APK do CI por cima do local). Sem migração SQL, sem pacotes novos e sem alterações em `lib/`. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída; portão a 2026-11-19 (Build APK #23 verde; APK do CI com o SHA-256 `e2bfab75…`, instalado com `adb install -r` por cima da app sem perder dados; ícone confirmado). No CI faltavam o secret `RELEASE_KEYSTORE_BASE64` e a palavra-passe certa (ver decisão 0014). Sem migração SQL, sem pacotes novos e sem alterações em `lib/`. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** o APK do CI instala-se por cima do local com `adb install -r`, sem desinstalar nada; o ícone deixa de ter a paleta antiga.
 

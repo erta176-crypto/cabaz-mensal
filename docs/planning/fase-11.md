@@ -1,6 +1,6 @@
 # Fase 11 · Correções vistas no telemóvel (alias sem rede, talão E.Leclerc)
 
-**Estado:** aprovado (2026-11-15); T1 e T2 feitas (falta reimportar no telemóvel). Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-15); T1 e T2 feitas; T1b aprovada a 2026-11-19 (opção A), por fazer. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** corrigir dois erros vistos no telemóvel ao verificar a Fase 10, antes de retomar o P1.
 
@@ -23,7 +23,7 @@
 | # | Decisão |
 |---|---|
 | D1 | Uma falha de rede nunca marca uma alteração como permanente, mesmo vinda da renovação da sessão. Só conta como permanente o que o servidor recusa (RLS, chave repetida, referência inválida) ou um erro de sessão que não é de rede (palavra-passe, conta apagada). |
-| D2 | As alterações que já ficaram com este erro voltam a ser tentadas ao carregar em "Tentar agora" (já existe). Não se cria migração de dados. |
+| D2 | ~~As alterações com este erro voltam a ser tentadas com "Tentar agora" (já existe).~~ Errado: `pendentesPorEnviar` exclui as que têm erro e "Tentar agora" só chama `sincronizar()`. Substituída pela T1b (2026-11-19, opção A). Sem migração de dados. |
 | D3 | O talão real nunca entra no repositório (é público): o teste usa um talão fictício com a mesma estrutura. |
 
 ## T1 · Alias: falha de rede continua transitória [x] (2026-11-15)
@@ -31,6 +31,12 @@
 - Teste que falhava: 25 envios sem rede → o alias fica na fila sem erro e chega ao servidor quando a rede volta. Testes novos: o 503 continua a ficar com erro à 20.ª tentativa; `classificarErro` distingue sem rede de 5xx e de sessão recusada.
 - Correção: `ErroSync.semRede` (`servidor.dart`), definido em `classificarErro` (ramo `AuthException` e ramo de rede) e respeitado em `Sincronizador.enviar`. O `ServidorFalso` marca "Sem rede" e "Resposta perdida" como `semRede` e tem `indisponivel` (503).
 - Os testes existentes de `test/sync/` passam sem alterações.
+
+## T1b · "Tentar agora" volta a tentar as alterações com erro [ ]
+- Visto no telemóvel (2026-11-19): o alias com erro de rede de antes da T1 fica para sempre; "Tentar agora" (`faixa_sync.dart:166`) só chama `sincronizar()` e `pendentesPorEnviar` (`base_local.dart:181`) filtra `erro IS NULL`.
+- Decisão (opção A, aprovada): "Tentar agora" limpa `erro` e `tentativas` de todas as alterações por enviar e depois sincroniza. Se o servidor voltar a recusar, voltam a ficar com erro. Rejeitadas: B (limpar ao arrancar pelo texto do erro: frágil, é migração de dados) e C (descartar o alias à mão).
+- Ficheiros: `base_local.dart` (método que limpa os erros), `SyncRepository`/`Sincronizador` (`tentarDeNovo()`), `faixa_sync.dart` (o botão chama-o). Ficheiros partilhados: dizer o impacto pelo grafo antes de editar.
+- Primeiro o teste que falha: alteração com erro + "Tentar agora" com rede → chega ao servidor e sai da fila. Teste: erro permanente (ex.: RLS) volta a ficar com erro depois de "Tentar agora".
 
 ## T2 · Leitor do E.Leclerc [x] (2026-11-19)
 - Feito: teste fictício com NBSP (`lidl_leclerc_test.dart`, falhava com "Talão sem data"); `lerLeclerc` troca NBSP e espaços seguidos por um espaço antes de partir em linhas. Talões reais: E.Leclerc 3/3, Lidl 71/71, Pingo Doce 24/24; análise 98/98. Falta reimportar no telemóvel.
