@@ -14,3 +14,12 @@ Opção A. O certificado continua a dizer "Android Debug"; se a app for para a P
 - A chave e as palavras-passe nunca entram no repositório: `android/key.properties` e `*.jks` estão no `.gitignore`. No CI vêm dos secrets `RELEASE_KEYSTORE_BASE64` e `RELEASE_KEYSTORE_PASSWORD`.
 - Sem `key.properties`, o release sai **sem assinatura** (nunca volta à chave de debug em silêncio). Localmente o build não avisa; o CI falha no passo que confere o SHA-256 do APK.
 - Guardar o `.jks` e a palavra-passe fora do PC: sem eles, atualizar a app obriga a desinstalá-la.
+
+## Atualizar os secrets do CI
+Correr no PowerShell e colar no secret logo a seguir, sem copiar mais nada pelo meio (os comandos não mostram nada no ecrã):
+- `RELEASE_KEYSTORE_BASE64` (texto que começa por `MII…`):
+  `[Convert]::ToBase64String([IO.File]::ReadAllBytes("$HOME\cabaz-mensal.jks")) | Set-Clipboard`
+- `RELEASE_KEYSTORE_PASSWORD` (a do `key.properties`, igual para o keystore e para a chave):
+  `((Get-Content "<projeto>\android\key.properties" | Select-String '^storePassword=').Line -replace '^storePassword=','').Trim() | Set-Clipboard`
+
+O passo "Chave de release a partir dos secrets" mostra o tamanho do keystore descodificado (2618 bytes) e confere o SHA-256. Erros vistos a 2026-11-19: "3 bytes" = no secret ficou o comprimento do base64 em vez do base64; `keystore password was incorrect` no `packageRelease` = palavra-passe antiga no secret.
