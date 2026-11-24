@@ -3,9 +3,10 @@
 *Atualizado em 2026-11-24. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Fase 11 · Alias sem rede e talão E.Leclerc:** T1, T1b, T2 e T3 feitas (commits locais, por enviar). Próximo: **portão no telemóvel** (APK local com `adb install -r`: alias enviado, talão de 07.11 importa). [`planning/fase-11.md`](planning/fase-11.md)
+Nenhuma em curso. Ver Próximo.
 
 ## Feito
+- **Fase 11 · Alias sem rede e talão E.Leclerc:** concluída (portão a 2026-11-24; [`planning/fase-11.md`](planning/fase-11.md)). Falhas sem rede nunca ficam com erro; "Tentar agora" volta a tentar as alterações com erro; o leitor do E.Leclerc aceita NBSP. Intermarché sem leitor: em `notas.md`.
 - **Fase 10 · Assinatura e ícone:** concluída (portão a 2026-11-19; [`planning/fase-10.md`](planning/fase-10.md)). Build APK do CI verde, APK do CI instalado por cima com `adb install -r` sem perder dados. Secrets do CI: comandos na decisão 0014.
 - **Fase 9b · Limite de tempo por página:** a cópia JSON, a exportação de compras e a abertura de talões deixam de dar "Sem rede" por o conjunto das páginas passar de 10 s ([`planning/fase-9b.md`](planning/fase-9b.md); 2026-11-15).
 - **Fase 9 · Correções:** concluída (portão a 2026-11-02; [`planning/fase-9.md`](planning/fase-9.md)). Cópia JSON com loja eliminada, `ErroSemResposta` e limites de tempo no Supabase, mensagens certas nas importações, CI da web com análise e testes, abertura no Painel, cores da web. Verificado no telemóvel.

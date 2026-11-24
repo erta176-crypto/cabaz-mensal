@@ -1,6 +1,6 @@
 # Fase 11 · Correções vistas no telemóvel (alias sem rede, talão E.Leclerc)
 
-**Estado:** aprovado (2026-11-15); T1, T1b, T2 e T3 feitas; falta o portão no telemóvel. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída (portão a 2026-11-24). Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** corrigir dois erros vistos no telemóvel ao verificar a Fase 10, antes de retomar o P1.
 
@@ -57,6 +57,7 @@
 - O portão da 9b ainda não está todo confirmado: falta exportar a cópia JSON e validá-la sem `substituir` (a abertura de talões já foi vista no telemóvel).
 - Há 4 commits locais por enviar (plano e ícone da Fase 10, 9b, assinatura). O `git push` só depois de o utilizador confirmar o portão.
 
-## Portão
+## Portão [x] (2026-11-24)
+- Confirmado no telemóvel (APK release local, `adb install -r`): "Tentar agora" enviou o alias e o banner desapareceu; o PDF do E.Leclerc de 07.11.2026 importa. Testes: 484 passam, 1 saltado; análise sem avisos.
 - `dart format --set-exit-if-changed lib test`, `flutter analyze` sem avisos e `flutter test --reporter compact`, todos verdes.
 - No telemóvel (`adb install -r`): o banner "1 alteração com erro" desaparece com "Tentar agora" e o alias fica enviado; o talão do E.Leclerc de 07.11.2026 importa.
