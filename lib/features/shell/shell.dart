@@ -384,7 +384,7 @@ class _BotaoImportar extends StatelessWidget {
   }
 }
 
-/// Ao centro, 16 px acima da posição acoplada: entra só 12 px na barra e
+/// Ao centro, 14 px acima da posição acoplada: entra só 14 px na barra e
 /// não tapa os ícones.
 class _CentroAcimaDaBarra extends FloatingActionButtonLocation {
   const _CentroAcimaDaBarra();
@@ -394,7 +394,7 @@ class _CentroAcimaDaBarra extends FloatingActionButtonLocation {
     final acoplado = FloatingActionButtonLocation.centerDocked.getOffset(
       geometria,
     );
-    return acoplado.translate(0, -16);
+    return acoplado.translate(0, -14);
   }
 }
 
