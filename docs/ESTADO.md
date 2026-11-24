@@ -3,7 +3,7 @@
 *Atualizado em 2026-11-24. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-Nenhuma em curso. Ver Próximo.
+**Fase 12 · Botão "+" e Mercadona em PDF:** T1 a T4 feitas; falta a verificação visual e o portão no telemóvel. [`planning/fase-12.md`](planning/fase-12.md)
 
 ## Feito
 - **Fase 11 · Alias sem rede e talão E.Leclerc:** concluída (portão a 2026-11-24; [`planning/fase-11.md`](planning/fase-11.md)). Falhas sem rede nunca ficam com erro; "Tentar agora" volta a tentar as alterações com erro; o leitor do E.Leclerc aceita NBSP. Intermarché sem leitor: em `notas.md`.

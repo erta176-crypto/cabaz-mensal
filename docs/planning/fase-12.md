@@ -19,22 +19,25 @@
 | D4 | Acima de 800 px não há barra: o menu lateral ganha, no topo, a entrada "Importar talão", que abre a mesma folha. |
 | D5 | O botão de Artigos fica como está: tem texto ("Novo …") e não se confunde com o "+". |
 
-## T1 · Importar a partir de um tipo [ ]
+## T1 · Importar a partir de um tipo [x] (2026-11-24)
+- Feito: `AtalhoImportar` e `escolherFicheirosProvider` (o `FilePicker` passa a poder ser substituído nos testes) em `importar_exportar_page.dart`; `router.dart` lê `?tipo=`. Testes em `importar_fotos_test.dart`.
 - `router.dart`: passar o `tipo` do URL à `ImportarExportarPage`.
 - `ImportarExportarPage({tipo})`: estado inicial e, no Android, abrir o seletor depois do primeiro frame.
 - Testes de widget: com `tipo=taloes`, "O que importar" mostra "Talões (PDF)"; sem `tipo`, fica como hoje.
 
-## T2 · "+" na barra e folha de atalhos [ ]
+## T2 · "+" na barra e folha de atalhos [x] (2026-11-24)
+- Feito: `_BotaoImportar` (gradiente do `CoresCabaz`, 56 px) no meio da `NavigationBar`; botão "Importar talão" no topo do menu lateral (também no ☰ do telemóvel). A `NavigationBar` dá a cada posição o papel de separador, que exige ação de toque: a semântica do "+" tem `onTap`. Testes em `shell_test.dart`.
 - `shell.dart`: "+" central na barra (< 800 px) e entrada no menu lateral (≥ 800 px); folha com os atalhos de D2.
 - Semântica ("Importar talão"), área de toque ≥ 48 px, cores do `CoresCabaz`.
 - Testes de widget: o "+" existe abaixo de 800 px e não acima; tocar num atalho navega para `/importar?tipo=…`; os 4 destinos continuam a navegar.
 
-## T4 · Mercadona "Fatura Simplificada" em PDF [ ]
+## T4 · Mercadona "Fatura Simplificada" em PDF [x] (2026-11-24)
+- Feito: `_dataPdf`, início dos artigos pela linha com "Descri", cabeçalho e rodapé de página ignorados, total com " €". Fixture fictícia `mercadona_pdf.txt`. Real: 67 linhas, bate; análise 104/104. O teste local `taloes_reais_test.dart` passa a ter o Mercadona no catálogo.
 - Primeiro um teste com um talão fictício com a mesma estrutura (`Data de emissão: DD-MM-AAAA HH:MM`; `Qtd. Descrição P. Unit (€) Valor (€) Taxa`), que falha com "Talão sem data".
 - `lerMercadona` passa a aceitar esta variante sem deixar de ler o talão em papel (testes atuais iguais).
 - Talão real em `dados-privados/talões/Mercadona_/` passa a bater (total e linhas).
 
-## T3 · Documentação [ ]
+## T3 · Documentação [x] (2026-11-24)
 - `mapa.md` (se aparecer ficheiro novo), `ESTADO.md`, este plano.
 
 ## Portão

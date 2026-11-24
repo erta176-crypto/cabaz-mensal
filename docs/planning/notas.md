@@ -7,3 +7,4 @@
 - CI: o Flutter está fixo em 3.47.5 nos dois workflows (2026-11-15), porque o `stable` passou a 3.50.0 e a análise falhou no CI (avisos não confirmados: o registo pede login). Subir o Flutter local e o do CI juntos, numa tarefa própria, e corrigir os avisos novos.
 - Comportamento conhecido: se a rede cair a meio do `recarregarTudo()` (depois de uma importação), a cache fica vazia até à próxima tentativa automática ou até a rede voltar; os dados estão no servidor.
 - Talões: o Intermarché não tem leitor (só Pingo Doce, Lidl, E.Leclerc e Mercadona); uma fotografia de talão do Intermarché dá "Formato de talão não reconhecido" (visto a 2026-11-24). Um leitor novo pede uma fase própria e talões de exemplo.
+- Talões: um PDF sem texto (digitalizado como imagem) dá "Formato de talão não reconhecido", quando devia dizer que o PDF não tem texto; lê-lo pediria OCR das páginas (visto a 2026-11-24, Fase 12).
