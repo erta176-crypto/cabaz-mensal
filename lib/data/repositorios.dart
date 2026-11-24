@@ -256,6 +256,9 @@ abstract interface class SyncRepository {
   Stream<List<AlteracaoPendente>> observarPendentes();
   Future<void> sincronizar();
 
+  /// Volta a tentar também as alterações com erro e sincroniza.
+  Future<void> tentarDeNovo();
+
   /// Descarta uma alteração recusada e volta a carregar o que ela afetava.
   Future<void> descartar(int id);
 

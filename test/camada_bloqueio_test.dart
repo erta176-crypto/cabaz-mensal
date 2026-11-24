@@ -29,6 +29,9 @@ class _FakeSync implements SyncRepository {
   Future<void> sincronizar() async {}
 
   @override
+  Future<void> tentarDeNovo() async {}
+
+  @override
   Future<void> descartar(int id) async {}
 
   @override

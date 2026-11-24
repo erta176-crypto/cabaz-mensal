@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cabaz_mensal/data/sync/servidor.dart';
 import 'package:cabaz_mensal/data/sync/servidor_supabase.dart';
+import 'package:cabaz_mensal/data/sync/sync_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -91,6 +92,55 @@ void main() {
       expect(fila.single.erro, contains('503'));
     },
   );
+
+  group('Tentar agora', () {
+    test(
+      'alteração com erro antigo volta a ser enviada e sai da fila',
+      () async {
+        final servidor = ServidorFalso();
+        final telemovel = Dispositivo(servidor);
+        addTearDown(telemovel.fechar);
+        final repo = LocalSyncRepository(telemovel.base, telemovel.sync);
+
+        servidor.online = false;
+        await telemovel.artigos.guardarAlias('loja-lidl', 'SALADA', 'a1');
+        // Estado deixado pelas versões anteriores à T1: erro de rede gravado.
+        final id = (await telemovel.base.observarPendentes().first).single.id;
+        await telemovel.base.marcarTentativa(
+          id,
+          erro: 'Sessão: ClientException with SocketException',
+        );
+
+        servidor.online = true;
+        await telemovel.sincronizar();
+        expect(servidor.t('aliases'), isEmpty);
+
+        await repo.tentarDeNovo();
+        expect(servidor.t('aliases').single['texto_talao'], 'SALADA');
+        expect(await telemovel.base.observarPendentes().first, isEmpty);
+      },
+    );
+
+    test('o servidor volta a recusar: fica outra vez com erro', () async {
+      final servidor = ServidorFalso()..recusar.add('aliases');
+      final telemovel = Dispositivo(servidor);
+      addTearDown(telemovel.fechar);
+      final repo = LocalSyncRepository(telemovel.base, telemovel.sync);
+
+      await telemovel.artigos.guardarAlias('loja-lidl', 'SALADA', 'a1');
+      await telemovel.sync.enviar();
+      expect(
+        (await telemovel.base.observarPendentes().first).single.erro,
+        contains('RLS'),
+      );
+
+      await repo.tentarDeNovo();
+      final fila = await telemovel.base.observarPendentes().first;
+      expect(fila.single.erro, contains('RLS'));
+      expect(fila.single.tentativas, 1);
+      expect(servidor.t('aliases'), isEmpty);
+    });
+  });
 
   group('classificarErro', () {
     test('falha de rede ao renovar a sessão: sem rede', () {

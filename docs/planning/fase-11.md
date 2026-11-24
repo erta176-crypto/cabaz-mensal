@@ -1,6 +1,6 @@
 # Fase 11 · Correções vistas no telemóvel (alias sem rede, talão E.Leclerc)
 
-**Estado:** aprovado (2026-11-15); T1 e T2 feitas; T1b aprovada a 2026-11-19 (opção A), por fazer. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-15); T1, T1b, T2 e T3 feitas; falta o portão no telemóvel. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** corrigir dois erros vistos no telemóvel ao verificar a Fase 10, antes de retomar o P1.
 
@@ -32,7 +32,8 @@
 - Correção: `ErroSync.semRede` (`servidor.dart`), definido em `classificarErro` (ramo `AuthException` e ramo de rede) e respeitado em `Sincronizador.enviar`. O `ServidorFalso` marca "Sem rede" e "Resposta perdida" como `semRede` e tem `indisponivel` (503).
 - Os testes existentes de `test/sync/` passam sem alterações.
 
-## T1b · "Tentar agora" volta a tentar as alterações com erro [ ]
+## T1b · "Tentar agora" volta a tentar as alterações com erro [x] (2026-11-24)
+- Feito: `BaseLocal.limparErrosPendentes`, `SyncRepository.tentarDeNovo` (limpa e chama `sincronizar`), botão em `faixa_sync.dart`. Testes em `aliases_sync_test.dart` (falhavam antes): erro antigo de rede → enviado e fora da fila; RLS → volta a ficar com erro.
 - Visto no telemóvel (2026-11-19): o alias com erro de rede de antes da T1 fica para sempre; "Tentar agora" (`faixa_sync.dart:166`) só chama `sincronizar()` e `pendentesPorEnviar` (`base_local.dart:181`) filtra `erro IS NULL`.
 - Decisão (opção A, aprovada): "Tentar agora" limpa `erro` e `tentativas` de todas as alterações por enviar e depois sincroniza. Se o servidor voltar a recusar, voltam a ficar com erro. Rejeitadas: B (limpar ao arrancar pelo texto do erro: frágil, é migração de dados) e C (descartar o alias à mão).
 - Ficheiros: `base_local.dart` (método que limpa os erros), `SyncRepository`/`Sincronizador` (`tentarDeNovo()`), `faixa_sync.dart` (o botão chama-o). Ficheiros partilhados: dizer o impacto pelo grafo antes de editar.
@@ -46,7 +47,8 @@
 - Corrigir `lerLeclerc` para aceitar a variante, sem deixar de aceitar os talões atuais (os testes de `taloes_reais_test.dart` e as fixtures atuais têm de continuar iguais).
 - Voltar a importar o PDF real no telemóvel.
 
-## T3 · Documentação [ ]
+## T3 · Documentação [x] (2026-11-24)
+- `sincronizacao.md` com a regra do "Tentar agora". Nada para `notas.md`.
 - `notas.md`: o comportamento conhecido, se alguma das correções deixar casos fora.
 - `sincronizacao.md`, se a regra de erros transitórios mudar.
 - `ESTADO.md` e este plano marcados.

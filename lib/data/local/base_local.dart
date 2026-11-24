@@ -200,6 +200,12 @@ class BaseLocal extends _$BaseLocal {
     updates: {pendentes},
   );
 
+  /// Põe as alterações com erro outra vez na fila ("Tentar agora").
+  Future<void> limparErrosPendentes() => customUpdate(
+    'UPDATE pendentes SET tentativas = 0, erro = NULL',
+    updates: {pendentes},
+  );
+
   // ---- Estado ------------------------------------------------------------
 
   Future<String?> lerEstado(String chave) async => (await (select(

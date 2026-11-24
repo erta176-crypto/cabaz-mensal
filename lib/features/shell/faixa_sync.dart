@@ -163,7 +163,7 @@ class DialogoPendentes extends ConsumerWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => ref.read(syncRepositoryProvider).sincronizar(),
+          onPressed: () => ref.read(syncRepositoryProvider).tentarDeNovo(),
           child: const Text('Tentar agora'),
         ),
         TextButton(

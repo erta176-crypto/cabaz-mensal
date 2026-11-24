@@ -33,6 +33,12 @@ class LocalSyncRepository implements SyncRepository {
   Future<void> sincronizar() async => _sincronizador?.sincronizar();
 
   @override
+  Future<void> tentarDeNovo() async {
+    await _base.limparErrosPendentes();
+    await _sincronizador?.sincronizar();
+  }
+
+  @override
   Future<void> descartar(int id) async {
     final p = (await _base.observarPendentes().first)
         .where((p) => p.id == id)

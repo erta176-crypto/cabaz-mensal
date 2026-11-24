@@ -1,9 +1,9 @@
 # Estado do projeto
 
-*Atualizado em 2026-11-19. Manter curto; o detalhe está nos ficheiros ligados.*
+*Atualizado em 2026-11-24. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Fase 11 · Alias sem rede e talão E.Leclerc:** plano aprovado; T1 e T2 feitas (commits locais 46e0651 e 72df2dc, por enviar). Próximo: **T1b** ("Tentar agora" volta a tentar as alterações com erro; opção A aprovada a 2026-11-19), depois T3 e o portão no telemóvel (APK local com `adb install -r`: alias enviado, talão de 07.11 importa). [`planning/fase-11.md`](planning/fase-11.md)
+**Fase 11 · Alias sem rede e talão E.Leclerc:** T1, T1b, T2 e T3 feitas (commits locais, por enviar). Próximo: **portão no telemóvel** (APK local com `adb install -r`: alias enviado, talão de 07.11 importa). [`planning/fase-11.md`](planning/fase-11.md)
 
 ## Feito
 - **Fase 10 · Assinatura e ícone:** concluída (portão a 2026-11-19; [`planning/fase-10.md`](planning/fase-10.md)). Build APK do CI verde, APK do CI instalado por cima com `adb install -r` sem perder dados. Secrets do CI: comandos na decisão 0014.

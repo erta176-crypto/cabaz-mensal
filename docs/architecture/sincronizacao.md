@@ -8,7 +8,7 @@ A app funciona sem rede. Toda a escrita passa pela cache local (drift) e por uma
 
 ## Envio e receção (`lib/data/sync/sincronizador.dart`)
 - Envio por ordem, com espera crescente entre tentativas.
-- Erros (`classificarErro`, `ErroSync`): permanente (o servidor recusa: RLS, chave repetida, sessão inválida) → a alteração fica com erro e a fila anda; transitório do servidor (5xx, timeout do Postgres) → conta uma tentativa e, à 20.ª, fica com erro; sem rede (`semRede`: o pedido não chegou ou a resposta perdeu-se, incluindo a renovação da sessão) → não conta tentativa e nunca fica com erro (Fase 11, D1).
+- Erros (`classificarErro`, `ErroSync`): permanente (o servidor recusa: RLS, chave repetida, sessão inválida) → a alteração fica com erro e a fila anda; transitório do servidor (5xx, timeout do Postgres) → conta uma tentativa e, à 20.ª, fica com erro; sem rede (`semRede`: o pedido não chegou ou a resposta perdeu-se, incluindo a renovação da sessão) → não conta tentativa e nunca fica com erro (Fase 11, D1). "Tentar agora" (`SyncRepository.tentarDeNovo`) limpa `erro` e `tentativas` de toda a fila e sincroniza; o que o servidor voltar a recusar fica outra vez com erro (Fase 11, T1b).
 - Receção por `atualizado_em`, com margem de 5 min.
 - O cursor da receção nunca fica atrás de `agora()` do servidor menos a margem.
 
