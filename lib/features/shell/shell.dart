@@ -320,7 +320,7 @@ class _AppShellState extends State<AppShell> {
       floatingActionButton: noBarra < 0
           ? null
           : _BotaoImportar(aoTocar: _abrirAtalhos),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: const _CentroAcimaDaBarra(),
       bottomNavigationBar: noBarra < 0
           ? null
           : DecoratedBox(
@@ -355,34 +355,46 @@ class _BotaoImportar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cores = CoresCabaz.of(context);
-    return Center(
-      child: Semantics(
-        button: true,
-        label: 'Importar talão',
-        onTap: aoTocar,
-        excludeSemantics: true,
-        child: Material(
-          shape: const CircleBorder(),
-          clipBehavior: Clip.antiAlias,
-          elevation: 3,
-          child: Ink(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [cores.gradienteInicio, cores.gradienteFim],
-              ),
+    return Semantics(
+      button: true,
+      label: 'Importar talão',
+      onTap: aoTocar,
+      excludeSemantics: true,
+      child: Material(
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        elevation: 3,
+        child: Ink(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [cores.gradienteInicio, cores.gradienteFim],
             ),
-            child: InkWell(
-              onTap: aoTocar,
-              child: Icon(Icons.add, size: 30, color: cores.sobreGradiente),
-            ),
+          ),
+          child: InkWell(
+            onTap: aoTocar,
+            child: Icon(Icons.add, size: 30, color: cores.sobreGradiente),
           ),
         ),
       ),
     );
+  }
+}
+
+/// Ao centro, 16 px acima da posição acoplada: entra só 12 px na barra e
+/// não tapa os ícones.
+class _CentroAcimaDaBarra extends FloatingActionButtonLocation {
+  const _CentroAcimaDaBarra();
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry geometria) {
+    final acoplado = FloatingActionButtonLocation.centerDocked.getOffset(
+      geometria,
+    );
+    return acoplado.translate(0, -16);
   }
 }
 

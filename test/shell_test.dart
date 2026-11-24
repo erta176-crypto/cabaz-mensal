@@ -159,6 +159,20 @@ void main() {
       expect(find.text('pagina /importar?tipo=taloes'), findsOneWidget);
     });
 
+    testWidgets('telemóvel: o "+" fica ao centro, um pouco acima da barra', (
+      tester,
+    ) async {
+      await _tamanho(tester, 400);
+      await tester.pumpWidget(_app('/lista'));
+      await tester.pumpAndSettle();
+      final mais = tester.getRect(find.bySemanticsLabel('Importar talão'));
+      final barra = tester.getRect(find.byType(NavigationBar));
+      expect(mais.center.dx, closeTo(barra.center.dx, 1));
+      // Entra no máximo 12 px na barra: não tapa os ícones.
+      expect(mais.bottom, lessThanOrEqualTo(barra.top + 12));
+      expect(mais.bottom, greaterThan(barra.top));
+    });
+
     testWidgets('telemóvel: os 4 nomes da barra ficam numa só linha', (
       tester,
     ) async {
