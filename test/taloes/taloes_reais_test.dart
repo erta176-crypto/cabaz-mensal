@@ -76,6 +76,7 @@ void main() {
           Loja(id: 'pd', slug: 'pingo-doce', nome: 'Pingo Doce'),
           Loja(id: 'lidl', slug: 'lidl', nome: 'Lidl'),
           Loja(id: 'lec', slug: 'e-leclerc', nome: 'E.Leclerc'),
+          Loja(id: 'mer', slug: 'mercadona', nome: 'Mercadona'),
         ],
         categorias: const [],
         artigos: const [],

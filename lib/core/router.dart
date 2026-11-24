@@ -83,8 +83,17 @@ GoRouter criarRouter(AuthRepository auth) {
           ),
           GoRoute(
             path: '/importar',
-            pageBuilder: (_, _) =>
-                const NoTransitionPage(child: ImportarExportarPage()),
+            pageBuilder: (_, estado) {
+              final atalho = AtalhoImportar.values
+                  .asNameMap()[estado.uri.queryParameters['tipo']];
+              // Outro atalho com o Importar aberto recria a página.
+              return NoTransitionPage(
+                child: ImportarExportarPage(
+                  key: ValueKey(atalho),
+                  atalho: atalho,
+                ),
+              );
+            },
           ),
           GoRoute(
             path: '/definicoes',

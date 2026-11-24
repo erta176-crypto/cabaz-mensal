@@ -81,6 +81,21 @@ final lerTextoPdfProvider = Provider<LerTextoPdf>((_) => textoDoPdf);
 bool get fotosNoAparelho =>
     !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
+/// Seletor de ficheiros com as extensões dadas (substituído nos testes).
+final escolherFicheirosProvider =
+    Provider<Future<List<PlatformFile>> Function(List<String> extensoes)>(
+      (_) =>
+          (extensoes) => FilePicker.pickFiles(
+            dialogTitle: 'Escolher ficheiro',
+            type: FileType.custom,
+            allowedExtensions: extensoes,
+          ),
+    );
+
+/// Atalhos do "+" (`/importar?tipo=…`): escolhem o tipo e, no aparelho,
+/// abrem logo o seletor.
+enum AtalhoImportar { taloes, camera, galeria }
+
 /// Câmara, galeria e fotografia recuperada depois de o Android terminar a
 /// app com a câmara aberta (substituídas nos testes).
 typedef SeletorFotos = ({
@@ -119,7 +134,9 @@ enum Formato {
 }
 
 class ImportarExportarPage extends ConsumerStatefulWidget {
-  const ImportarExportarPage({super.key});
+  const ImportarExportarPage({super.key, this.atalho});
+
+  final AtalhoImportar? atalho;
 
   @override
   ConsumerState<ImportarExportarPage> createState() =>
@@ -168,8 +185,25 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
   @override
   void initState() {
     super.initState();
+    final atalho = widget.atalho;
+    if (atalho != null) {
+      _oQue = atalho == AtalhoImportar.taloes ? OQue.taloes : OQue.fotos;
+    }
     if (fotosNoAparelho) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _recuperarFoto());
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await _recuperarFoto();
+        // Na web, o navegador só abre o seletor a partir de um toque.
+        if (!mounted || _ocupado) return;
+        switch (atalho) {
+          case AtalhoImportar.taloes:
+            await _escolherFicheiro();
+          case AtalhoImportar.camera:
+            await _tirarFotografia();
+          case AtalhoImportar.galeria:
+            await _escolherFotografias();
+          case null:
+        }
+      });
     }
   }
 
@@ -202,11 +236,9 @@ class _ImportarExportarPageState extends ConsumerState<ImportarExportarPage> {
   // ---------------------------------------------------------------------------
 
   Future<void> _escolherFicheiro() async {
-    final ficheiros = await FilePicker.pickFiles(
-      dialogTitle: 'Escolher ficheiro',
-      type: FileType.custom,
-      allowedExtensions: [for (final f in _oQue.paraImportar) f.extensao],
-    );
+    final ficheiros = await ref.read(escolherFicheirosProvider)([
+      for (final f in _oQue.paraImportar) f.extensao,
+    ]);
     if (ficheiros.isEmpty || !mounted) return;
     if (_oQue == OQue.taloes) {
       return _abrirTaloes([

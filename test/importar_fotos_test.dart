@@ -80,6 +80,8 @@ void main() {
     WidgetTester t, {
     List<XFile> galeria = const [],
     List<XFile> perdidas = const [],
+    AtalhoImportar? atalho,
+    List<String> pedidos = const [],
   }) async {
     t.view.physicalSize = const Size(1000, 3000);
     t.view.devicePixelRatio = 1;
@@ -104,10 +106,17 @@ void main() {
           artigosRepositoryProvider.overrideWithValue(_Artigos()),
           categoriasRepositoryProvider.overrideWithValue(_Categorias()),
           seletorFotosProvider.overrideWithValue((
-            camera: () async => const [],
+            camera: () async {
+              pedidos.add('camera');
+              return const [];
+            },
             galeria: () async => galeria,
             perdidas: () async => perdidas,
           )),
+          escolherFicheirosProvider.overrideWithValue((extensoes) async {
+            pedidos.add('ficheiros ${extensoes.join(',')}');
+            return const [];
+          }),
           ocrFotosProvider.overrideWithValue((
             inteira: (_) async => _caixas(_mercadona),
             emFaixas: (_) async => const [],
@@ -115,7 +124,7 @@ void main() {
         ],
         child: MaterialApp(
           theme: construirTema(Brightness.light, fontesGoogle: false),
-          home: const ImportarExportarPage(),
+          home: ImportarExportarPage(atalho: atalho),
         ),
       ),
     );
@@ -196,5 +205,55 @@ void main() {
     await t.pumpAndSettle();
     expect(find.byType(ExpansionTile), findsNothing);
     expect(File(f.path).existsSync(), isFalse);
+  });
+
+  group('atalhos do "+"', () {
+    String oQue(WidgetTester t) => t
+        .widget<EditableText>(
+          find.descendant(
+            of: find.byType(DropdownMenu<OQue>).first,
+            matching: find.byType(EditableText),
+          ),
+        )
+        .controller
+        .text;
+
+    testWidgets('"Talão em PDF": Talões (PDF) e abre o seletor de PDFs', (
+      t,
+    ) async {
+      final pedidos = <String>[];
+      await abrir(t, atalho: AtalhoImportar.taloes, pedidos: pedidos);
+      expect(oQue(t), 'Talões (PDF)');
+      expect(pedidos, ['ficheiros pdf']);
+    });
+
+    testWidgets('"Fotografar talão": Talões (fotografia) e abre a câmara', (
+      t,
+    ) async {
+      final pedidos = <String>[];
+      await abrir(t, atalho: AtalhoImportar.camera, pedidos: pedidos);
+      expect(oQue(t), 'Talões (fotografia)');
+      expect(pedidos, ['camera']);
+    });
+
+    testWidgets('"Talão da galeria": escolhe da galeria e lê o talão', (
+      t,
+    ) async {
+      await abrir(
+        t,
+        atalho: AtalhoImportar.galeria,
+        galeria: [foto('talao.jpg')],
+      );
+      expect(oQue(t), 'Talões (fotografia)');
+      expect(find.byType(ExpansionTile), findsOneWidget);
+      expect(find.textContaining(RegExp(r'· Novo$')), findsOneWidget);
+    });
+
+    testWidgets('sem atalho: fica como antes e não abre nada', (t) async {
+      final pedidos = <String>[];
+      await abrir(t, pedidos: pedidos);
+      expect(oQue(t), 'Artigos e preços');
+      expect(pedidos, isEmpty);
+    });
   });
 }

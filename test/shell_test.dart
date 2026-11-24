@@ -1,6 +1,7 @@
 import 'package:cabaz_mensal/core/tema.dart';
 import 'package:cabaz_mensal/features/shell/filtro_pilula.dart';
 import 'package:cabaz_mensal/features/shell/shell.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -23,9 +24,12 @@ Widget _app(
           for (final d in destinos)
             GoRoute(
               path: d.caminho,
-              builder: (_, _) => Pagina(
+              builder: (_, estado) => Pagina(
                 titulo: d.rotuloCurto,
-                corpo: Text('pagina ${d.caminho}'),
+                corpo: Text(
+                  'pagina ${d.caminho}'
+                  '${estado.uri.hasQuery ? '?${estado.uri.query}' : ''}',
+                ),
               ),
             ),
         ],
@@ -45,6 +49,101 @@ Future<void> _tamanho(WidgetTester tester, double largura) async {
 }
 
 void main() {
+  group('"+" para importar talões', () {
+    Future<void> abrirFolha(WidgetTester tester) async {
+      await tester.tap(find.bySemanticsLabel('Importar talão'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('telemóvel: "+" no meio da barra abre os atalhos', (
+      tester,
+    ) async {
+      await _tamanho(tester, 400);
+      await tester.pumpWidget(_app('/lista'));
+      await tester.pumpAndSettle();
+
+      // Dois destinos de cada lado do "+".
+      final mais = tester.getCenter(find.bySemanticsLabel('Importar talão'));
+      expect(mais.dx, closeTo(200, 1));
+      Finder naBarra(String t) => find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text(t),
+      );
+      expect(tester.getCenter(naBarra('Lista')).dx, lessThan(mais.dx));
+      expect(tester.getCenter(naBarra('Histórico')).dx, greaterThan(mais.dx));
+      expect(
+        tester.getSize(find.bySemanticsLabel('Importar talão')).width,
+        greaterThanOrEqualTo(48),
+      );
+
+      await abrirFolha(tester);
+      expect(find.text('Talão em PDF'), findsOneWidget);
+      expect(find.text('Fotografar talão'), findsOneWidget);
+      expect(find.text('Talão da galeria'), findsOneWidget);
+      expect(find.text('Outro ficheiro'), findsOneWidget);
+
+      await tester.tap(find.text('Talão em PDF'));
+      await tester.pumpAndSettle();
+      expect(find.text('pagina /importar?tipo=taloes'), findsOneWidget);
+    });
+
+    testWidgets('cada atalho vai para o seu tipo', (tester) async {
+      await _tamanho(tester, 400);
+      for (final (rotulo, destino) in [
+        ('Fotografar talão', 'pagina /importar?tipo=camera'),
+        ('Talão da galeria', 'pagina /importar?tipo=galeria'),
+        ('Outro ficheiro', 'pagina /importar'),
+      ]) {
+        await tester.pumpWidget(_app('/painel'));
+        await tester.pumpAndSettle();
+        await abrirFolha(tester);
+        await tester.tap(find.text(rotulo));
+        await tester.pumpAndSettle();
+        expect(find.text(destino), findsOneWidget, reason: rotulo);
+      }
+    });
+
+    testWidgets('fora do Android: sem atalhos de fotografia', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      try {
+        await _tamanho(tester, 400);
+        await tester.pumpWidget(_app('/lista'));
+        await tester.pumpAndSettle();
+        await abrirFolha(tester);
+        expect(find.text('Talão em PDF'), findsOneWidget);
+        expect(find.text('Fotografar talão'), findsNothing);
+        expect(find.text('Talão da galeria'), findsNothing);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
+
+    testWidgets('ecrã largo: "Importar talão" no topo do menu', (tester) async {
+      await _tamanho(tester, 1200);
+      await tester.pumpWidget(_app('/lista'));
+      await tester.pumpAndSettle();
+      expect(find.byType(NavigationBar), findsNothing);
+      await abrirFolha(tester);
+      await tester.tap(find.text('Talão em PDF'));
+      await tester.pumpAndSettle();
+      expect(find.text('pagina /importar?tipo=taloes'), findsOneWidget);
+    });
+
+    testWidgets('telemóvel: os destinos à direita do "+" navegam', (
+      tester,
+    ) async {
+      await _tamanho(tester, 400);
+      await tester.pumpWidget(_app('/lista'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Histórico'));
+      await tester.pumpAndSettle();
+      expect(find.text('pagina /historico'), findsOneWidget);
+      await tester.tap(find.text('Painel'));
+      await tester.pumpAndSettle();
+      expect(find.text('pagina /painel'), findsOneWidget);
+    });
+  });
+
   testWidgets('telemóvel (< 800 px): barra inferior com 4 e ☰ com 6', (
     tester,
   ) async {

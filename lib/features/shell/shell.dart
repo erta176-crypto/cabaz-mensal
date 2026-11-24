@@ -1,4 +1,5 @@
 import 'package:cabaz_mensal/core/tema.dart';
+import 'package:cabaz_mensal/features/importar_exportar/importar_exportar_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -140,6 +141,48 @@ class _AppShellState extends State<AppShell> {
     context.go(destinos[indice].caminho);
   }
 
+  /// Atalhos do "+" para importar talões (Fase 12, D2).
+  Future<void> _abrirAtalhos() async {
+    _chave.currentState?.closeDrawer();
+    final caminho = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (contexto) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (icone, rotulo, caminho) in [
+              (
+                Icons.picture_as_pdf_outlined,
+                'Talão em PDF',
+                '/importar?tipo=${AtalhoImportar.taloes.name}',
+              ),
+              if (fotosNoAparelho) ...[
+                (
+                  Icons.photo_camera_outlined,
+                  'Fotografar talão',
+                  '/importar?tipo=${AtalhoImportar.camera.name}',
+                ),
+                (
+                  Icons.photo_library_outlined,
+                  'Talão da galeria',
+                  '/importar?tipo=${AtalhoImportar.galeria.name}',
+                ),
+              ],
+              (Icons.upload_file_outlined, 'Outro ficheiro', '/importar'),
+            ])
+              ListTile(
+                leading: Icon(icone),
+                title: Text(rotulo),
+                onTap: () => Navigator.pop(contexto, caminho),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (caminho != null && mounted) context.go(caminho);
+  }
+
   @override
   Widget build(BuildContext context) {
     final atual = indiceDestino(widget.localizacao);
@@ -201,6 +244,14 @@ class _AppShellState extends State<AppShell> {
         ),
         children: [
           const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: FilledButton.icon(
+              onPressed: _abrirAtalhos,
+              icon: const Icon(Icons.add),
+              label: const Text('Importar talão'),
+            ),
+          ),
           for (final d in destinos) ...[
             if (d.caminho == '/importar')
               const Divider(indent: 28, endIndent: 28),
@@ -247,6 +298,8 @@ class _AppShellState extends State<AppShell> {
     }
 
     final noBarra = destinosBarraInferior.indexOf(destinos[atual]);
+    // O "+" fica no meio da barra, entre os destinos.
+    final meio = destinosBarraInferior.length ~/ 2;
     return Scaffold(
       key: _chave,
       drawer: menu,
@@ -265,19 +318,64 @@ class _AppShellState extends State<AppShell> {
                 border: Border(top: BorderSide(color: esquema.outlineVariant)),
               ),
               child: NavigationBar(
-                selectedIndex: noBarra,
-                onDestinationSelected: (i) =>
-                    _ir(destinos.indexOf(destinosBarraInferior[i])),
+                selectedIndex: noBarra < meio ? noBarra : noBarra + 1,
+                onDestinationSelected: (i) => _ir(
+                  destinos.indexOf(destinosBarraInferior[i < meio ? i : i - 1]),
+                ),
                 destinations: [
-                  for (final d in destinosBarraInferior)
+                  for (final (i, d) in destinosBarraInferior.indexed) ...[
+                    if (i == meio) _BotaoImportar(aoTocar: _abrirAtalhos),
                     NavigationDestination(
                       icon: Icon(d.icone),
                       selectedIcon: Icon(d.iconeSelecionado),
                       label: d.rotuloCurto,
                     ),
+                  ],
                 ],
               ),
             ),
+    );
+  }
+}
+
+/// "+" redondo no meio da barra inferior: abre os atalhos de importação.
+class _BotaoImportar extends StatelessWidget {
+  const _BotaoImportar({required this.aoTocar});
+
+  final VoidCallback aoTocar;
+
+  @override
+  Widget build(BuildContext context) {
+    final cores = CoresCabaz.of(context);
+    return Center(
+      child: Semantics(
+        button: true,
+        label: 'Importar talão',
+        // A NavigationBar marca cada posição como separador, que tem de ter
+        // uma ação de toque.
+        onTap: aoTocar,
+        excludeSemantics: true,
+        child: Material(
+          shape: const CircleBorder(),
+          clipBehavior: Clip.antiAlias,
+          elevation: 3,
+          child: Ink(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [cores.gradienteInicio, cores.gradienteFim],
+              ),
+            ),
+            child: InkWell(
+              onTap: aoTocar,
+              child: Icon(Icons.add, size: 30, color: cores.sobreGradiente),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

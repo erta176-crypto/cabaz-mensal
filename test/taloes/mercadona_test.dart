@@ -82,6 +82,23 @@ void main() {
     );
   });
 
+  test(
+    'fatura simplificada em PDF: data, artigos de várias páginas e total',
+    () {
+      final t = lerMercadona(_fixture('mercadona_pdf'))!;
+      expect(t.data, DateTime(2026, 11, 22));
+      expect(
+        [for (final l in t.linhas) l.texto],
+        ['AGUA COM GAS', 'IOGURTE NATURAL', 'CAFE MOIDO'],
+      );
+      expect([for (final l in t.linhas) l.quantidade], [1, 2, 1]);
+      expect([for (final l in t.linhas) l.precoUnitCent], [59, 45, 315]);
+      expect(t.naoReconhecidas, isEmpty);
+      expect(t.totalCent, 464);
+      expect(t.bate, isTrue);
+    },
+  );
+
   test('lerTalao reconhece o Mercadona e os outros leitores não', () {
     expect(lerTalao(texto)!.loja, 'Mercadona');
     expect(lerPingoDoce(texto), isNull);

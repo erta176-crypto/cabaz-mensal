@@ -1,15 +1,23 @@
-/// Leitor dos talões do Mercadona (texto do OCR de uma fotografia). Regras em
-/// docs/planning/fase-7.md (T2 e D4).
+/// Leitor dos talões do Mercadona: texto do OCR de uma fotografia
+/// (docs/planning/fase-7.md, T2 e D4) e fatura simplificada em PDF
+/// (docs/planning/fase-12.md, T4).
 library;
 
 import 'talao.dart';
 
 /// Quantidade, texto, preço unitário (só com quantidade > 1), valor, IVA.
 final _artigo = RegExp(r'^(\d+) ?(.+?)(?: (\d+,\d{2}))? (\d+,\d{2}) [A-Z]$');
-final _valorNoFim = RegExp(r' (\d+,\d{2})€?$');
+final _valorNoFim = RegExp(r' (\d+,\d{2}) ?€?$');
 final _compra = RegExp(r'COMPRA (\d+,\d{2})');
 final _iva = RegExp(r'^[A-Z] \d+% \d+,\d{2} \d+,\d{2} (\d+,\d{2})$');
 final _data = RegExp(r'^(\d{2})-(\d{2})-(\d{2}) \d{2}:\d{2}');
+
+/// Fatura em PDF: "Data de emissão: DD-MM-AAAA HH:MM".
+final _dataPdf = RegExp(r'^Data de emiss.o: (\d{2})-(\d{2})-(\d{4})');
+
+/// Cabeçalho e rodapé que o PDF repete em cada página, no meio dos artigos.
+bool _repetidoNaPagina(String l) =>
+    l.contains('Descri') || l.startsWith('MERCADONA —');
 
 /// null se o texto não é de um talão do Mercadona. Lança [FormatException]
 /// se é, mas falta a data ou o total.
@@ -17,15 +25,32 @@ TalaoLido? lerMercadona(String texto) {
   if (!texto.contains('MERCADONA')) return null;
   final ls = linhasDe(texto);
 
+  final dataPdf = ls.map(_dataPdf.firstMatch).nonNulls.firstOrNull;
   final dataM = ls.map(_data.firstMatch).nonNulls.firstOrNull;
-  if (dataM == null) throw const FormatException('Talão sem data');
+  final DateTime data;
+  if (dataPdf != null) {
+    data = DateTime(
+      int.parse(dataPdf[3]!),
+      int.parse(dataPdf[2]!),
+      int.parse(dataPdf[1]!),
+    );
+  } else if (dataM != null) {
+    data = DateTime(
+      2000 + int.parse(dataM[1]!),
+      int.parse(dataM[2]!),
+      int.parse(dataM[3]!),
+    );
+  } else {
+    throw const FormatException('Talão sem data');
+  }
   final iTotal = ls.indexWhere((l) => l.startsWith('TOTAL'));
   if (iTotal < 0) throw const FormatException('Talão sem total');
 
   final linhas = <LinhaTalao>[];
   final estranhas = <String>[];
-  final inicio = ls.indexWhere((l) => l.startsWith('Descri')) + 1;
+  final inicio = ls.indexWhere((l) => l.contains('Descri')) + 1;
   for (final l in ls.sublist(inicio, iTotal)) {
+    if (_repetidoNaPagina(l)) continue;
     final m = _artigo.firstMatch(l);
     if (m == null) {
       estranhas.add(l);
@@ -62,11 +87,7 @@ TalaoLido? lerMercadona(String texto) {
 
   return TalaoLido(
     loja: 'Mercadona',
-    data: DateTime(
-      2000 + int.parse(dataM[1]!),
-      int.parse(dataM[2]!),
-      int.parse(dataM[3]!),
-    ),
+    data: data,
     linhas: linhas,
     totalCent: candidatos.contains(soma) ? soma : candidatos.first,
     naoReconhecidas: estranhas,

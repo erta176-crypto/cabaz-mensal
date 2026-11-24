@@ -1,0 +1,25 @@
+MERCADONA
+FATURA SIMPLIFICADA: FS 0000000000000/000001
+Loja: Rua Fictícia, 1 — Cidade Exemplo
+Telefone: 200000000
+Empresa: Empresa Exemplo, Lda.
+NIF Emissor: 500000000 | Capital Social: 1.000 €
+Data de emissão: 22-11-2026 18:05
+ATCUD: ABCD1234-1
+Artigos Adquiridos
+Qtd. Descrição P. Unit (€) Valor (€) Taxa
+1 AGUA COM GAS 0,59 0,59 D
+2 IOGURTE NATURAL 0,45 0,90 B
+MERCADONA — Fatura Simplificada FS 0000000000000/000001 Page 1 of 2
+Qtd. Descrição P. Unit (€) Valor (€) Taxa
+1 CAFE MOIDO 3,15 3,15 D
+TOTAL 4,64 €
+CARTÃO BANCÁRIO 4,64 €
+Resumo de IVA
+Taxa Valor s/IVA (€) Valor IVA (€) Valor c/IVA (€)
+B 6% 0,85 0,05 0,90
+D 23% 3,04 0,70 3,74
+Detalhes do Pagamento
+Terminal Pagamento Automático: 12345678 | Data/Hora TPA: 22-11-26 18:05:10 | Per1 Tr1 Msg1
+Operação: COMPRA — 4,64 € | Id. Estab.: 1 | AUT: 1 MC DB EEA
+MERCADONA — Fatura Simplificada FS 0000000000000/000001 Page 2 of 2
