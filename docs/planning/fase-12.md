@@ -40,6 +40,10 @@
 ## T3 · Documentação [x] (2026-11-24)
 - `mapa.md` (se aparecer ficheiro novo), `ESTADO.md`, este plano.
 
+## Correções vistas no portão (2026-11-24)
+- Com o "+" numa das 5 posições da barra, "Histórico" partia em duas linhas: o "+" passa a botão flutuante acoplado ao meio da barra (`centerDocked`), e a barra volta a 4 posições. Teste: os 4 nomes com a mesma altura.
+- Sem barra (Importar, Definições) não havia forma rápida de voltar ao Painel: opção A aprovada, ícone do Painel no cabeçalho, ao lado do ☰ (só ecrã estreito). Rejeitadas: B (barra também nessas páginas: a `NavigationBar` obriga a um destino marcado) e C (seta para trás: nem sempre volta ao Painel).
+
 ## Portão
 - `dart format --set-exit-if-changed lib test`, `flutter analyze` sem avisos e `flutter test --reporter compact`, todos verdes.
 - Verificação visual: claro e escuro, abaixo e acima de 800 px (`flutter run -d chrome`).

@@ -49,6 +49,36 @@ Future<void> _tamanho(WidgetTester tester, double largura) async {
 }
 
 void main() {
+  group('voltar ao Painel nas páginas sem barra', () {
+    final painel = find.byTooltip('Painel e estatísticas');
+
+    for (final caminho in ['/importar', '/definicoes']) {
+      testWidgets('telemóvel, $caminho: botão no cabeçalho vai ao Painel', (
+        tester,
+      ) async {
+        await _tamanho(tester, 400);
+        await tester.pumpWidget(_app(caminho));
+        await tester.pumpAndSettle();
+        expect(find.byType(NavigationBar), findsNothing);
+        await tester.tap(painel);
+        await tester.pumpAndSettle();
+        expect(find.text('pagina /painel'), findsOneWidget);
+      });
+    }
+
+    testWidgets('com barra ou em ecrã largo não aparece', (tester) async {
+      await _tamanho(tester, 400);
+      await tester.pumpWidget(_app('/lista'));
+      await tester.pumpAndSettle();
+      expect(painel, findsNothing);
+
+      await _tamanho(tester, 1200);
+      await tester.pumpWidget(_app('/importar'));
+      await tester.pumpAndSettle();
+      expect(painel, findsNothing);
+    });
+  });
+
   group('"+" para importar talões', () {
     Future<void> abrirFolha(WidgetTester tester) async {
       await tester.tap(find.bySemanticsLabel('Importar talão'));

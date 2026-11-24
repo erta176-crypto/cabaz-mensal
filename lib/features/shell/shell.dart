@@ -91,11 +91,15 @@ class ShellScope extends InheritedWidget {
   const ShellScope({
     super.key,
     required this.abrirMenu,
+    this.irPainel,
     this.faixa,
     required super.child,
   });
 
   final VoidCallback? abrirMenu;
+
+  /// Botão para o Painel nas páginas sem barra inferior (só ecrã estreito).
+  final VoidCallback? irPainel;
 
   /// Faixa mostrada por baixo do título de cada página (sincronização).
   final Widget? faixa;
@@ -105,7 +109,9 @@ class ShellScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(ShellScope old) =>
-      old.abrirMenu != abrirMenu || old.faixa != faixa;
+      old.abrirMenu != abrirMenu ||
+      old.irPainel != irPainel ||
+      old.faixa != faixa;
 }
 
 /// Estrutura de navegação:
@@ -303,6 +309,7 @@ class _AppShellState extends State<AppShell> {
       drawer: menu,
       body: ShellScope(
         abrirMenu: () => _chave.currentState?.openDrawer(),
+        irPainel: noBarra < 0 ? () => _ir(0) : null,
         faixa: widget.faixa,
         child: widget.child,
       ),
@@ -428,6 +435,7 @@ class _PaginaState extends State<Pagina> {
       key: _cabecalho,
       titulo: widget.titulo,
       abrirMenu: escopo?.abrirMenu,
+      irPainel: escopo?.irPainel,
       acoes: widget.acoes,
       filtros: widget.filtros,
       pesquisa: widget.pesquisa,
@@ -478,6 +486,7 @@ class CabecalhoPagina extends StatelessWidget {
     super.key,
     required this.titulo,
     required this.abrirMenu,
+    this.irPainel,
     required this.acoes,
     required this.filtros,
     required this.pesquisa,
@@ -485,6 +494,7 @@ class CabecalhoPagina extends StatelessWidget {
 
   final String titulo;
   final VoidCallback? abrirMenu;
+  final VoidCallback? irPainel;
   final List<Widget> acoes;
   final List<Widget> filtros;
   final Widget? pesquisa;
@@ -531,6 +541,15 @@ class CabecalhoPagina extends StatelessWidget {
                             onPressed: abrirMenu,
                             style: estiloBotaoSobreGradiente(cores),
                           ),
+                        if (irPainel != null) ...[
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: Icon(destinos.first.icone),
+                            tooltip: destinos.first.rotulo,
+                            onPressed: irPainel,
+                            style: estiloBotaoSobreGradiente(cores),
+                          ),
+                        ],
                         const Spacer(),
                         ...acoes,
                       ],
