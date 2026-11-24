@@ -298,8 +298,6 @@ class _AppShellState extends State<AppShell> {
     }
 
     final noBarra = destinosBarraInferior.indexOf(destinos[atual]);
-    // O "+" fica no meio da barra, entre os destinos.
-    final meio = destinosBarraInferior.length ~/ 2;
     return Scaffold(
       key: _chave,
       drawer: menu,
@@ -310,6 +308,12 @@ class _AppShellState extends State<AppShell> {
       ),
       // Importar e Definições só estão no menu ☰; aí a barra fica escondida
       // porque não tem nenhum destino para marcar como selecionado.
+      // O "+" fica por cima do meio da barra, fora das 4 posições: assim os
+      // nomes dos destinos cabem numa linha.
+      floatingActionButton: noBarra < 0
+          ? null
+          : _BotaoImportar(aoTocar: _abrirAtalhos),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: noBarra < 0
           ? null
           : DecoratedBox(
@@ -318,19 +322,16 @@ class _AppShellState extends State<AppShell> {
                 border: Border(top: BorderSide(color: esquema.outlineVariant)),
               ),
               child: NavigationBar(
-                selectedIndex: noBarra < meio ? noBarra : noBarra + 1,
-                onDestinationSelected: (i) => _ir(
-                  destinos.indexOf(destinosBarraInferior[i < meio ? i : i - 1]),
-                ),
+                selectedIndex: noBarra,
+                onDestinationSelected: (i) =>
+                    _ir(destinos.indexOf(destinosBarraInferior[i])),
                 destinations: [
-                  for (final (i, d) in destinosBarraInferior.indexed) ...[
-                    if (i == meio) _BotaoImportar(aoTocar: _abrirAtalhos),
+                  for (final d in destinosBarraInferior)
                     NavigationDestination(
                       icon: Icon(d.icone),
                       selectedIcon: Icon(d.iconeSelecionado),
                       label: d.rotuloCurto,
                     ),
-                  ],
                 ],
               ),
             ),
@@ -338,7 +339,7 @@ class _AppShellState extends State<AppShell> {
   }
 }
 
-/// "+" redondo no meio da barra inferior: abre os atalhos de importação.
+/// "+" redondo sobre o meio da barra inferior: abre os atalhos de importação.
 class _BotaoImportar extends StatelessWidget {
   const _BotaoImportar({required this.aoTocar});
 
@@ -351,8 +352,6 @@ class _BotaoImportar extends StatelessWidget {
       child: Semantics(
         button: true,
         label: 'Importar talão',
-        // A NavigationBar marca cada posição como separador, que tem de ter
-        // uma ação de toque.
         onTap: aoTocar,
         excludeSemantics: true,
         child: Material(

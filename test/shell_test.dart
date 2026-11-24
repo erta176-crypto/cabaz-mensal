@@ -129,6 +129,28 @@ void main() {
       expect(find.text('pagina /importar?tipo=taloes'), findsOneWidget);
     });
 
+    testWidgets('telemóvel: os 4 nomes da barra ficam numa só linha', (
+      tester,
+    ) async {
+      // Na fonte de teste cada letra tem a largura do tamanho: 560 px dão
+      // para "Histórico" com 4 posições, mas não com 5.
+      await _tamanho(tester, 560);
+      await tester.pumpWidget(_app('/lista'));
+      await tester.pumpAndSettle();
+      final alturas = {
+        for (final d in destinosBarraInferior)
+          tester
+              .getSize(
+                find.descendant(
+                  of: find.byType(NavigationBar),
+                  matching: find.text(d.rotuloCurto),
+                ),
+              )
+              .height,
+      };
+      expect(alturas, hasLength(1), reason: 'alturas: $alturas');
+    });
+
     testWidgets('telemóvel: os destinos à direita do "+" navegam', (
       tester,
     ) async {
