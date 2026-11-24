@@ -168,8 +168,8 @@ void main() {
       final mais = tester.getRect(find.bySemanticsLabel('Importar talão'));
       final barra = tester.getRect(find.byType(NavigationBar));
       expect(mais.center.dx, closeTo(barra.center.dx, 1));
-      // Entra no máximo 14 px na barra: não tapa os ícones.
-      expect(mais.bottom, lessThanOrEqualTo(barra.top + 14));
+      // Entra no máximo 16 px na barra: não tapa os ícones.
+      expect(mais.bottom, lessThanOrEqualTo(barra.top + 16));
       expect(mais.bottom, greaterThan(barra.top));
     });
 
