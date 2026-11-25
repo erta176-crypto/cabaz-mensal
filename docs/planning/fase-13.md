@@ -1,6 +1,6 @@
 # Fase 13 · Categorias: renomear sem nomes repetidos, juntar e ver artigos
 
-**Estado:** aprovado (2026-11-25); T1 feita. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1 e T2 feitas. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** renomear uma categoria para um nome que já existe nunca chega ao servidor; o utilizador escolhe juntar as duas. Tocar numa categoria mostra os seus artigos.
 
@@ -34,7 +34,9 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P2"). Os outros dois pontos d
 - `CategoriasRepository` ganha `juntar(origemId, destinoId)`: reativa o destino se estiver apagado, move os artigos e elimina a origem. Testes: artigos movidos, origem apagada, destino reativado, e chega ao outro aparelho depois de sincronizar.
 - Ficheiros partilhados (`repositorios.dart`, `repositorios_locais.dart`, `domain/`): dizer o impacto pelo grafo antes de editar.
 
-## T2 · UI: juntar ou recuperar ao renomear [ ]
+## T2 · UI: juntar ou recuperar ao renomear [x] (2026-11-25)
+- Feito: `DialogoJuntarCategoria` (`dialogos.dart`); `_juntarCategoria` em `artigos_page.dart` usa `_eliminarComAnular` (novo parâmetro `aviso`): a junção só é feita quando o aviso fecha sem "Anular". Criar com o nome de uma ativa continua a mostrar só a mensagem.
+- Testes de widget em `test/categorias_page_test.dart` (5), com um repositório falso: a base drift real dentro do relógio falso do teste de widget prendia o `pumpAndSettle`. Os dados reais estão provados em `test/sync/categorias_sync_test.dart`.
 - `artigos_page.dart`: ao apanhar `ErroNomeRepetido`, diálogo de D2/D3; "Juntar" usa `_eliminarComAnular` (o "Anular" repõe a origem e os artigos).
 - Testes de widget: renomear para nome existente mostra "Juntar a X" e não grava; "Juntar" move e mostra "Anular".
 

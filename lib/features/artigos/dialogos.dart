@@ -281,6 +281,55 @@ class _DialogoCategoriaState extends State<DialogoCategoria> {
   }
 }
 
+/// Ao renomear [origem] para o nome de [existente]: juntar as duas (os
+/// artigos passam para [existente]) ou cancelar. Devolve true para juntar.
+class DialogoJuntarCategoria extends StatelessWidget {
+  const DialogoJuntarCategoria({
+    super.key,
+    required this.origem,
+    required this.existente,
+    required this.apagada,
+    required this.nArtigos,
+  });
+
+  final Categoria origem;
+  final Categoria existente;
+  final bool apagada;
+  final int nArtigos;
+
+  @override
+  Widget build(BuildContext context) {
+    final x = '"${existente.nome}"';
+    final artigos = switch (nArtigos) {
+      0 => 'A categoria "${origem.nome}" não tem artigos e é eliminada.',
+      1 =>
+        'O artigo de "${origem.nome}" passa para $x e '
+            '"${origem.nome}" é eliminada.',
+      _ =>
+        'Os $nArtigos artigos de "${origem.nome}" passam para $x e '
+            '"${origem.nome}" é eliminada.',
+    };
+    return AlertDialog(
+      title: Text(
+        apagada ? 'A categoria $x foi eliminada' : 'Já existe a categoria $x',
+      ),
+      content: Text(
+        apagada ? 'Podes recuperá-la e juntar-lhe esta. $artigos' : artigos,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(apagada ? 'Recuperar $x e juntar' : 'Juntar a $x'),
+        ),
+      ],
+    );
+  }
+}
+
 /// Ao eliminar uma categoria com artigos, pergunta para onde os mover.
 /// Devolve `(destino: id ou null)`, ou null se cancelado.
 class DialogoMoverArtigos extends StatefulWidget {

@@ -49,13 +49,14 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
     required String id,
     required String descricao,
     required Future<void> Function() eliminar,
+    String? aviso,
   }) {
     setState(() => _ocultos.add(id));
     final mensagens = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
     mensagens
         .showSnackBar(
           SnackBar(
-            content: Text('"$descricao" eliminado.'),
+            content: Text(aviso ?? '"$descricao" eliminado.'),
             duration: const Duration(seconds: 5),
             persist: false,
             action: SnackBarAction(label: 'Anular', onPressed: () {}),
@@ -135,9 +136,38 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
       } else {
         await repo.atualizar(categoria.copyWith(nome: r.nome, ordem: r.ordem));
       }
+    } on ErroNomeRepetido catch (e) {
+      if (categoria == null) {
+        if (mounted) _mensagem('$e');
+        return;
+      }
+      await _juntarCategoria(categoria, e);
     } catch (e) {
       if (mounted) _mensagem('$e');
     }
+  }
+
+  /// Renomear para o nome de outra categoria: juntar as duas (Fase 13, D2
+  /// e D3), com "Anular".
+  Future<void> _juntarCategoria(Categoria origem, ErroNomeRepetido e) async {
+    final artigos = ref.read(artigosProvider).value ?? const <Artigo>[];
+    final juntar = await showDialog<bool>(
+      context: context,
+      builder: (_) => DialogoJuntarCategoria(
+        origem: origem,
+        existente: e.existente,
+        apagada: e.apagada,
+        nArtigos: artigos.where((a) => a.categoriaId == origem.id).length,
+      ),
+    );
+    if (juntar != true || !mounted) return;
+    final repo = ref.read(categoriasRepositoryProvider);
+    _eliminarComAnular(
+      id: origem.id,
+      descricao: origem.nome,
+      aviso: '"${origem.nome}" junta-se a "${e.existente.nome}".',
+      eliminar: () => repo.juntar(origem.id, e.existente.id),
+    );
   }
 
   Future<void> _eliminarCategoria(
