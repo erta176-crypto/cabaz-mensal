@@ -1,6 +1,6 @@
 # Fase 15 · Eliminar um talão no Histórico
 
-**Estado:** aprovado (2026-11-25); T1 e T2 feitas. Uma migração (coluna `apagado_em` em `compras`; funções e vista passam a respeitá-la); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1, T2 e T3 feitas. Uma migração (coluna `apagado_em` em `compras`; funções e vista passam a respeitá-la); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** no Histórico, eliminar um talão (uma compra) com confirmação e "Anular". Depois de eliminado, desaparece do Histórico, do Painel (totais, barras, orçamento, folha da Fase 14), do resumo por loja, das exportações e da cópia JSON, neste e nos outros aparelhos. "Anular" repõe tudo.
 
@@ -42,7 +42,9 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P1"). Aprovado pelo utilizado
 - `DadosRepository.eliminarCompra` e `reporCompra` (`repositorios.dart`, `supabase_repositorios.dart`, falsos em `test/fakes.dart` e nos outros que implementam a interface); filtros de D3. Ficheiros partilhados: impacto pelo grafo antes de editar.
 - Os pedidos finos ao PostgREST (`update`, `.isFilter('apagado_em', null)` nas contagens) não têm teste unitário (o repositório não tem onde os injetar); ficam provados no portão (reimportar, contagens da loja) e no `fase15.sql`.
 
-## T3 · UI no Histórico [ ]
+## T3 · UI no Histórico [x] (2026-11-25)
+- Feito: `eliminar_talao.dart` (novo: `DialogoEliminarTalao`, `MenuTalao`); `historico_page.dart` (`_eliminar`: confirma, grava, aviso com "Anular" que repõe; `invalidate` do Histórico e do `painelProvider` pelo contentor, que continua válido se o Histórico fechar antes do "Anular"); `detalhe_compra.dart` ("⋮" na barra do detalhe: confirma e fecha com `true`; o Histórico elimina). No ecrã largo o "⋮" fica na linha da lista, ao lado do detalhe.
+- Testes: 6 em `historico_page_test.dart` (diálogo e "Cancelar", eliminar, "Anular", sem rede, ecrã largo, detalhe no telemóvel). `flutter build web` compila. O Painel a voltar a pedir fica para o portão (o teste do Histórico não tem o Painel montado).
 - `historico_page.dart` e `detalhe_compra.dart`: "⋮" → "Eliminar talão" → diálogo → `eliminarCompra` → aviso "Talão eliminado." com "Anular" (`reporCompra`) → `invalidate` (D5).
 - Testes de widget (repositório falso): o diálogo mostra loja, data e total; "Cancelar" não chama nada; confirmar chama `eliminarCompra` e o talão sai da lista; "Anular" chama `reporCompra` e o talão volta; sem rede mostra a mensagem e o talão fica; ecrã largo limpa a seleção; no detalhe, eliminar fecha o detalhe e mostra o aviso; o Painel volta a pedir os dados.
 

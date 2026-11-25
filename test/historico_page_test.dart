@@ -72,6 +72,31 @@ class _EstatisticasFalsas implements EstatisticasRepository {
   }) => throw UnimplementedError();
 }
 
+/// Só o que o Histórico usa para eliminar e repor talões (Fase 15).
+class _Dados implements DadosRepository {
+  final eliminadas = <String>{};
+  final pedidos = <String>[];
+  bool semRede = false;
+
+  @override
+  Future<void> eliminarCompra(String id) async {
+    if (semRede) {
+      throw const ErroDados('Sem rede: liga-te para eliminar o talão.');
+    }
+    pedidos.add('eliminar $id');
+    eliminadas.add(id);
+  }
+
+  @override
+  Future<void> reporCompra(String id) async {
+    pedidos.add('repor $id');
+    eliminadas.remove(id);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation i) => super.noSuchMethod(i);
+}
+
 void main() {
   setUpAll(() => initializeDateFormatting('pt_PT'));
 
@@ -81,6 +106,7 @@ void main() {
     double largura = 400,
     double altura = 1600,
     double menu = 0,
+    _Dados? dados,
   }) async {
     t.view.physicalSize = Size(largura, altura);
     t.view.devicePixelRatio = 1;
@@ -92,6 +118,7 @@ void main() {
           lojasProvider.overrideWith((_) => Stream.value(_lojas)),
           artigosProvider.overrideWith((_) => Stream.value(_artigos)),
           aliasesProvider.overrideWith((_) => Stream.value(const {})),
+          if (dados != null) dadosRepositoryProvider.overrideWithValue(dados),
         ],
         child: MaterialApp(
           theme: construirTema(Brightness.light, fontesGoogle: false),
@@ -205,5 +232,126 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Tentar outra vez'), findsOneWidget);
+  });
+
+  group('eliminar talão (Fase 15)', () {
+    late _Dados dados;
+    late _EstatisticasFalsas repo;
+
+    Future<void> abrirComDados(WidgetTester t, {double largura = 400}) {
+      dados = _Dados();
+      repo = _EstatisticasFalsas(
+        () async => [
+          for (final c in _compras)
+            if (!dados.eliminadas.contains(c.id)) c,
+        ],
+      );
+      return abrir(t, repo, dados: dados, largura: largura);
+    }
+
+    Future<void> pedirEliminar(WidgetTester t) async {
+      // O primeiro talão da lista é o c1 (Continente, 20/10, 40 €).
+      await t.tap(find.byTooltip('Ações do talão').first);
+      await t.pumpAndSettle();
+      await t.tap(find.text('Eliminar talão'));
+      await t.pumpAndSettle();
+    }
+
+    Finder noDialogo(String texto) => find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.textContaining(texto),
+    );
+
+    testWidgets('o diálogo mostra loja, data e total; "Cancelar" não elimina', (
+      t,
+    ) async {
+      await abrirComDados(t);
+      await pedirEliminar(t);
+      expect(noDialogo('Continente'), findsOneWidget);
+      expect(noDialogo(formatarData(DateTime(2026, 10, 20))), findsOneWidget);
+      expect(noDialogo(formatarCent(4000)), findsOneWidget);
+
+      await t.tap(find.text('Cancelar'));
+      await t.pumpAndSettle();
+      expect(dados.pedidos, isEmpty);
+      expect(find.text(formatarCent(4000)), findsOneWidget);
+    });
+
+    testWidgets('eliminar tira o talão da lista e mostra "Anular"', (t) async {
+      await abrirComDados(t);
+      final pedidosAntes = repo.pedidos.length;
+      await pedirEliminar(t);
+      await t.tap(find.widgetWithText(FilledButton, 'Eliminar'));
+      await t.pumpAndSettle();
+
+      expect(dados.pedidos, ['eliminar c1']);
+      expect(repo.pedidos.length, greaterThan(pedidosAntes));
+      expect(find.text(formatarCent(4000)), findsNothing);
+      expect(find.text('Talão eliminado.'), findsOneWidget);
+      expect(find.text('Anular'), findsOneWidget);
+    });
+
+    testWidgets('"Anular" repõe o talão', (t) async {
+      await abrirComDados(t);
+      await pedirEliminar(t);
+      await t.tap(find.widgetWithText(FilledButton, 'Eliminar'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Anular'));
+      await t.pumpAndSettle();
+
+      expect(dados.pedidos, ['eliminar c1', 'repor c1']);
+      expect(find.text(formatarCent(4000)), findsOneWidget);
+    });
+
+    testWidgets('sem rede: mostra a mensagem e o talão fica', (t) async {
+      await abrirComDados(t);
+      dados.semRede = true;
+      await pedirEliminar(t);
+      await t.tap(find.widgetWithText(FilledButton, 'Eliminar'));
+      await t.pumpAndSettle();
+
+      expect(
+        find.text('Sem rede: liga-te para eliminar o talão.'),
+        findsOneWidget,
+      );
+      expect(find.text(formatarCent(4000)), findsOneWidget);
+      expect(find.text('Talão eliminado.'), findsNothing);
+    });
+
+    testWidgets('ecrã largo: eliminar o talão aberto limpa o detalhe', (
+      t,
+    ) async {
+      await abrirComDados(t, largura: 1000);
+      await t.tap(find.text(formatarCent(4000)));
+      await t.pumpAndSettle();
+      expect(find.byType(DetalheCompra), findsOneWidget);
+
+      await pedirEliminar(t);
+      await t.tap(find.widgetWithText(FilledButton, 'Eliminar'));
+      await t.pumpAndSettle();
+      expect(find.byType(DetalheCompra), findsNothing);
+      expect(find.text('Escolhe uma compra.'), findsOneWidget);
+    });
+
+    testWidgets('no detalhe (telemóvel): eliminar fecha o detalhe e o aviso '
+        'aparece no Histórico', (t) async {
+      await abrirComDados(t);
+      await t.tap(find.text(formatarCent(4000)));
+      await t.pumpAndSettle();
+      expect(find.byType(DetalheCompraPage), findsOneWidget);
+
+      await t.tap(find.byTooltip('Ações do talão'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Eliminar talão'));
+      await t.pumpAndSettle();
+      expect(noDialogo('Continente'), findsOneWidget);
+      await t.tap(find.widgetWithText(FilledButton, 'Eliminar'));
+      await t.pumpAndSettle();
+
+      expect(find.byType(DetalheCompraPage), findsNothing);
+      expect(dados.pedidos, ['eliminar c1']);
+      expect(find.text('Talão eliminado.'), findsOneWidget);
+      expect(find.text(formatarCent(4000)), findsNothing);
+    });
   });
 }

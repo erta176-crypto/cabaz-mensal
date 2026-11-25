@@ -6,12 +6,14 @@ import 'package:intl/intl.dart';
 
 import '../../core/formatos.dart';
 import '../../data/providers.dart';
+import '../../data/repositorios.dart';
 import '../../domain/estatisticas.dart';
 import '../../domain/modelos.dart';
 import '../estatisticas/cores.dart';
 import '../shell/filtro_pilula.dart';
 import '../shell/shell.dart';
 import 'detalhe_compra.dart';
+import 'eliminar_talao.dart';
 import 'pesquisa.dart';
 
 final _mes = DateFormat("MMMM 'de' y", 'pt_PT');
@@ -72,6 +74,60 @@ class _HistoricoPageState extends ConsumerState<HistoricoPage> {
   void _submeter(String v) {
     _espera?.cancel();
     setState(() => _pesquisa = v);
+  }
+
+  /// Elimina um talão (Fase 15, D4 e D5): confirma (salvo se já confirmado
+  /// no detalhe), grava logo e mostra o aviso com "Anular", que o repõe.
+  Future<void> _eliminar(
+    CompraResumo c,
+    Loja? loja, {
+    bool confirmado = false,
+  }) async {
+    if (!confirmado) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (_) => DialogoEliminarTalao(compra: c, loja: loja),
+      );
+      if (ok != true || !mounted) return;
+    }
+    // O contentor e o aviso continuam válidos se o Histórico fechar antes
+    // de o utilizador carregar em "Anular".
+    final contentor = ProviderScope.containerOf(context, listen: false);
+    final mensagens = ScaffoldMessenger.of(context);
+    final dados = contentor.read(dadosRepositoryProvider);
+    void atualizar() => contentor
+      ..invalidate(_comprasHistoricoProvider)
+      ..invalidate(painelProvider);
+
+    try {
+      await dados.eliminarCompra(c.id);
+    } on ErroDados catch (e) {
+      mensagens.showSnackBar(SnackBar(content: Text(e.mensagem)));
+      return;
+    }
+    if (mounted && _selecionada == c.id) setState(() => _selecionada = null);
+    atualizar();
+    mensagens
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: const Text('Talão eliminado.'),
+          duration: const Duration(seconds: 5),
+          persist: false,
+          action: SnackBarAction(
+            label: 'Anular',
+            onPressed: () async {
+              try {
+                await dados.reporCompra(c.id);
+              } on ErroDados catch (e) {
+                mensagens.showSnackBar(SnackBar(content: Text(e.mensagem)));
+                return;
+              }
+              atualizar();
+            },
+          ),
+        ),
+      );
   }
 
   _ChaveHistorico _chave() {
@@ -233,17 +289,20 @@ class _HistoricoPageState extends ConsumerState<HistoricoPage> {
             ),
           const SizedBox(width: 4),
           Text(formatarCent(c.totalCent)),
+          MenuTalao(aoEliminar: () => _eliminar(c, loja)),
         ],
       ),
-      onTap: () {
+      onTap: () async {
         if (largo) {
           setState(() => _selecionada = c.id);
-        } else {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => DetalheCompraPage(compra: c),
-            ),
-          );
+          return;
+        }
+        // O detalhe devolve true quando o talão foi confirmado para eliminar.
+        final eliminar = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(builder: (_) => DetalheCompraPage(compra: c)),
+        );
+        if (eliminar == true && mounted) {
+          await _eliminar(c, loja, confirmado: true);
         }
       },
     );

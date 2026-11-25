@@ -6,6 +6,7 @@ import '../../data/providers.dart';
 import '../../domain/estatisticas.dart';
 import '../../domain/modelos.dart';
 import '../artigos/ver_artigo.dart';
+import 'eliminar_talao.dart';
 
 const avisoRever = 'A soma das linhas não bate com o total';
 
@@ -159,7 +160,8 @@ class DetalheCompra extends ConsumerWidget {
   }
 }
 
-/// O detalhe num ecrã próprio (telemóvel, < 800 px).
+/// O detalhe num ecrã próprio (telemóvel, < 800 px). Fecha com true quando
+/// o talão foi confirmado para eliminar (o Histórico elimina-o).
 class DetalheCompraPage extends ConsumerWidget {
   const DetalheCompraPage({super.key, required this.compra});
 
@@ -171,7 +173,21 @@ class DetalheCompraPage extends ConsumerWidget {
         .where((l) => l.id == compra.lojaId)
         .firstOrNull;
     return Scaffold(
-      appBar: AppBar(title: Text(loja?.nome ?? 'Compra')),
+      appBar: AppBar(
+        title: Text(loja?.nome ?? 'Compra'),
+        actions: [
+          MenuTalao(
+            aoEliminar: () async {
+              final ok = await showDialog<bool>(
+                context: context,
+                builder: (_) =>
+                    DialogoEliminarTalao(compra: compra, loja: loja),
+              );
+              if (ok == true && context.mounted) Navigator.pop(context, true);
+            },
+          ),
+        ],
+      ),
       body: DetalheCompra(compra: compra),
     );
   }
