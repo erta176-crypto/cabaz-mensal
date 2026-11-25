@@ -1,6 +1,6 @@
 # Fase 13 · Categorias: renomear sem nomes repetidos, juntar e ver artigos
 
-**Estado:** aprovado (2026-11-25); T1 a T4 feitas. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1 a T5 feitas; falta o portão no telemóvel. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** renomear uma categoria para um nome que já existe nunca chega ao servidor; o utilizador escolhe juntar as duas. Tocar numa categoria mostra os seus artigos.
 
@@ -49,7 +49,8 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P2"). Os outros dois pontos d
 - Feito: `classificarErro` (`servidor_supabase.dart`) devolve o texto de D6, sem o texto técnico do Postgres; continua permanente. Teste em `aliases_sync_test.dart`.
 - `servidor_supabase.dart`: texto de D6. Teste em `aliases_sync_test.dart` ou no teste de `classificarErro`.
 
-## T5 · Documentação [ ]
+## T5 · Documentação [x] (2026-11-25)
+- `sincronizacao.md` (nomes de categoria e 23505), `mapa.md`, `ESTADO.md`, este plano. Nada para `notas.md`.
 - `sincronizacao.md` (regra do nome igual), `ESTADO.md`, este plano; `notas.md` se ficar algo de fora.
 
 ## Portão

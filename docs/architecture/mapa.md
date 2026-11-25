@@ -47,7 +47,7 @@
 - `entrada`: email e palavra-passe (com botão para a mostrar).
 - `bloqueio`: `CamadaBloqueio`, no `builder` do `MaterialApp.router`, por cima de todas as rotas (Fase 8): com sessão e bloqueio ligado, bloqueia ao abrir e ao voltar depois de 5 min (`AppLifecycleListener`, `agoraProvider`); ecrã com "Desbloquear" (pede logo) e "Sair".
 - `lista`: Lista do mês e Concluir compra.
-- `artigos`: Artigos, categorias e lojas; `ver_artigo.dart` (Ver artigo com preços por loja e evolução do preço, aberto a partir de Artigos, Lista, Painel e detalhe da compra).
+- `artigos`: Artigos, categorias e lojas (tocar numa categoria mostra os seus artigos; renomear para um nome existente abre `DialogoJuntarCategoria`); `ver_artigo.dart` (Ver artigo com preços por loja e evolução do preço, aberto a partir de Artigos, Lista, Painel e detalhe da compra).
 - `importar_exportar`: `/importar?tipo=taloes|camera|galeria` (`AtalhoImportar`) escolhe o tipo e, no Android, abre o seletor; pré-visualização e arrastar e largar na web; "Talões (fotografia)" só no Android (câmara e galeria com o `image_picker`, OCR com `ocrFotosProvider`, fotografia recuperada com `retrieveLostData`, cópias temporárias apagadas ao importar ou cancelar); "Talões (PDF)" com `previsualizacao_taloes.dart` (um cartão por talão, estado e linhas; corrigir, apagar e acrescentar linhas, linhas por reconhecer, total e data, ver a fotografia).
 - `definicoes`: conta, sincronização, `sairDaConta` (também usado pelo ecrã de bloqueio), interruptor do bloqueio (só onde o aparelho o permite), tema, gestos.
 - `painel`: Painel e estatísticas (filtros de período e loja, números, gráficos; aviso quando os dados vêm da cache); `orcamento_cartao.dart` (cartão do orçamento do mês e diálogo "Editar orçamento").

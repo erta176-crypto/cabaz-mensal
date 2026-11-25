@@ -17,6 +17,8 @@ A app funciona sem rede. Toda a escrita passa pela cache local (drift) e por uma
 - `orcamentos` sincroniza pelo `id`, que é determinístico (uuid v5 de utilizador, mês e categoria; decisão 0009): dois aparelhos que criam o mesmo orçamento sem rede geram o mesmo id e o upsert junta-os.
 - Eliminar marca `apagado_em`. Voltar a criar algo apagado reativa a mesma linha (mesmo id), nunca cria uma linha nova.
 - Índices únicos sempre completos.
+- Nomes de categoria: o repositório compara sem espaços nas pontas, maiúsculas e acentos, contra todas as categorias, incluindo as eliminadas (o índice `categorias_user_id_nome_key` inclui-as). Um nome repetido nunca vai para a fila: lança `ErroNomeRepetido` e a UI oferece juntar (`juntar`: reativa o destino, move os artigos, elimina a origem). Fase 13.
+- Chave repetida vinda do servidor (23505): erro permanente com mensagem legível; a alteração fica com erro até ser descartada ou tentada de novo.
 - `preferencias.reiniciado_em` manda limpar a cache (`limparCache`: registos, cursores `cursor:%` e painéis guardados `painel:%`).
 - Vence a última escrita a chegar ao servidor.
 - A chave `tema` em `estado` é do aparelho: não sincroniza e `limparTudo` mantém-na.

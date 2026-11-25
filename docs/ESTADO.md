@@ -3,7 +3,7 @@
 *Atualizado em 2026-11-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-Nenhuma em curso. Ver Próximo.
+**Fase 13 · Categorias:** T1 a T5 feitas (commits locais, por enviar); falta o portão no telemóvel. [`planning/fase-13.md`](planning/fase-13.md)
 
 ## Feito
 - **Fase 12 · Botão "+" e Mercadona em PDF:** concluída (portão a 2026-11-25; [`planning/fase-12.md`](planning/fase-12.md)). "+" ao centro da barra com atalhos de importação, "Importar talão" no menu lateral, botão do Painel nas páginas sem barra, leitor da fatura simplificada do Mercadona.
