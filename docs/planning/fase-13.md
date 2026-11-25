@@ -1,6 +1,6 @@
 # Fase 13 · Categorias: renomear sem nomes repetidos, juntar e ver artigos
 
-**Estado:** aprovado (2026-11-25); T1 e T2 feitas. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1, T2 e T3 feitas. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** renomear uma categoria para um nome que já existe nunca chega ao servidor; o utilizador escolhe juntar as duas. Tocar numa categoria mostra os seus artigos.
 
@@ -40,7 +40,8 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P2"). Os outros dois pontos d
 - `artigos_page.dart`: ao apanhar `ErroNomeRepetido`, diálogo de D2/D3; "Juntar" usa `_eliminarComAnular` (o "Anular" repõe a origem e os artigos).
 - Testes de widget: renomear para nome existente mostra "Juntar a X" e não grava; "Juntar" move e mostra "Anular".
 
-## T3 · Tocar numa categoria abre os seus artigos [ ]
+## T3 · Tocar numa categoria abre os seus artigos [x] (2026-11-25)
+- Feito: `onTap` no `ListTile` da categoria (`artigos_page.dart`) muda para Artigos com o filtro dessa categoria. Teste em `categorias_page_test.dart`.
 - O `ListTile` da categoria passa a ter `onTap`: muda para "Artigos" com `_filtroCategoria` = essa categoria. O "⋮" fica como está.
 - Teste de widget: tocar na categoria mostra só os artigos dela.
 

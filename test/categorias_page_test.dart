@@ -58,6 +58,12 @@ void main() {
                 categoriaId: 'cat-fruta',
                 unidade: Unidade.un,
               ),
+              Artigo(
+                id: 'art-iogurte',
+                nome: 'Iogurte',
+                categoriaId: 'cat-lat',
+                unidade: Unidade.un,
+              ),
             ]),
           ),
           lojasProvider.overrideWith((_) => Stream.value(const [])),
@@ -156,5 +162,18 @@ void main() {
     await renomear(tester, 'Fruta fresca');
     expect(find.byType(AlertDialog), findsNothing);
     expect(repo.chamadas, ['atualizar Fruta fresca']);
+  });
+
+  testWidgets('tocar numa categoria mostra os artigos dela', (tester) async {
+    await abrir(tester);
+    expect(find.text('Banana'), findsNothing);
+
+    await tester.tap(find.widgetWithText(ListTile, 'Fruta'));
+    await tester.pumpAndSettle();
+    expect(find.text('Banana'), findsOneWidget);
+    expect(find.text('Iogurte'), findsNothing);
+    // O filtro mostra a categoria escolhida.
+    expect(find.text('Fruta'), findsWidgets);
+    expect(repo.chamadas, isEmpty);
   });
 }

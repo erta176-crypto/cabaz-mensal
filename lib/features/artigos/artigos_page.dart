@@ -430,6 +430,11 @@ class _ArtigosPageState extends ConsumerState<ArtigosPage> {
         return ListTile(
           title: Text(c.nome),
           subtitle: Text('$n ${n == 1 ? 'artigo' : 'artigos'}'),
+          // Mostra os artigos desta categoria (Fase 13, D5).
+          onTap: () => setState(() {
+            _mostrar = Mostrar.artigos;
+            _filtroCategoria = c.id;
+          }),
           trailing: PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             tooltip: 'Ações',
