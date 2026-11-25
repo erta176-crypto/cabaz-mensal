@@ -70,19 +70,16 @@ class ServidorFalso implements ServidorSync {
   };
 
   void _unicos(String tabela, Map<String, dynamic> linha) {
-    // Índices únicos parciais (só entre os ativos), como na migração 1A.
+    // Índices únicos completos (incluem as linhas apagadas), como desde a
+    // migração 1B (categorias_user_id_nome_key, lojas_user_id_slug_key).
     final coluna = switch (tabela) {
       'categorias' => 'nome',
       'lojas' => 'slug',
       _ => null,
     };
-    if (coluna == null || linha['apagado_em'] != null) return;
-    final repetida = t(tabela).any(
-      (o) =>
-          o['id'] != linha['id'] &&
-          o['apagado_em'] == null &&
-          o[coluna] == linha[coluna],
-    );
+    if (coluna == null) return;
+    final repetida = t(tabela)
+        .any((o) => o['id'] != linha['id'] && o[coluna] == linha[coluna]);
     if (repetida) {
       throw const ErroSync('Registo repetido (23505)', transitorio: false);
     }

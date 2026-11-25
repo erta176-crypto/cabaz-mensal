@@ -49,9 +49,17 @@ abstract interface class LojasRepository {
 abstract interface class CategoriasRepository {
   Stream<List<Categoria>> observarCategorias();
 
-  /// Criar com o nome de uma categoria eliminada reativa-a.
+  /// Criar com o nome de uma categoria eliminada reativa-a. Lança
+  /// [ErroNomeRepetido] se já há uma ativa com o mesmo nome.
   Future<void> criar({required String nome, required int ordem});
+
+  /// Lança [ErroNomeRepetido] se o nome é o de outra categoria, ativa ou
+  /// eliminada (o índice único do servidor inclui as eliminadas).
   Future<void> atualizar(Categoria categoria);
+
+  /// Junta [origemId] a [destinoId]: os artigos passam para o destino
+  /// (reativado, se estava eliminado) e a origem é eliminada.
+  Future<void> juntar(String origemId, String destinoId);
 
   /// Elimina a categoria. Os artigos que tinha passam para [moverPara]
   /// (ou ficam sem categoria, se for null).
@@ -296,6 +304,20 @@ class ErroDados implements Exception {
 
   @override
   String toString() => mensagem;
+}
+
+/// Nome de categoria igual ao de [existente] (sem contar espaços nas pontas,
+/// maiúsculas e acentos). [apagada]: [existente] está eliminada.
+class ErroNomeRepetido extends ErroDados {
+  ErroNomeRepetido(this.existente, {required this.apagada})
+    : super(
+        apagada
+            ? 'Já existe a categoria "${existente.nome}" (eliminada).'
+            : 'Já existe a categoria "${existente.nome}".',
+      );
+
+  final Categoria existente;
+  final bool apagada;
 }
 
 /// Uma escrita no servidor passou do tempo: o pedido pode ter sido

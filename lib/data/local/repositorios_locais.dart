@@ -108,27 +108,77 @@ class LocalCategoriasRepository implements CategoriasRepository {
               ..sort((a, b) => a.ordem.compareTo(b.ordem)),
       );
 
+  /// Nome sem espaços nas pontas; vazio é recusado.
+  String _nomeLimpo(String nome) {
+    final n = nome.trim();
+    if (n.isEmpty) {
+      throw const ErroDados('O nome da categoria não pode ficar vazio.');
+    }
+    return n;
+  }
+
+  /// Outra categoria (ativa ou eliminada) com o mesmo nome, sem contar
+  /// maiúsculas e acentos. Uma ativa tem prioridade sobre uma eliminada.
+  Future<Map<String, dynamic>?> _comMesmoNome(
+    String nome, {
+    String? exceto,
+  }) async {
+    final chave = normalizar(nome);
+    final iguais = [
+      for (final c in await _base.lerTabela(
+        'categorias',
+        incluirApagados: true,
+      ))
+        if (c['id'] != exceto &&
+            normalizar((c['nome'] as String).trim()) == chave)
+          c,
+    ];
+    return iguais.where((c) => c['apagado_em'] == null).firstOrNull ??
+        iguais.firstOrNull;
+  }
+
   @override
   Future<void> criar({required String nome, required int ordem}) async {
-    final todas = await _base.lerTabela('categorias', incluirApagados: true);
-    final mesmoNome = todas.where((c) => c['nome'] == nome).toList();
-    if (mesmoNome.any((c) => c['apagado_em'] == null)) {
-      throw ErroDados('Já existe a categoria "$nome".');
+    final n = _nomeLimpo(nome);
+    final igual = await _comMesmoNome(n);
+    if (igual != null && igual['apagado_em'] == null) {
+      throw ErroNomeRepetido(Categoria.fromMap(igual), apagada: false);
     }
     await _escrita.inserir('categorias', {
       // Reativa a categoria eliminada com o mesmo nome.
-      'id': mesmoNome.isNotEmpty ? mesmoNome.first['id'] : _novoId(),
-      'nome': nome,
+      'id': igual?['id'] ?? _novoId(),
+      'nome': n,
       'ordem': ordem,
     });
   }
 
   @override
-  Future<void> atualizar(Categoria categoria) => _escrita.atualizar(
-    'categorias',
-    categoria.id,
-    {'nome': categoria.nome, 'ordem': categoria.ordem},
-  );
+  Future<void> atualizar(Categoria categoria) async {
+    final n = _nomeLimpo(categoria.nome);
+    final igual = await _comMesmoNome(n, exceto: categoria.id);
+    if (igual != null) {
+      throw ErroNomeRepetido(
+        Categoria.fromMap(igual),
+        apagada: igual['apagado_em'] != null,
+      );
+    }
+    await _escrita.atualizar('categorias', categoria.id, {
+      'nome': n,
+      'ordem': categoria.ordem,
+    });
+  }
+
+  @override
+  Future<void> juntar(String origemId, String destinoId) async {
+    final destino = (await _base.lerTabela(
+      'categorias',
+      incluirApagados: true,
+    )).firstWhere((c) => c['id'] == destinoId);
+    if (destino['apagado_em'] != null) {
+      await _escrita.restaurar('categorias', destinoId);
+    }
+    await eliminar(origemId, moverPara: destinoId);
+  }
 
   @override
   Future<void> eliminar(String id, {String? moverPara}) async {
