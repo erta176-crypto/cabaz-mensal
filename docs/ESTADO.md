@@ -3,7 +3,7 @@
 *Atualizado em 2026-11-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-Nenhuma em curso. Ver Próximo.
+**Fase 16 · Leitor do Intermarché:** T1 a T3 feitas (commits locais, por enviar); falta o portão no telemóvel. [`planning/fase-16.md`](planning/fase-16.md)
 
 ## Feito
 - **Fase 15 · Eliminar talão:** concluída (portão a 2026-11-25; [`planning/fase-15.md`](planning/fase-15.md)). "⋮ → Eliminar talão" no Histórico e no detalhe, com confirmação e "Anular" (só com rede); `compras.apagado_em` (migração aplicada) e todas as leituras sem as compras eliminadas. Fecha o pedido de 2026-11-25 (Fases 13 a 15).

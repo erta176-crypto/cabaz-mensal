@@ -1,6 +1,6 @@
 # Fase 16 · Leitor de talões do Intermarché (fotografia)
 
-**Estado:** aprovado (2026-11-25); T1 e T2 feitas. Só Dart; sem migração e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1 a T3 feitas; falta o portão. Só Dart; sem migração e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** importar talões em papel do Intermarché por fotografia, pelo mesmo caminho dos outros (OCR no aparelho → linhas → leitor → pré-visualização → `importar_lote`).
 
@@ -59,7 +59,8 @@ Origem: `notas.md` (2026-11-24: uma fotografia do Intermarché deu "Formato de t
 - `lib/import/taloes/intermarche.dart` (novo) e `ler_talao.dart`.
 - `fotos_reais_test.dart` passa a incluir a fotografia do Intermarché (lida e bate).
 
-## T3 · Documentação [ ]
+## T3 · Documentação [x] (2026-11-25)
+- `mapa.md` (leitor novo), `notas.md` (D6 e D8; saiu a nota do Intermarché sem leitor), `ESTADO.md`, este plano.
 - `mapa.md` (leitor novo), `notas.md` (D6, D8, e retirar a nota do Intermarché), `ESTADO.md`, este plano.
 
 ## Portão
