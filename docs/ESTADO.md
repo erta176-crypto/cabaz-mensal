@@ -3,9 +3,10 @@
 *Atualizado em 2026-11-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Fase 13 · Categorias:** T1 a T5 feitas (commits locais, por enviar); falta o portão no telemóvel. [`planning/fase-13.md`](planning/fase-13.md)
+Nenhuma em curso. Ver Próximo.
 
 ## Feito
+- **Fase 13 · Categorias:** concluída (portão a 2026-11-25; [`planning/fase-13.md`](planning/fase-13.md)). Renomear para um nome existente (maiúsculas, acentos, eliminadas) oferece juntar ou recuperar e nunca chega ao servidor; tocar numa categoria mostra os seus artigos; mensagem legível para o 23505. A seguir, do mesmo pedido: Fase 14 (detalhe no Painel) e Fase 15 (eliminar talão).
 - **Fase 12 · Botão "+" e Mercadona em PDF:** concluída (portão a 2026-11-25; [`planning/fase-12.md`](planning/fase-12.md)). "+" ao centro da barra com atalhos de importação, "Importar talão" no menu lateral, botão do Painel nas páginas sem barra, leitor da fatura simplificada do Mercadona.
 - **Fase 11 · Alias sem rede e talão E.Leclerc:** concluída (portão a 2026-11-24; [`planning/fase-11.md`](planning/fase-11.md)). Falhas sem rede nunca ficam com erro; "Tentar agora" volta a tentar as alterações com erro; o leitor do E.Leclerc aceita NBSP. Intermarché sem leitor: em `notas.md`.
 - **Fase 10 · Assinatura e ícone:** concluída (portão a 2026-11-19; [`planning/fase-10.md`](planning/fase-10.md)). Build APK do CI verde, APK do CI instalado por cima com `adb install -r` sem perder dados. Secrets do CI: comandos na decisão 0014.

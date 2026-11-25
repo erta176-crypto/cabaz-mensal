@@ -1,6 +1,6 @@
 # Fase 13 · Categorias: renomear sem nomes repetidos, juntar e ver artigos
 
-**Estado:** aprovado (2026-11-25); T1 a T5 feitas; falta o portão no telemóvel. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída (portão a 2026-11-25). Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** renomear uma categoria para um nome que já existe nunca chega ao servidor; o utilizador escolhe juntar as duas. Tocar numa categoria mostra os seus artigos.
 
@@ -53,6 +53,7 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P2"). Os outros dois pontos d
 - `sincronizacao.md` (nomes de categoria e 23505), `mapa.md`, `ESTADO.md`, este plano. Nada para `notas.md`.
 - `sincronizacao.md` (regra do nome igual), `ESTADO.md`, este plano; `notas.md` se ficar algo de fora.
 
-## Portão
+## Portão [x] (2026-11-25)
+- Confirmado pelo utilizador no telemóvel (APK release local, `adb install -r`): renomear para um nome existente oferece "Juntar"; juntar e anular; tocar numa categoria mostra os artigos; o "Alterar categoria" com erro foi descartado. Testes: 515 passam, 1 saltado; análise sem avisos.
 - `dart format --set-exit-if-changed lib test`, `flutter analyze` sem avisos e `flutter test --reporter compact`, todos verdes.
 - No telemóvel (`adb install -r`): renomear uma categoria para o nome de outra (com outras maiúsculas) oferece "Juntar"; juntar e anular; tocar numa categoria mostra os artigos; o "Alterar categoria" com erro que está na fila é descartado com "Descartar e recarregar".
