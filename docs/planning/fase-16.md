@@ -34,7 +34,18 @@ Origem: `notas.md` (2026-11-24: uma fotografia do Intermarché deu "Formato de t
 | D7 | A loja "Intermarché" é criada pelo utilizador em Artigos → Lojas antes de importar (é assim que as outras foram criadas). |
 | D8 | O leitor é feito com um só talão: o que não se viu (0.1) fica a rever na pré-visualização, que já permite corrigir; os casos novos ficam em `notas.md` à espera de exemplos. |
 
-## T1 · OCR real da fotografia (prova) [ ]
+## T1 · OCR real da fotografia (prova) [x] (2026-11-25)
+- Feito: APK de prova num worktree temporário (`pt.cabazmensal.app.prova`, nome "Cabaz prova"). A pasta tem de ser criada pela própria app (`path_provider`, dependência indireta, só na prova): a criada pelo `adb` ficava sem acesso. O Xiaomi pede confirmação no ecrã para instalar uma app nova por USB. Prova desinstalada e worktree removido; `pt.cabazmensal.app` instalada antes e depois.
+- Resultado: imagem inteira 83 caixas (3,5 s), em faixas 82 (2,3 s); caixas em `dados-privados/ocr-prova/` (fora do git).
+- Estrutura do texto, depois de `linhasDasCaixas` e `normalizarOcr` (sem valores reais):
+  - Logótipo lido como "IntermaRche" (inteira) e "Intermarche" (faixas); "INTERMARCHE <LOCAL>" no bloco do terminal.
+  - Artigos numa linha: `*DESCRIÇÃO EurN,NN L`. O asterisco às vezes sai como "x" minúsculo colado ("xCHA…"). "Eur" sai sempre colado ao valor.
+  - Repetidos seguidos, depois `ART# 0NNNNNNNNNNNNN`.
+  - Total: `N Art., COM TOTAL DE EurNN,NN`; nas faixas "COM" saiu "0OM". Também `MULTIBANCO EurNN,NN`, `TOTAL a b c` no recapitulativo (num dos casos um valor com ponto) e `COMPRA NN,NNEur`.
+  - Data: `H:MM:SS AAAA-MM-DD` (igual nas duas); terminal `AA-MM-DD HH:MM:SS`.
+  - Número: `DOCUMENTO No:FS …`. Local: `… NNNN-NNN TORRES NOVAS`.
+  - A soma dos artigos lidos bate com o total, inteira e em faixas.
+- Conclusão: a normalização atual chega (não há regra nova); o leitor aceita o "x" no lugar do asterisco e procura o total por "TOTAL DE Eur" ou pelos outros candidatos (D4).
 - Worktree temporário com a prova (D1); OCR da `IMG_20261121_102201.jpg`, inteira e em faixas; caixas em `dados-privados/ocr-prova/` (fora do git); tempos.
 - No PC, passar as caixas por `linhasDasCaixas` e `normalizarOcr` e mostrar só a **estrutura** que o leitor precisa (sem valores nem nomes de artigos): como saem o asterisco, o "Eur", a letra do IVA, a linha do total e a data; se a imagem inteira chega ou se precisa de faixas.
 - Se a normalização precisar de uma regra nova (ex.: "Eur 1,39" → "Eur1,39"), entra aqui, com teste, sem mudar os outros talões (`taloes_reais_test.dart` e `fotos_reais_test.dart` iguais).
