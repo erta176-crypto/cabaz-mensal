@@ -1,6 +1,6 @@
 # Fase 13 · Categorias: renomear sem nomes repetidos, juntar e ver artigos
 
-**Estado:** aprovado (2026-11-25); T1, T2 e T3 feitas. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1 a T4 feitas. Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** renomear uma categoria para um nome que já existe nunca chega ao servidor; o utilizador escolhe juntar as duas. Tocar numa categoria mostra os seus artigos.
 
@@ -45,7 +45,8 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P2"). Os outros dois pontos d
 - O `ListTile` da categoria passa a ter `onTap`: muda para "Artigos" com `_filtroCategoria` = essa categoria. O "⋮" fica como está.
 - Teste de widget: tocar na categoria mostra só os artigos dela.
 
-## T4 · Mensagem do 23505 [ ]
+## T4 · Mensagem do 23505 [x] (2026-11-25)
+- Feito: `classificarErro` (`servidor_supabase.dart`) devolve o texto de D6, sem o texto técnico do Postgres; continua permanente. Teste em `aliases_sync_test.dart`.
 - `servidor_supabase.dart`: texto de D6. Teste em `aliases_sync_test.dart` ou no teste de `classificarErro`.
 
 ## T5 · Documentação [ ]

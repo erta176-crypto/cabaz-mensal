@@ -124,9 +124,16 @@ ErroSync classificarErro(Object e) {
         codigo.startsWith('40') || // serialização, deadlock
         RegExp(r'^5\d\d$').hasMatch(codigo) ||
         e.message.toLowerCase().contains('jwt');
+    // Chave repetida: o texto do Postgres não diz nada ao utilizador.
+    if (codigo == '23505') {
+      return const ErroSync(
+        'Já existe um registo com o mesmo nome no servidor. '
+        'Descarta a alteração e volta a fazê-la.',
+        transitorio: false,
+      );
+    }
     final motivo = switch (codigo) {
       '42501' => 'Sem permissão (RLS)',
-      '23505' => 'Registo repetido',
       '23503' => 'Referência a um registo que não existe',
       _ => 'Erro do servidor',
     };

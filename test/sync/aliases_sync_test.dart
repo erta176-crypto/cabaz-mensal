@@ -172,6 +172,24 @@ void main() {
       expect(e.semRede, isTrue);
     });
 
+    test('chave repetida (23505): permanente, com mensagem legível e sem o '
+        'texto técnico', () {
+      final e = classificarErro(
+        const PostgrestException(
+          message:
+              'duplicate key value violates unique constraint '
+              '"categorias_user_id_nome_key"',
+          code: '23505',
+        ),
+      );
+      expect(e.transitorio, isFalse);
+      expect(
+        e.mensagem,
+        'Já existe um registo com o mesmo nome no servidor. '
+        'Descarta a alteração e volta a fazê-la.',
+      );
+    });
+
     test('erro do Postgres: nunca é falta de rede', () {
       final e = classificarErro(
         const PostgrestException(message: 'x', code: '57014'),
