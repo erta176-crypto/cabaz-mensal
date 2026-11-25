@@ -1,6 +1,6 @@
 # Fase 14 · Painel: tocar numa loja ou categoria mostra os artigos
 
-**Estado:** aprovado (2026-11-25); T1 a T4 feitas; falta o portão. Uma migração (função SQL nova, só leitura, sem tabelas nem índices novos); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída (portão a 2026-11-25). Uma migração (função SQL nova, só leitura, sem tabelas nem índices novos); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** no Painel, tocar numa barra de "Por loja" ou "Por categoria" (incluindo "Sem categoria" e "Outras") abre a lista dos artigos que dão esse valor, com o mesmo período e a mesma loja do Painel. A soma da lista é sempre igual ao valor da barra.
 
@@ -49,7 +49,8 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P3"). Eliminar talão fica pa
 - `mapa.md` (modelos, RPC, folha, migração e `supabase/verificacao/`), `notas.md` (nota para a Fase 15), `ESTADO.md`, este plano.
 - `mapa.md` (função SQL, `supabase/verificacao/`, folha nova), `ESTADO.md`, este plano; nota em `docs/planning/notas.md` para a Fase 15 (D4).
 
-## Portão
+## Portão [x] (2026-11-25)
+- Confirmado pelo utilizador no telemóvel (APK release local, `adb install -r`) e na web: tocar em lojas e categorias abre a folha com o total igual à barra; detalhe do artigo; sem rede. Testes: 531 passam, 1 saltado; análise sem avisos; `flutter build web` compila; `fase14.sql`: 128 barras, 0 diferentes; `get_advisors` sem avisos novos.
 - `dart format --set-exit-if-changed lib test`, `flutter analyze` sem avisos e `flutter test --reporter compact`, todos verdes; `flutter build web` compila; `get_advisors` sem avisos novos; `supabase/verificacao/fase14.sql` sem diferenças.
 - No telemóvel (`adb install -r`): tocar em "Mercadona" e em "Limpeza e casa" (períodos "Este mês" e "Tudo"); a soma da folha é igual à barra; tocar num artigo abre o detalhe; sem rede aparece a mensagem.
 - Na web (`flutter run -d chrome`): o mesmo toque, abaixo e acima de 800 px, em claro e escuro.
