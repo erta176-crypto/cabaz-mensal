@@ -21,6 +21,7 @@ A app funciona sem rede. Toda a escrita passa pela cache local (drift) e por uma
 - Chave repetida vinda do servidor (23505): erro permanente com mensagem legível; a alteração fica com erro até ser descartada ou tentada de novo.
 - `preferencias.reiniciado_em` manda limpar a cache (`limparCache`: registos, cursores `cursor:%` e painéis guardados `painel:%`).
 - Vence a última escrita a chegar ao servidor.
+- Compras e linhas não estão na fila nem na cache (só no servidor). Eliminar um talão marca `compras.apagado_em` diretamente no servidor (só com rede; "Anular" volta a pôr `null`); as linhas seguem a compra. As RPCs, a vista `resumo_por_loja` e as leituras da app ignoram as eliminadas (Fase 15).
 - A chave `tema` em `estado` é do aparelho: não sincroniza e `limparTudo` mantém-na.
 - A cache do Painel (`estado`, chaves `painel:%`) não sincroniza; é apagada por `limparCache` (reinício) e por `limparTudo` (sair).
 

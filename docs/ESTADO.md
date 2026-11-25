@@ -3,7 +3,7 @@
 *Atualizado em 2026-11-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-Nenhuma em curso. Ver Próximo.
+**Fase 15 · Eliminar talão:** T1 a T4 feitas (commits locais, por enviar; migração aplicada); falta o portão no telemóvel e na web. [`planning/fase-15.md`](planning/fase-15.md)
 
 ## Feito
 - **Fase 14 · Detalhe no Painel:** concluída (portão a 2026-11-25; [`planning/fase-14.md`](planning/fase-14.md)). Tocar numa loja, categoria, "Sem categoria" ou "Outras" abre a folha com os artigos (RPC `artigos_do_painel`, migração aplicada), com a soma igual à barra. A seguir, do mesmo pedido: Fase 15 (eliminar talão).

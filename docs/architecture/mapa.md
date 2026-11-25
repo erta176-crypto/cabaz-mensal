@@ -23,7 +23,7 @@
   - `escrita.dart`: grava na cache e põe na fila.
   - `sincronizador.dart`: envio e receção.
   - `servidor_supabase.dart`: a ligação ao Supabase.
-- `supabase/`: autenticação, consultas de compras e dados (importar, exportar, apagar, resumo). `base.dart`: tradução de erros e os auxiliares de tempo `lerComRede`, `escreverComLimite` e `buscarPaginas` (leitura por páginas, com limite por página).
+- `supabase/`: autenticação, consultas de compras e dados (importar, exportar, apagar, resumo; eliminar e repor talões, e `semComprasEliminadas`/`comprasExistentesDe`, que deixam as compras eliminadas fora da cópia JSON, das exportações e da deteção de repetidos). `base.dart`: tradução de erros e os auxiliares de tempo `lerComRede`, `escreverComLimite` e `buscarPaginas` (leitura por páginas, com limite por página).
   - `supabase_estatisticas.dart`: RPC `painel` (com cache do último resultado na tabela `estado`, chave `painel:<período>:<loja|todas>`) e `historico_compras`, `artigos_do_painel` (artigos de uma barra) e linhas de uma compra (só com rede). Cada pedido tem um limite de 10 s; esgotado, conta como sem rede (decidido no portão da Fase 2: no Android, sem ligação, o pedido podia ficar preso).
 
 ## `lib/import/`: importação sem interface, testável
@@ -51,7 +51,7 @@
 - `importar_exportar`: `/importar?tipo=taloes|camera|galeria` (`AtalhoImportar`) escolhe o tipo e, no Android, abre o seletor; pré-visualização e arrastar e largar na web; "Talões (fotografia)" só no Android (câmara e galeria com o `image_picker`, OCR com `ocrFotosProvider`, fotografia recuperada com `retrieveLostData`, cópias temporárias apagadas ao importar ou cancelar); "Talões (PDF)" com `previsualizacao_taloes.dart` (um cartão por talão, estado e linhas; corrigir, apagar e acrescentar linhas, linhas por reconhecer, total e data, ver a fotografia).
 - `definicoes`: conta, sincronização, `sairDaConta` (também usado pelo ecrã de bloqueio), interruptor do bloqueio (só onde o aparelho o permite), tema, gestos.
 - `painel`: Painel e estatísticas (filtros de período e loja, números, gráficos; aviso quando os dados vêm da cache; tocar numa barra de loja ou categoria abre `folha_detalhe.dart` com os artigos); `orcamento_cartao.dart` (cartão do orçamento do mês e diálogo "Editar orçamento").
-- `historico`: Histórico só de consulta (filtros, pesquisa por artigo, alias, EAN ou texto do talão, lista por mês) e detalhe da compra (ao lado a partir de 800 px).
+- `historico`: Histórico (filtros, pesquisa por artigo, alias, EAN ou texto do talão, lista por mês) e detalhe da compra (ao lado a partir de 800 px); `eliminar_talao.dart` ("⋮ → Eliminar talão", confirmação; "Anular" repõe).
 - `estatisticas`: componentes de gráficos partilhados pelo Painel e pelo Ver artigo (`corDeHex` e `corDaLoja`, regra única da cor da loja `#rrggbb`, usada também na Lista e em Artigos; `BarrasHorizontais` sem `fl_chart`, `GraficoMeses` e `GraficoPreco` com `fl_chart`).
 
 ## `supabase/migrations/`
@@ -62,9 +62,10 @@
 - `fase2`: RPC `painel` e `historico_compras` (só leitura, `security invoker`).
 - `fase4_orcamentos`: tabela `orcamentos` (mês, categoria ou total, valor; único por utilizador/mês/categoria) e `apagar_todos_dados` com orçamentos; `fase4_orcamentos_tempo_real`: tabela na publicação de tempo real.
 - `fase14_artigos_do_painel`: RPC `artigos_do_painel` (só leitura, `security invoker`; artigos de uma barra do Painel, com a soma igual à barra).
+- `fase15_eliminar_compra`: `compras.apagado_em`; `painel`, `historico_compras`, `artigos_do_painel` e `resumo_por_loja` ignoram as compras eliminadas.
 
 ## `supabase/verificacao/`
-- SQL só de leitura para correr no servidor: `fase14.sql` compara cada barra do `painel` com a soma de `artigos_do_painel` (tem de dar 0 diferentes; voltar a correr na Fase 15).
+- SQL só de leitura para correr no servidor: `fase14.sql` compara cada barra do `painel` com a soma de `artigos_do_painel` (tem de dar 0 diferentes); `fase15.sql` compara o `painel`, o `historico_compras` e o `resumo_por_loja` com uma contagem direta sem as compras eliminadas, e conta as eliminadas. Correr os dois depois de mexer em compras ou nas RPCs.
 
 ## `test/`
 - Servidor falso em memória e drift em memória (`test/sync/`). Nenhum teste usa o Supabase real.
