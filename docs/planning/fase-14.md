@@ -1,6 +1,6 @@
 # Fase 14 · Painel: tocar numa loja ou categoria mostra os artigos
 
-**Estado:** aprovado (2026-11-25); T1, T2 e T3 feitas. Uma migração (função SQL nova, só leitura, sem tabelas nem índices novos); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1 a T4 feitas; falta o portão. Uma migração (função SQL nova, só leitura, sem tabelas nem índices novos); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** no Painel, tocar numa barra de "Por loja" ou "Por categoria" (incluindo "Sem categoria" e "Outras") abre a lista dos artigos que dão esse valor, com o mesmo período e a mesma loja do Painel. A soma da lista é sempre igual ao valor da barra.
 
@@ -45,7 +45,8 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P3"). Eliminar talão fica pa
 - `painel_page.dart`: toque em loja, categoria, "Sem categoria" e "Outras" abre a folha de D5.
 - Testes de widget: a folha abre com o título, os artigos por ordem do total e o total igual ao da barra; linhas de D3 só quando ≠ 0; tocar num artigo abre o `DialogoVerArtigo`; sem rede mostra a mensagem de D6; Painel da cache mostra o aviso de D6; as barras sem `aoTocar` ficam como estão (Lista, Orçamento).
 
-## T4 · Documentação [ ]
+## T4 · Documentação [x] (2026-11-25)
+- `mapa.md` (modelos, RPC, folha, migração e `supabase/verificacao/`), `notas.md` (nota para a Fase 15), `ESTADO.md`, este plano.
 - `mapa.md` (função SQL, `supabase/verificacao/`, folha nova), `ESTADO.md`, este plano; nota em `docs/planning/notas.md` para a Fase 15 (D4).
 
 ## Portão

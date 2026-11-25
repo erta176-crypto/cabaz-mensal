@@ -8,3 +8,4 @@
 - Comportamento conhecido: se a rede cair a meio do `recarregarTudo()` (depois de uma importação), a cache fica vazia até à próxima tentativa automática ou até a rede voltar; os dados estão no servidor.
 - Talões: o Intermarché não tem leitor (só Pingo Doce, Lidl, E.Leclerc e Mercadona); uma fotografia de talão do Intermarché dá "Formato de talão não reconhecido" (visto a 2026-11-24). Um leitor novo pede uma fase própria e talões de exemplo.
 - Talões: um PDF sem texto (digitalizado como imagem) dá "Formato de talão não reconhecido", quando devia dizer que o PDF não tem texto; lê-lo pediria OCR das páginas (visto a 2026-11-24, Fase 12).
+- Fase 15 (eliminar talão): quando `compras` ganhar `apagado_em`, mudar juntas as RPCs `painel` e `artigos_do_painel` (e `historico_compras`) para ignorar as apagadas, e voltar a correr `supabase/verificacao/fase14.sql` (Fase 14, D4).

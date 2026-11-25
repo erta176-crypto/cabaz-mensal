@@ -3,7 +3,7 @@
 *Atualizado em 2026-11-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-Nenhuma em curso. Ver Próximo.
+**Fase 14 · Detalhe no Painel:** T1 a T4 feitas (commits locais, por enviar; migração aplicada); falta o portão no telemóvel e na web. [`planning/fase-14.md`](planning/fase-14.md)
 
 ## Feito
 - **Fase 13 · Categorias:** concluída (portão a 2026-11-25; [`planning/fase-13.md`](planning/fase-13.md)). Renomear para um nome existente (maiúsculas, acentos, eliminadas) oferece juntar ou recuperar e nunca chega ao servidor; tocar numa categoria mostra os seus artigos; mensagem legível para o 23505. A seguir, do mesmo pedido: Fase 14 (detalhe no Painel) e Fase 15 (eliminar talão).
