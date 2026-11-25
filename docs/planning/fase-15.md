@@ -1,6 +1,6 @@
 # Fase 15 · Eliminar um talão no Histórico
 
-**Estado:** aprovado (2026-11-25); T1 à espera da migração. Uma migração (coluna `apagado_em` em `compras`; funções e vista passam a respeitá-la); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1 feita. Uma migração (coluna `apagado_em` em `compras`; funções e vista passam a respeitá-la); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** no Histórico, eliminar um talão (uma compra) com confirmação e "Anular". Depois de eliminado, desaparece do Histórico, do Painel (totais, barras, orçamento, folha da Fase 14), do resumo por loja, das exportações e da cópia JSON, neste e nos outros aparelhos. "Anular" repõe tudo.
 
@@ -27,10 +27,10 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P1"). Aprovado pelo utilizado
 | D7 | Fora do âmbito, para `notas.md`: ecrã "Talões eliminados" para repor depois dos 5 s (hoje: reimportar o PDF); compras de origem "lista" (`concluir_compra`) eliminadas não mexem na Lista do mês. |
 | D8 | Implantação: a migração vem primeiro. Com a coluna `null` em todas as compras, as funções novas devolvem o mesmo que as antigas, e o APK e a web antigos continuam a funcionar. O APK novo só depois da migração; a web só muda com o push, depois do portão. |
 
-## T1 · Migração e verificação no servidor [ ]
+## T1 · Migração e verificação no servidor [x] (2026-11-25)
 - Escritos (2026-11-25): `supabase/migrations/20261126000000_fase15_eliminar_compra.sql` e `supabase/verificacao/fase15.sql`. As definições ativas no servidor eram iguais às das migrações fase2, fase1a e fase14; a migração só lhes junta o filtro (confirmado por diff). Os `create or replace` mantêm as permissões.
 - Antes de aplicar: `fase15.sql` sem as referências a `apagado_em` deu 0 diferentes (painel e historico_compras em 10 filtros; resumo_por_loja em 4 lojas).
-- Falta: o utilizador aplicar a migração; depois `fase15.sql`, `fase14.sql` e `get_advisors`.
+- Aplicada pelo utilizador (2026-11-25). Confirmado: coluna `apagado_em` (nula), filtro nas 3 funções e na vista, `security_invoker` mantido, permissões iguais (`anon` não, `authenticated` sim). `fase15.sql`: 0 diferentes (painel e historico_compras em 10 filtros, resumo_por_loja em 4 lojas), 0 compras eliminadas. `fase14.sql`: 128 barras, 0 diferentes. `get_advisors`: nenhum aviso novo (só o da Leaked Password Protection e o INFO do índice de `lojas`, já existentes).
 - `supabase/migrations/20261126000000_fase15_eliminar_compra.sql`: `begin`/`commit`; `alter table compras add column apagado_em timestamptz`; `create or replace` das 3 funções e da vista (D2), copiadas das versões atuais com o filtro a mais. Em comentário, "Como desfazer" (repor as definições da fase2, fase1a e fase14; a coluna pode ficar). Aplicada pelo utilizador no SQL Editor; depois `get_advisors` sem avisos novos.
 - `supabase/verificacao/fase15.sql`, só leitura (não grava nada): para o utilizador, conta as compras eliminadas e compara cada leitura com uma contagem direta nas tabelas, só com `apagado_em is null`: total e n.º de compras do `painel` ("este mês" e "tudo", sem e com cada loja), `historico_compras` (n.º e soma), `resumo_por_loja` (por loja). Tem de dar 0 diferentes. Corre também `fase14.sql`.
 - Correr os dois logo depois de aplicar (0 eliminadas: prova que nada mudou) e outra vez no portão, depois de eliminar um talão (prova que fica de fora).
