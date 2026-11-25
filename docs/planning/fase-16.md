@@ -1,6 +1,6 @@
 # Fase 16 · Leitor de talões do Intermarché (fotografia)
 
-**Estado:** aprovado (2026-11-25). Só Dart; sem migração e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1 e T2 feitas. Só Dart; sem migração e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** importar talões em papel do Intermarché por fotografia, pelo mesmo caminho dos outros (OCR no aparelho → linhas → leitor → pré-visualização → `importar_lote`).
 
@@ -51,7 +51,9 @@ Origem: `notas.md` (2026-11-24: uma fotografia do Intermarché deu "Formato de t
 - Se a normalização precisar de uma regra nova (ex.: "Eur 1,39" → "Eur1,39"), entra aqui, com teste, sem mudar os outros talões (`taloes_reais_test.dart` e `fotos_reais_test.dart` iguais).
 - Remover o worktree e confirmar que a app real continua instalada.
 
-## T2 · Leitor `lerIntermarche` [ ]
+## T2 · Leitor `lerIntermarche` [x] (2026-11-25)
+- Feito: `lib/import/taloes/intermarche.dart` (novo), em último lugar no `lerTalao`. Talão fictício `test/fixtures/taloes/intermarche_papel.txt`; 9 testes em `test/taloes/intermarche_test.dart` (falhavam antes: o leitor não existia).
+- Talão real (`fotos_reais_test.dart`, local): lê-se inteiro (sem faixas), 8 linhas (10 unidades; dois pares repetidos juntaram-se), 0 por reconhecer, bate; data, local "Torres Novas" e número certos. Os outros talões reais continuam iguais (PDF: Pingo Doce 25/25, Lidl 75/75, E.Leclerc 3/3; análise 104/104; fotografias da Fase 7 iguais).
 - Primeiro os testes, com um talão fictício com a mesma estrutura (`test/fixtures/taloes/intermarche_papel.txt`, valores e artigos inventados): hoje dá `null` ("Formato de talão não reconhecido").
 - Testes: reconhecimento (D2) e que nenhum outro leitor o apanha; linhas, quantidades juntadas e `ART#` ignorado (D3); total que bate e total estragado (D4); data, número e local (D5); sem o bloco do terminal; uma linha estranha fica "por reconhecer".
 - `lib/import/taloes/intermarche.dart` (novo) e `ler_talao.dart`.

@@ -57,6 +57,33 @@ void main() {
     expect(faixasPedidas, ['lidl1.png', 'lidl2.png']);
   }, skip: saltar);
 
+  // Talão do Intermarché em papel, fotografia da câmara (Fase 16).
+  test('Intermarché em papel: lê-se inteiro e bate', () async {
+    final faixasPedidas = <String>[];
+    final LeitorOcr ocr = (
+      inteira: (c) async => _caixas('$c.json'),
+      emFaixas: (c) async {
+        faixasPedidas.add(c);
+        return _caixas('faixas-$c.json');
+      },
+    );
+    const foto = 'IMG_20261121_102201.jpg';
+    final r = await lerFotos([(nome: foto, caminho: foto)], ocr);
+    expect(r.ilegiveis, isEmpty);
+    final t = lerTalao(r.lidos.single.texto)!;
+    // ignore: avoid_print
+    print(
+      '${t.loja}: ${t.linhas.length} linhas, '
+      '${t.naoReconhecidas.length} por reconhecer, bate=${t.bate}',
+    );
+    expect((t.loja, t.data), ('Intermarché', DateTime(2026, 11, 21)));
+    expect(t.local, 'Torres Novas');
+    expect(t.numero, isNotNull);
+    expect(t.bate, isTrue);
+    expect(t.naoReconhecidas, isEmpty);
+    expect(faixasPedidas, isEmpty);
+  }, skip: saltar);
+
   // Duas fotografias do mesmo talão do E.Leclerc em papel (T6 da Fase 7).
   test('E.Leclerc em papel: uma bate, a outra fica a rever', () async {
     final LeitorOcr ocr = (

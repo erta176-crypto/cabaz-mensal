@@ -1,6 +1,7 @@
 /// Reconhece a loja de um talão e lê-o.
 library;
 
+import 'intermarche.dart';
 import 'leclerc.dart';
 import 'lidl.dart';
 import 'mercadona.dart';
@@ -13,4 +14,5 @@ TalaoLido? lerTalao(String texto) =>
     lerPingoDoce(texto) ??
     lerLidl(texto) ??
     lerLeclerc(texto) ??
-    lerMercadona(texto);
+    lerMercadona(texto) ??
+    lerIntermarche(texto);
