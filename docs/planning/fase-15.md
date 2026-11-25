@@ -1,6 +1,6 @@
 # Fase 15 · Eliminar um talão no Histórico
 
-**Estado:** aprovado (2026-11-25); T1 a T4 feitas; falta o portão. Uma migração (coluna `apagado_em` em `compras`; funções e vista passam a respeitá-la); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída (portão a 2026-11-25). Uma migração (coluna `apagado_em` em `compras`; funções e vista passam a respeitá-la); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** no Histórico, eliminar um talão (uma compra) com confirmação e "Anular". Depois de eliminado, desaparece do Histórico, do Painel (totais, barras, orçamento, folha da Fase 14), do resumo por loja, das exportações e da cópia JSON, neste e nos outros aparelhos. "Anular" repõe tudo.
 
@@ -52,7 +52,9 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P1"). Aprovado pelo utilizado
 - `mapa.md` (repositório, Histórico, migração, `fase15.sql`), `sincronizacao.md` (compras eliminadas), `notas.md` (D6 e D7; a nota da Fase 14 sobre esta fase saiu), `ESTADO.md`, este plano.
 - `mapa.md` (migração, `fase15.sql`, `semComprasEliminadas`), `sincronizacao.md` (compras: eliminadas com `apagado_em`, só com rede, fora da fila), `notas.md` (D6 e D7; retirar a nota da Fase 14 sobre esta fase), `ESTADO.md`, este plano.
 
-## Portão
+## Portão [x] (2026-11-25)
+- Confirmado pelo utilizador no telemóvel (APK release local, `adb install -r`): eliminar e "Anular"; eliminar baixa o Painel, a barra e o orçamento; o talão desaparece na web publicada (versão anterior, porque o filtro está no servidor); reimportar o PDF aparece como novo; sem rede mostra a mensagem. O botão de eliminar na web só fica publicado com o push (`deploy-web.yml`).
+- Servidor, com 1 compra eliminada: `fase15.sql` 0 diferentes; `fase14.sql` 0 diferentes; total do Painel + talão eliminado = soma de todas as compras; as linhas do talão ficam na base. Testes: 543 passam, 1 saltado; análise sem avisos; `flutter build web` compila; `get_advisors` sem avisos novos.
 - `dart format --set-exit-if-changed lib test`, `flutter analyze` sem avisos e `flutter test --reporter compact`, todos verdes; `flutter build web` compila; `get_advisors` sem avisos novos.
 - No telemóvel (`adb install -r`), com um talão de teste (ex.: o PDF do Mercadona, que se pode reimportar):
   1. Eliminar e "Anular": o talão volta.
