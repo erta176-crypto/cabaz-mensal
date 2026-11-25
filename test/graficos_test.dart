@@ -77,8 +77,8 @@ void main() {
         t,
         const BarrasHorizontais(
           itens: [
-            (rotulo: 'Laticínios', cent: 12345, cor: Colors.red),
-            (rotulo: 'Fruta', cent: 500, cor: Colors.blue),
+            (rotulo: 'Laticínios', cent: 12345, cor: Colors.red, aoTocar: null),
+            (rotulo: 'Fruta', cent: 500, cor: Colors.blue, aoTocar: null),
           ],
         ),
       );
@@ -90,6 +90,37 @@ void main() {
         find.bySemanticsLabel('Laticínios: ${formatarCent(12345)}'),
         findsOneWidget,
       );
+    });
+
+    testWidgets('com aoTocar: botão com 48 px que chama aoTocar; sem '
+        'aoTocar: não é botão', (t) async {
+      var toques = 0;
+      await _mostrar(
+        t,
+        BarrasHorizontais(
+          itens: [
+            (
+              rotulo: 'Laticínios',
+              cent: 12345,
+              cor: Colors.red,
+              aoTocar: () => toques++,
+            ),
+            (rotulo: 'Fruta', cent: 500, cor: Colors.blue, aoTocar: null),
+          ],
+        ),
+      );
+      final botao = find.bySemanticsLabel(RegExp('^Laticínios: '));
+      expect(t.getSize(botao).height, greaterThanOrEqualTo(48));
+      expect(t.getSemantics(botao).flagsCollection.isButton, isTrue);
+      expect(
+        t
+            .getSemantics(find.bySemanticsLabel(RegExp('^Fruta: ')))
+            .flagsCollection
+            .isButton,
+        isFalse,
+      );
+      await t.tap(botao);
+      expect(toques, 1);
     });
 
     testWidgets('lista vazia mostra a mensagem', (t) async {

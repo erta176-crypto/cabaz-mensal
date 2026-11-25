@@ -1,6 +1,6 @@
 # Fase 14 · Painel: tocar numa loja ou categoria mostra os artigos
 
-**Estado:** aprovado (2026-11-25); T1 e T2 feitas. Uma migração (função SQL nova, só leitura, sem tabelas nem índices novos); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1, T2 e T3 feitas. Uma migração (função SQL nova, só leitura, sem tabelas nem índices novos); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** no Painel, tocar numa barra de "Por loja" ou "Por categoria" (incluindo "Sem categoria" e "Outras") abre a lista dos artigos que dão esse valor, com o mesmo período e a mesma loja do Painel. A soma da lista é sempre igual ao valor da barra.
 
@@ -38,7 +38,9 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P3"). Eliminar talão fica pa
 - Primeiro os testes: `DetalhePainel.fromJson`; `totalCent` = artigos + sem artigo + diferença; ordem pelo total; quantidade em un e em kg; parâmetros enviados à RPC para loja, categoria, "Sem categoria" e "Outras".
 - `DetalhePainel` (`domain/estatisticas.dart`), `EstatisticasRepository.artigosDoPainel` (`repositorios.dart`, `supabase_estatisticas.dart`), `detalhePainelProvider` (`providers.dart`, com `refazerQuandoVoltarARede`). Ficheiros partilhados: impacto pelo grafo antes de editar.
 
-## T3 · UI: toque nas barras e folha dos artigos [ ]
+## T3 · UI: toque nas barras e folha dos artigos [x] (2026-11-25)
+- Feito: `BarrasHorizontais` com `aoTocar` por item (`InkWell`, 48 px, semântica de botão); `folha_detalhe.dart` (nova: `abrirDetalhePainel`); `painel_page.dart` liga loja, categoria, "Sem categoria" e "Outras". `formatarKg` passou para `core/formatos.dart` (usado também em `detalhe_compra.dart`, que tinha o mesmo formato).
+- Testes: 7 em `painel_page_test.dart` (folha, ordem, total, linhas de D3, "Outras", artigo, sem rede, cache) e 1 em `graficos_test.dart` (botão com 48 px; sem `aoTocar` não é botão). `flutter build web` compila.
 - `BarrasHorizontais`: `aoTocar` opcional por item; com toque, a linha tem `InkWell`, semântica de botão com o rótulo e o valor, e altura ≥ 48 px.
 - `painel_page.dart`: toque em loja, categoria, "Sem categoria" e "Outras" abre a folha de D5.
 - Testes de widget: a folha abre com o título, os artigos por ordem do total e o total igual ao da barra; linhas de D3 só quando ≠ 0; tocar num artigo abre o `DialogoVerArtigo`; sem rede mostra a mensagem de D6; Painel da cache mostra o aviso de D6; as barras sem `aoTocar` ficam como estão (Lista, Orçamento).

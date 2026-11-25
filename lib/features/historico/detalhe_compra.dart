@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../core/formatos.dart';
 import '../../data/providers.dart';
 import '../../domain/estatisticas.dart';
 import '../../domain/modelos.dart';
 import '../artigos/ver_artigo.dart';
-
-final _kg = NumberFormat('0.000', 'pt_PT');
 
 const avisoRever = 'A soma das linhas não bate com o total';
 
@@ -107,7 +104,7 @@ class DetalheCompra extends ConsumerWidget {
       final unit = l.precoUnitCent;
       return [
         if (peso != null)
-          '${_kg.format(peso / 1000)} kg'
+          formatarKg(peso)
         else if (l.quantidade != null)
           '${l.quantidade} un',
         if (unit != null) '${formatarCent(unit)}${peso != null ? '/kg' : ''}',

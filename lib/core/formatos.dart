@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 final _moeda = NumberFormat.currency(locale: 'pt_PT', symbol: '€');
 final _data = DateFormat('d MMM y', 'pt_PT');
 final _inteiro = NumberFormat.decimalPattern('pt_PT');
+final _kg = NumberFormat('0.000', 'pt_PT');
 
 /// 465226 → "4652,26 €" (pt-PT; o separador de milhares é um espaço fino).
 String formatarCent(int cent) => _moeda.format(cent / 100);
@@ -14,3 +15,6 @@ String centParaCampo(int cent) =>
 String formatarData(DateTime d) => _data.format(d);
 
 String formatarInteiro(int n) => _inteiro.format(n);
+
+/// 1250 g → "1,250 kg".
+String formatarKg(int gramas) => '${_kg.format(gramas / 1000)} kg';

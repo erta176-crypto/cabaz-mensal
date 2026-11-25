@@ -13,6 +13,7 @@ import '../estatisticas/grafico_meses.dart';
 import '../artigos/ver_artigo.dart';
 import '../shell/filtro_pilula.dart';
 import '../shell/shell.dart';
+import 'folha_detalhe.dart';
 import 'orcamento_cartao.dart';
 
 final _hora = DateFormat('HH:mm', 'pt_PT');
@@ -122,7 +123,7 @@ class _PainelPageState extends ConsumerState<PainelPage> {
             ),
           )
         else
-          ..._seccoes(d, lojas),
+          ..._seccoes(d, lojas, daCache: guardadoEm != null),
       ],
     );
   }
@@ -210,7 +211,11 @@ class _PainelPageState extends ConsumerState<PainelPage> {
     );
   }
 
-  List<Widget> _seccoes(DadosPainel d, List<Loja> lojas) {
+  List<Widget> _seccoes(
+    DadosPainel d,
+    List<Loja> lojas, {
+    required bool daCache,
+  }) {
     final esquema = Theme.of(context).colorScheme;
     final intervalo = intervaloDe(_periodo, DateTime.now());
     final de = _periodo == Periodo.tudo && d.porMes.isNotEmpty
@@ -229,6 +234,17 @@ class _PainelPageState extends ConsumerState<PainelPage> {
         a.id: a,
     };
     final topo = categoriasTopo(d.porCategoria);
+    final outras = d.porCategoria.skip(topo.topo.length);
+    String rotuloCategoria(String? id) =>
+        id == null ? 'Sem categoria' : categorias[id] ?? 'Categoria apagada';
+    // Folha com os artigos da barra, no filtro do Painel (Fase 14).
+    VoidCallback abrir(String rotulo, BarraPainel barra) =>
+        () => abrirDetalhePainel(
+          context,
+          titulo: '$rotulo · ${_periodo.rotulo}',
+          barra: barra,
+          painelDaCache: daCache,
+        );
 
     final porLoja = _seccao(
       'Por loja',
@@ -241,6 +257,10 @@ class _PainelPageState extends ConsumerState<PainelPage> {
               cor: porId[t.lojaId] == null
                   ? esquema.primary
                   : corDaLoja(porId[t.lojaId]!, esquema),
+              aoTocar: abrir(
+                porId[t.lojaId]?.nome ?? 'Loja apagada',
+                BarraPainel(filtro: _filtro, lojaId: t.lojaId),
+              ),
             ),
         ],
       ),
@@ -254,14 +274,32 @@ class _PainelPageState extends ConsumerState<PainelPage> {
             itens: [
               for (final c in topo.topo)
                 (
-                  rotulo: c.categoriaId == null
-                      ? 'Sem categoria'
-                      : categorias[c.categoriaId] ?? 'Categoria apagada',
+                  rotulo: rotuloCategoria(c.categoriaId),
                   cent: c.totalCent,
                   cor: esquema.primary,
+                  aoTocar: abrir(
+                    rotuloCategoria(c.categoriaId),
+                    BarraPainel(
+                      filtro: _filtro,
+                      categoriaIds: [?c.categoriaId],
+                      semCategoria: c.categoriaId == null,
+                    ),
+                  ),
                 ),
               if (topo.outrasCent > 0)
-                (rotulo: 'Outras', cent: topo.outrasCent, cor: esquema.primary),
+                (
+                  rotulo: 'Outras',
+                  cent: topo.outrasCent,
+                  cor: esquema.primary,
+                  aoTocar: abrir(
+                    'Outras',
+                    BarraPainel(
+                      filtro: _filtro,
+                      categoriaIds: [for (final c in outras) ?c.categoriaId],
+                      semCategoria: outras.any((c) => c.categoriaId == null),
+                    ),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 8),

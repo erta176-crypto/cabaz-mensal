@@ -35,6 +35,11 @@ class _EstatisticasFalsas implements EstatisticasRepository {
   Future<ResultadoPainel> Function() resposta;
   final filtros = <FiltroCompras>[];
 
+  /// Resposta de artigosDoPainel e os pedidos feitos.
+  Future<DetalhePainel> Function() detalhe = () async =>
+      const DetalhePainel(artigos: [], semArtigoCent: 0, diferencaCent: 0);
+  final barras = <BarraPainel>[];
+
   @override
   Future<ResultadoPainel> painel(FiltroCompras filtro, {DateTime? hoje}) {
     filtros.add(filtro);
@@ -59,7 +64,17 @@ class _EstatisticasFalsas implements EstatisticasRepository {
     List<String>? categoriaIds,
     bool semCategoria = false,
     DateTime? hoje,
-  }) => throw UnimplementedError();
+  }) {
+    barras.add(
+      BarraPainel(
+        filtro: filtro,
+        lojaId: lojaId,
+        categoriaIds: categoriaIds ?? const [],
+        semCategoria: semCategoria,
+      ),
+    );
+    return detalhe();
+  }
 }
 
 void main() {
@@ -81,6 +96,8 @@ void main() {
           lojasProvider.overrideWith((_) => Stream.value(_lojas)),
           categoriasProvider.overrideWith((_) => Stream.value(_categorias)),
           artigosProvider.overrideWith((_) => Stream.value(_artigos)),
+          precosAtuaisProvider.overrideWith((_) => Stream.value(const [])),
+          registosPrecoProvider.overrideWith((_, _) => Stream.value(const [])),
         ],
         child: MaterialApp(
           theme: construirTema(Brightness.light, fontesGoogle: false),
@@ -235,5 +252,193 @@ void main() {
       t.getTopLeft(find.text('Por categoria')).dy,
       greaterThan(t.getTopLeft(find.text('Por loja')).dy),
     );
+  });
+
+  group('tocar numa barra (Fase 14)', () {
+    const detalheContinente = DetalhePainel(
+      artigos: [
+        ArtigoDetalhe(
+          artigoId: 'a1',
+          totalCent: 9000,
+          quantidade: 6,
+          pesoG: 0,
+          nCompras: 2,
+        ),
+        ArtigoDetalhe(
+          artigoId: 'a-apagado',
+          totalCent: 1000,
+          quantidade: 0,
+          pesoG: 1250,
+          nCompras: 1,
+        ),
+      ],
+      semArtigoCent: 0,
+      diferencaCent: 0,
+    );
+
+    Future<_EstatisticasFalsas> abrirFolha(
+      WidgetTester t,
+      String barra, {
+      DetalhePainel detalhe = detalheContinente,
+      ResultadoPainel? painel,
+      DadosPainel? dados,
+    }) async {
+      final repo = _EstatisticasFalsas(
+        () async => painel ?? ResultadoPainel(dados ?? _dados()),
+      )..detalhe = () async => detalhe;
+      await abrir(t, repo);
+      await t.tap(find.bySemanticsLabel(RegExp('^${RegExp.escape(barra)}: ')));
+      await t.pumpAndSettle();
+      return repo;
+    }
+
+    testWidgets('loja: folha com título, artigos por ordem do total e total '
+        'igual à barra', (t) async {
+      final repo = await abrirFolha(t, 'Continente');
+      expect(repo.barras.single.lojaId, 'l1');
+      expect(repo.barras.single.categoriaIds, isEmpty);
+      expect(find.text('Continente · Este mês'), findsOneWidget);
+      final folha = find.byType(BottomSheet);
+      expect(
+        find.descendant(of: folha, matching: find.text('Leite')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: folha, matching: find.text('6 un · 2 compras')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: folha, matching: find.text('Artigo apagado')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: folha, matching: find.text('1,250 kg · 1 compra')),
+        findsOneWidget,
+      );
+      expect(
+        t
+            .getTopLeft(
+              find.descendant(of: folha, matching: find.text('Leite')),
+            )
+            .dy,
+        lessThan(
+          t
+              .getTopLeft(
+                find.descendant(
+                  of: folha,
+                  matching: find.text('Artigo apagado'),
+                ),
+              )
+              .dy,
+        ),
+      );
+      // Total igual ao valor da barra (10000).
+      expect(
+        find.descendant(of: folha, matching: find.text(formatarCent(10000))),
+        findsOneWidget,
+      );
+      expect(find.textContaining('Linhas sem artigo'), findsNothing);
+      expect(find.textContaining('Diferença'), findsNothing);
+    });
+
+    testWidgets('linhas sem artigo e diferença só quando não são 0', (t) async {
+      await abrirFolha(
+        t,
+        'Continente',
+        detalhe: const DetalhePainel(
+          artigos: [
+            ArtigoDetalhe(
+              artigoId: 'a1',
+              totalCent: 9000,
+              quantidade: 1,
+              pesoG: 0,
+              nCompras: 1,
+            ),
+          ],
+          semArtigoCent: 700,
+          diferencaCent: 300,
+        ),
+      );
+      expect(find.text('Linhas sem artigo'), findsOneWidget);
+      expect(find.text('Diferença do total das compras'), findsOneWidget);
+      expect(find.text(formatarCent(700)), findsOneWidget);
+      expect(find.text(formatarCent(300)), findsOneWidget);
+    });
+
+    testWidgets('categoria e "Sem categoria"', (t) async {
+      final repo = await abrirFolha(t, 'Laticínios');
+      expect(repo.barras.single.categoriaIds, ['c1']);
+      expect(repo.barras.single.semCategoria, isFalse);
+      expect(repo.barras.single.lojaId, isNull);
+      expect(find.text('Laticínios · Este mês'), findsOneWidget);
+
+      await t.tapAt(const Offset(10, 10)); // fecha a folha
+      await t.pumpAndSettle();
+      await t.tap(find.bySemanticsLabel(RegExp('^Sem categoria: ')));
+      await t.pumpAndSettle();
+      expect(repo.barras.last.categoriaIds, isEmpty);
+      expect(repo.barras.last.semCategoria, isTrue);
+    });
+
+    testWidgets('"Outras": as categorias depois das 8 maiores', (t) async {
+      final repo = await abrirFolha(
+        t,
+        'Outras',
+        dados: DadosPainel(
+          totalCent: 1000,
+          nCompras: 1,
+          poupancaCent: 0,
+          porMes: [TotalMes(DateTime(2026, 10), 1000, 1)],
+          porLoja: const [TotalLoja('l1', 1000, 1)],
+          porCategoria: [
+            for (var i = 1; i <= 9; i++) TotalCategoria('c$i', 100),
+            const TotalCategoria(null, 100),
+          ],
+          artigos: const [],
+        ),
+      );
+      expect(repo.barras.single.categoriaIds, ['c9']);
+      expect(repo.barras.single.semCategoria, isTrue);
+      expect(find.text('Outras · Este mês'), findsOneWidget);
+    });
+
+    testWidgets('tocar num artigo abre o detalhe do artigo', (t) async {
+      await abrirFolha(t, 'Continente');
+      await t.tap(
+        find.descendant(
+          of: find.byType(BottomSheet),
+          matching: find.text('Leite'),
+        ),
+      );
+      await t.pumpAndSettle();
+      expect(find.byType(Dialog), findsOneWidget);
+    });
+
+    testWidgets('sem rede: mostra a mensagem', (t) async {
+      final repo = _EstatisticasFalsas(() async => ResultadoPainel(_dados()))
+        ..detalhe = () async =>
+            throw const ErroDados('Sem rede: liga-te para ver os artigos.');
+      await abrir(t, repo);
+      await t.tap(find.bySemanticsLabel(RegExp('^Continente: ')));
+      await t.pumpAndSettle();
+      expect(
+        find.text('Sem rede: liga-te para ver os artigos.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('Painel da cache: a folha avisa que a lista é de agora', (
+      t,
+    ) async {
+      await abrirFolha(
+        t,
+        'Continente',
+        painel: ResultadoPainel(_dados(), guardadoEm: DateTime(2026, 10, 1)),
+      );
+      expect(
+        find.text('O Painel está desatualizado; esta lista é de agora.'),
+        findsOneWidget,
+      );
+    });
   });
 }
