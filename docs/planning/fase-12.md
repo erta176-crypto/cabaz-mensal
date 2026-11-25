@@ -1,6 +1,6 @@
 # Fase 12 · Botão "+" para importar talões e Mercadona em PDF
 
-**Estado:** aprovado (2026-11-24), com a T4 (Mercadona em PDF digital). Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída (portão a 2026-11-25), com a T4 (Mercadona em PDF digital). Só Dart. Sem migração SQL e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** chegar a uma importação de talões em 2 toques, a partir de qualquer ecrã com barra inferior.
 
@@ -44,7 +44,9 @@
 - Com o "+" numa das 5 posições da barra, "Histórico" partia em duas linhas: o "+" passa a botão flutuante acoplado ao meio da barra (`centerDocked`), e a barra volta a 4 posições. Teste: os 4 nomes com a mesma altura.
 - Sem barra (Importar, Definições) não havia forma rápida de voltar ao Painel: opção A aprovada, ícone do Painel no cabeçalho, ao lado do ☰ (só ecrã estreito). Rejeitadas: B (barra também nessas páginas: a `NavigationBar` obriga a um destino marcado) e C (seta para trás: nem sempre volta ao Painel).
 
-## Portão
+## Portão [x] (2026-11-25)
+- Confirmado pelo utilizador no telemóvel (APK release local, `adb install -r`): "+" ao centro, 12 px acima da posição acoplada (afinado no portão: 16 → 14 → 12); atalhos; botão do Painel no Importar; fatura do Mercadona importa. Testes: 499 passam, 1 saltado; análise sem avisos. A verificação visual na web não foi feita pelo agente (extensão do Chrome desligada).
+- "Mercadona .pdf" (imagem sem texto) passou para `dados-privados/sem-texto/`.
 - `dart format --set-exit-if-changed lib test`, `flutter analyze` sem avisos e `flutter test --reporter compact`, todos verdes.
 - Verificação visual: claro e escuro, abaixo e acima de 800 px (`flutter run -d chrome`).
 - No telemóvel (`adb install -r`): "+" → "Talão em PDF" abre o seletor de PDFs; "Fotografar talão" abre a câmara.

@@ -1,11 +1,12 @@
 # Estado do projeto
 
-*Atualizado em 2026-11-24. Manter curto; o detalhe está nos ficheiros ligados.*
+*Atualizado em 2026-11-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Fase 12 · Botão "+" e Mercadona em PDF:** T1 a T4 feitas; falta a verificação visual e o portão no telemóvel. [`planning/fase-12.md`](planning/fase-12.md)
+Nenhuma em curso. Ver Próximo.
 
 ## Feito
+- **Fase 12 · Botão "+" e Mercadona em PDF:** concluída (portão a 2026-11-25; [`planning/fase-12.md`](planning/fase-12.md)). "+" ao centro da barra com atalhos de importação, "Importar talão" no menu lateral, botão do Painel nas páginas sem barra, leitor da fatura simplificada do Mercadona.
 - **Fase 11 · Alias sem rede e talão E.Leclerc:** concluída (portão a 2026-11-24; [`planning/fase-11.md`](planning/fase-11.md)). Falhas sem rede nunca ficam com erro; "Tentar agora" volta a tentar as alterações com erro; o leitor do E.Leclerc aceita NBSP. Intermarché sem leitor: em `notas.md`.
 - **Fase 10 · Assinatura e ícone:** concluída (portão a 2026-11-19; [`planning/fase-10.md`](planning/fase-10.md)). Build APK do CI verde, APK do CI instalado por cima com `adb install -r` sem perder dados. Secrets do CI: comandos na decisão 0014.
 - **Fase 9b · Limite de tempo por página:** a cópia JSON, a exportação de compras e a abertura de talões deixam de dar "Sem rede" por o conjunto das páginas passar de 10 s ([`planning/fase-9b.md`](planning/fase-9b.md); 2026-11-15).
