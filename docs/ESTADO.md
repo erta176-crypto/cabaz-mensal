@@ -3,9 +3,10 @@
 *Atualizado em 2026-11-25. Manter curto; o detalhe está nos ficheiros ligados.*
 
 ## Fase atual
-**Fase 16 · Leitor do Intermarché:** T1 a T3 feitas (commits locais, por enviar); falta o portão no telemóvel. [`planning/fase-16.md`](planning/fase-16.md)
+Nenhuma em curso. Ver Próximo.
 
 ## Feito
+- **Fase 16 · Leitor do Intermarché:** concluída (portão a 2026-11-25; [`planning/fase-16.md`](planning/fase-16.md)). Talões em papel do Intermarché por fotografia (feito com um só exemplo; casos por ver em `notas.md`).
 - **Fase 15 · Eliminar talão:** concluída (portão a 2026-11-25; [`planning/fase-15.md`](planning/fase-15.md)). "⋮ → Eliminar talão" no Histórico e no detalhe, com confirmação e "Anular" (só com rede); `compras.apagado_em` (migração aplicada) e todas as leituras sem as compras eliminadas. Fecha o pedido de 2026-11-25 (Fases 13 a 15).
 - **Fase 14 · Detalhe no Painel:** concluída (portão a 2026-11-25; [`planning/fase-14.md`](planning/fase-14.md)). Tocar numa loja, categoria, "Sem categoria" ou "Outras" abre a folha com os artigos (RPC `artigos_do_painel`, migração aplicada), com a soma igual à barra. A seguir, do mesmo pedido: Fase 15 (eliminar talão).
 - **Fase 13 · Categorias:** concluída (portão a 2026-11-25; [`planning/fase-13.md`](planning/fase-13.md)). Renomear para um nome existente (maiúsculas, acentos, eliminadas) oferece juntar ou recuperar e nunca chega ao servidor; tocar numa categoria mostra os seus artigos; mensagem legível para o 23505. A seguir, do mesmo pedido: Fase 14 (detalhe no Painel) e Fase 15 (eliminar talão).

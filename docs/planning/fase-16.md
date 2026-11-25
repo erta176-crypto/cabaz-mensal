@@ -1,6 +1,6 @@
 # Fase 16 · Leitor de talões do Intermarché (fotografia)
 
-**Estado:** aprovado (2026-11-25); T1 a T3 feitas; falta o portão. Só Dart; sem migração e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** concluída (portão a 2026-11-25). Só Dart; sem migração e sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** importar talões em papel do Intermarché por fotografia, pelo mesmo caminho dos outros (OCR no aparelho → linhas → leitor → pré-visualização → `importar_lote`).
 
@@ -63,6 +63,7 @@ Origem: `notas.md` (2026-11-24: uma fotografia do Intermarché deu "Formato de t
 - `mapa.md` (leitor novo), `notas.md` (D6 e D8; saiu a nota do Intermarché sem leitor), `ESTADO.md`, este plano.
 - `mapa.md` (leitor novo), `notas.md` (D6, D8, e retirar a nota do Intermarché), `ESTADO.md`, este plano.
 
-## Portão
+## Portão [x] (2026-11-25)
+- Confirmado pelo utilizador no telemóvel (APK release local, `adb install -r`): loja "Intermarché" criada; a fotografia do talão de 21/11 importa como 1 talão que bate, com data e local certos; aparece no Histórico e no Painel. Testes: 553 passam, 1 saltado; análise sem avisos; talões e fotografias reais (locais) iguais.
 - `dart format --set-exit-if-changed lib test`, `flutter analyze` sem avisos e `flutter test --reporter compact`, todos verdes; `taloes_reais_test.dart` e `fotos_reais_test.dart` (locais) verdes.
 - No telemóvel (`adb install -r`), depois de criar a loja "Intermarché": importar a fotografia pela galeria; aparece 1 talão "Novo" que bate (ou "a rever" com a diferença explicada), com a data e o local certos; importar; aparece no Histórico e no Painel.
