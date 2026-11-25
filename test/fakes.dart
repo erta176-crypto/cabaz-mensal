@@ -92,6 +92,16 @@ class FakeDadosRepository implements DadosRepository {
       ),
   ];
 
+  /// Talões eliminados e repostos, pela ordem dos pedidos.
+  final pedidosCompras = <String>[];
+
+  @override
+  Future<void> eliminarCompra(String id) async =>
+      pedidosCompras.add('eliminar $id');
+
+  @override
+  Future<void> reporCompra(String id) async => pedidosCompras.add('repor $id');
+
   @override
   Future<ResumoDados> resumoDados() async => ResumoDados(
     nCompras: base.t('compras').length,

@@ -199,9 +199,16 @@ abstract interface class DadosRepository {
   /// importar_lote). Devolve as contagens por tabela.
   Future<Map<String, int>> importarLote(Map<String, dynamic> payload);
 
-  /// Compras já gravadas (para detetar repetidas ao importar).
+  /// Compras já gravadas e não eliminadas (para detetar repetidas ao
+  /// importar).
   Future<List<({String lojaId, String data, String? local, int totalCent})>>
   comprasExistentes();
+
+  /// Elimina um talão (marca `apagado_em`; só com rede). Fase 15.
+  Future<void> eliminarCompra(String id);
+
+  /// Repõe um talão eliminado ("Anular"; só com rede). Fase 15.
+  Future<void> reporCompra(String id);
 }
 
 class EstadoSync {

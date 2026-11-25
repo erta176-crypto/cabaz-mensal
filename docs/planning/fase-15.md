@@ -1,6 +1,6 @@
 # Fase 15 · Eliminar um talão no Histórico
 
-**Estado:** aprovado (2026-11-25); T1 feita. Uma migração (coluna `apagado_em` em `compras`; funções e vista passam a respeitá-la); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1 e T2 feitas. Uma migração (coluna `apagado_em` em `compras`; funções e vista passam a respeitá-la); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** no Histórico, eliminar um talão (uma compra) com confirmação e "Anular". Depois de eliminado, desaparece do Histórico, do Painel (totais, barras, orçamento, folha da Fase 14), do resumo por loja, das exportações e da cópia JSON, neste e nos outros aparelhos. "Anular" repõe tudo.
 
@@ -35,7 +35,9 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P1"). Aprovado pelo utilizado
 - `supabase/verificacao/fase15.sql`, só leitura (não grava nada): para o utilizador, conta as compras eliminadas e compara cada leitura com uma contagem direta nas tabelas, só com `apagado_em is null`: total e n.º de compras do `painel` ("este mês" e "tudo", sem e com cada loja), `historico_compras` (n.º e soma), `resumo_por_loja` (por loja). Tem de dar 0 diferentes. Corre também `fase14.sql`.
 - Correr os dois logo depois de aplicar (0 eliminadas: prova que nada mudou) e outra vez no portão, depois de eliminar um talão (prova que fica de fora).
 
-## T2 · Repositório [ ]
+## T2 · Repositório [x] (2026-11-25)
+- Feito (`supabase_repositorios.dart`): funções puras `semComprasEliminadas` (aplicada no `lerTudo`, por isso vale para a cópia JSON e para a exportação de compras) e `comprasExistentesDe`; `eliminarCompra`/`reporCompra` (`update` de `apagado_em`, limite de leitura, mensagens de D4); `isFilter('apagado_em', null)` em `contarCompras`, `comprasDaLoja`, `locaisUsados`, `temDados` e `resumoDados`. Interface em `repositorios.dart`; `FakeDadosRepository` regista os pedidos.
+- Testes: `test/compras_eliminadas_test.dart` (6: filtro, outras tabelas iguais, cópia JSON, exportação de compras, deteção de repetidos). Os pedidos finos ao PostgREST ficam para o portão e o `fase15.sql`.
 - Primeiro os testes (puros): `semComprasEliminadas` retira as compras com `apagado_em` e só as suas linhas, e deixa o resto igual; a cópia JSON (`montarExportacao`) sai sem elas; `comprasExistentes` ignora as eliminadas (o mapeamento passa a ser uma função pura testada).
 - `DadosRepository.eliminarCompra` e `reporCompra` (`repositorios.dart`, `supabase_repositorios.dart`, falsos em `test/fakes.dart` e nos outros que implementam a interface); filtros de D3. Ficheiros partilhados: impacto pelo grafo antes de editar.
 - Os pedidos finos ao PostgREST (`update`, `.isFilter('apagado_em', null)` nas contagens) não têm teste unitário (o repositório não tem onde os injetar); ficam provados no portão (reimportar, contagens da loja) e no `fase15.sql`.

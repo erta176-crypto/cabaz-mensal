@@ -41,18 +41,61 @@ class SupabaseAuthRepository implements AuthRepository {
   Future<void> sair() => _c.auth.signOut();
 }
 
-/// Consultas sobre compras antigas (só com rede).
+/// Tira das tabelas lidas do servidor as compras eliminadas e as suas linhas
+/// (Fase 15, D3): ficam fora da cópia JSON e das exportações.
+Map<String, List<Map<String, dynamic>>> semComprasEliminadas(
+  Map<String, List<Map<String, dynamic>>> tudo,
+) {
+  final eliminadas = {
+    for (final c in tudo['compras'] ?? const <Map<String, dynamic>>[])
+      if (c['apagado_em'] != null) c['id'],
+  };
+  if (eliminadas.isEmpty) return tudo;
+  return {
+    ...tudo,
+    'compras': [
+      for (final c in tudo['compras']!)
+        if (!eliminadas.contains(c['id'])) c,
+    ],
+    'linhas_compra': [
+      for (final l in tudo['linhas_compra'] ?? const <Map<String, dynamic>>[])
+        if (!eliminadas.contains(l['compra_id'])) l,
+    ],
+  };
+}
+
+/// Compras lidas do servidor → as que contam como já importadas (sem as
+/// eliminadas: um talão eliminado pode ser importado de novo).
+List<({String lojaId, String data, String? local, int totalCent})>
+comprasExistentesDe(List<Map<String, dynamic>> linhas) => [
+  for (final c in linhas)
+    if (c['apagado_em'] == null)
+      (
+        lojaId: c['loja_id'] as String,
+        data: c['data'] as String,
+        local: c['local'] as String?,
+        totalCent: (c['total_cent'] as num).toInt(),
+      ),
+];
+
+/// Consultas sobre compras antigas (só com rede; sem as eliminadas).
 class SupabaseConsultasCompras implements ConsultasCompras {
   SupabaseConsultasCompras(this._c, {this.limite = limiteLeituraPadrao});
   final SupabaseClient _c;
   final Duration limite;
 
   @override
-  Future<int> contarCompras() => _comRede(() => _c.from('compras').count());
+  Future<int> contarCompras() =>
+      _comRede(() => _c.from('compras').count().isFilter('apagado_em', null));
 
   @override
-  Future<int> comprasDaLoja(String lojaId) =>
-      _comRede(() => _c.from('compras').count().eq('loja_id', lojaId));
+  Future<int> comprasDaLoja(String lojaId) => _comRede(
+    () => _c
+        .from('compras')
+        .count()
+        .eq('loja_id', lojaId)
+        .isFilter('apagado_em', null),
+  );
 
   @override
   Future<List<String>> locaisUsados(String lojaId) => _comRede(() async {
@@ -60,6 +103,7 @@ class SupabaseConsultasCompras implements ConsultasCompras {
         .from('compras')
         .select('local')
         .eq('loja_id', lojaId)
+        .isFilter('apagado_em', null)
         .not('local', 'is', null);
     final locais = {for (final l in linhas) l['local'] as String}.toList()
       ..sort();
@@ -113,10 +157,10 @@ class SupabaseDadosRepository implements DadosRepository {
 
   @override
   Future<bool> temDados() => _ler(() async {
-    for (final t in ['lojas', 'artigos', 'compras']) {
+    for (final t in ['lojas', 'artigos']) {
       if (await _c.from(t).count() > 0) return true;
     }
-    return false;
+    return await _c.from('compras').count().isFilter('apagado_em', null) > 0;
   });
 
   @override
@@ -142,7 +186,7 @@ class SupabaseDadosRepository implements DadosRepository {
           for (final t in tabelas)
             t: await buscarTudo(_c, t, limite: limiteLeitura),
         };
-      });
+      }).then(semComprasEliminadas);
 
   @override
   Future<void> apagarTudo() => _escrever(() => _c.rpc('apagar_todos_dados'));
@@ -157,7 +201,7 @@ class SupabaseDadosRepository implements DadosRepository {
   Future<ResumoDados> resumoDados() => _ler(() async {
     final lojas = await resumoPorLoja();
     return ResumoDados(
-      nCompras: await _c.from('compras').count(),
+      nCompras: await _c.from('compras').count().isFilter('apagado_em', null),
       nArtigos: await _c.from('artigos').count().isFilter('apagado_em', null),
       lojas: lojas,
     );
@@ -179,17 +223,26 @@ class SupabaseDadosRepository implements DadosRepository {
     final linhas = await buscarTudo(
       _c,
       'compras',
-      colunas: 'id, loja_id, data, local, total_cent',
+      colunas: 'id, loja_id, data, local, total_cent, apagado_em',
       limite: limiteLeitura,
     );
-    return [
-      for (final c in linhas)
-        (
-          lojaId: c['loja_id'] as String,
-          data: c['data'] as String,
-          local: c['local'] as String?,
-          totalCent: (c['total_cent'] as num).toInt(),
-        ),
-    ];
+    return comprasExistentesDe(linhas);
   });
+
+  @override
+  Future<void> eliminarCompra(String id) => lerComRede(
+    () => _c
+        .from('compras')
+        .update({'apagado_em': DateTime.now().toUtc().toIso8601String()})
+        .eq('id', id),
+    limite: limiteLeitura,
+    semRede: 'Sem rede: liga-te para eliminar o talão.',
+  );
+
+  @override
+  Future<void> reporCompra(String id) => lerComRede(
+    () => _c.from('compras').update({'apagado_em': null}).eq('id', id),
+    limite: limiteLeitura,
+    semRede: 'Sem rede: liga-te para repor o talão.',
+  );
 }
