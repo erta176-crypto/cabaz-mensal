@@ -1,6 +1,6 @@
 # Fase 14 · Painel: tocar numa loja ou categoria mostra os artigos
 
-**Estado:** aprovado (2026-11-25); T1 à espera da migração. Uma migração (função SQL nova, só leitura, sem tabelas nem índices novos); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1 feita. Uma migração (função SQL nova, só leitura, sem tabelas nem índices novos); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** no Painel, tocar numa barra de "Por loja" ou "Por categoria" (incluindo "Sem categoria" e "Outras") abre a lista dos artigos que dão esse valor, com o mesmo período e a mesma loja do Painel. A soma da lista é sempre igual ao valor da barra.
 
@@ -24,10 +24,10 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P3"). Eliminar talão fica pa
 | D5 | Folha inferior que rola: título "Mercadona · Este mês", uma linha por artigo (nome, "3 un" ou "1,25 kg" pela unidade do artigo, n.º de compras, total), total no fim. Tocar num artigo abre o `DialogoVerArtigo`. No ecrã largo, a folha fica com a largura máxima da Material (não ocupa o ecrã todo). |
 | D6 | Só com rede, como as linhas de uma compra. Sem rede: "Sem rede: liga-te para ver os artigos." Se o Painel está a mostrar a cache, as barras continuam a abrir a folha (com dados atuais) e a folha avisa: "O Painel está desatualizado; esta lista é de agora." |
 
-## T1 · Migração e verificação no servidor [ ]
+## T1 · Migração e verificação no servidor [x] (2026-11-25)
 - Escritos: `supabase/migrations/20261125000000_fase14_artigos_do_painel.sql` e `supabase/verificacao/fase14.sql`.
 - Antes de aplicar (2026-11-25), com uma cópia da função em `pg_temp` numa transação sem commit: 128 barras ("este mês" e "tudo", sem e com loja: 7 de loja, 114 de categoria, 7 de "Outras"), 0 diferentes. Não havia barras "Sem categoria".
-- Falta: o utilizador aplicar a migração no SQL Editor; depois correr `fase14.sql` com as RPCs reais e os `get_advisors`.
+- Aplicada pelo utilizador (2026-11-25). Confirmado em `pg_proc`: `security invoker`, `search_path` vazio, sem `execute` para `anon`, com `execute` para `authenticated`. `fase14.sql` com as RPCs reais: 128 barras, 0 diferentes. `get_advisors`: segurança só com o aviso antigo (Leaked Password Protection); desempenho só com um INFO antigo (índice `lojas_user_id_atualizado_em_idx` por usar). Nenhum aviso novo.
 - `supabase/migrations/20261125000000_fase14_artigos_do_painel.sql`: só `create function` + `revoke`/`grant`. Aplicada pelo utilizador no SQL Editor (decisão 0002); depois `get_advisors` sem avisos novos.
 - Antes de aplicar: correr o corpo da função como consulta de leitura com a sessão do utilizador (`set_config('request.jwt.claims', …, true)` numa transação) e comparar com o `painel`. Depois de aplicar: o mesmo, chamando as duas RPCs. Casos: 2 lojas e 2 categorias reais, "Sem categoria", "Outras", períodos "Este mês" e "Tudo", com e sem loja no filtro. Mostrar só totais e contagens (sem nomes de artigos).
 - O SQL de verificação fica em `supabase/verificacao/fase14.sql` (só leitura), para voltar a correr na Fase 15.
