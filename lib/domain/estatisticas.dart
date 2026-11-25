@@ -199,6 +199,103 @@ List<TotalMes> mesesCompletos(
   return (topo: topo, outrasCent: outras);
 }
 
+/// Um artigo da lista de uma barra do Painel (RPC `artigos_do_painel`).
+class ArtigoDetalhe {
+  const ArtigoDetalhe({
+    required this.artigoId,
+    required this.totalCent,
+    required this.quantidade,
+    required this.pesoG,
+    required this.nCompras,
+  });
+
+  final String artigoId;
+
+  /// Soma do `pago_cent` das linhas.
+  final int totalCent;
+  final int quantidade;
+  final int pesoG;
+  final int nCompras;
+
+  /// Comprado ao peso (mostra-se em kg).
+  bool get porPeso => pesoG > 0;
+}
+
+/// Barra do Painel tocada: o filtro do Painel e o que a barra representa.
+/// Igualdade por valor (é a chave do `detalhePainelProvider`).
+class BarraPainel {
+  const BarraPainel({
+    required this.filtro,
+    this.lojaId,
+    this.categoriaIds = const [],
+    this.semCategoria = false,
+  });
+
+  final FiltroCompras filtro;
+
+  /// Loja da barra (vista por loja); null = a do filtro.
+  final String? lojaId;
+
+  /// Categorias da barra (uma, ou várias em "Outras").
+  final List<String> categoriaIds;
+
+  /// Inclui as linhas sem categoria ("Sem categoria" ou dentro de "Outras").
+  final bool semCategoria;
+
+  @override
+  bool operator ==(Object other) =>
+      other is BarraPainel &&
+      other.filtro == filtro &&
+      other.lojaId == lojaId &&
+      other.semCategoria == semCategoria &&
+      other.categoriaIds.length == categoriaIds.length &&
+      Iterable<int>.generate(categoriaIds.length)
+          .every((i) => other.categoriaIds[i] == categoriaIds[i]);
+
+  @override
+  int get hashCode =>
+      Object.hash(filtro, lojaId, semCategoria, Object.hashAll(categoriaIds));
+}
+
+/// Artigos que dão o valor de uma barra do Painel (Fase 14). A soma
+/// [totalCent] é igual ao valor da barra.
+class DetalhePainel {
+  const DetalhePainel({
+    required this.artigos,
+    required this.semArtigoCent,
+    required this.diferencaCent,
+  });
+
+  /// Por ordem do total, do maior para o menor.
+  final List<ArtigoDetalhe> artigos;
+
+  /// Linhas sem artigo.
+  final int semArtigoCent;
+
+  /// Só por loja: total das compras menos a soma das suas linhas.
+  final int diferencaCent;
+
+  int get totalCent =>
+      artigos.fold(0, (s, a) => s + a.totalCent) +
+      semArtigoCent +
+      diferencaCent;
+
+  factory DetalhePainel.fromJson(Map<String, dynamic> j) => DetalhePainel(
+    artigos: [
+      for (final m in (j['artigos'] as List).cast<Map<String, dynamic>>())
+        ArtigoDetalhe(
+          artigoId: m['artigo_id'] as String,
+          totalCent: _int(m['total_cent']),
+          quantidade: _int(m['quantidade']),
+          pesoG: _int(m['peso_g']),
+          nCompras: _int(m['n_compras']),
+        ),
+    ],
+    semArtigoCent: _int(j['sem_artigo_cent']),
+    diferencaCent: _int(j['diferenca_cent']),
+  );
+}
+
 /// Resultado do painel com a origem: do servidor ou da cache.
 class ResultadoPainel {
   const ResultadoPainel(this.dados, {this.guardadoEm});

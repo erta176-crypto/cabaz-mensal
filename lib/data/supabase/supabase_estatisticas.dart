@@ -18,6 +18,7 @@ typedef LerLinhas = Future<List<Map<String, dynamic>>> Function(
 );
 
 const _semRedeHistorico = 'Sem rede: o histórico precisa do servidor.';
+const _semRedeDetalhe = 'Sem rede: liga-te para ver os artigos.';
 
 /// Painel (com cache do último resultado) e histórico (só com rede).
 class SupabaseEstatisticasRepository implements EstatisticasRepository {
@@ -115,13 +116,40 @@ class SupabaseEstatisticasRepository implements EstatisticasRepository {
       LinhaCompra.fromMap(m),
   ];
 
-  Future<T> _comRede<T>(Future<T> Function() f) async {
+  @override
+  Future<DetalhePainel> artigosDoPainel(
+    FiltroCompras filtro, {
+    String? lojaId,
+    List<String>? categoriaIds,
+    bool semCategoria = false,
+    DateTime? hoje,
+  }) async {
+    final i = intervaloDe(filtro.periodo, hoje ?? DateTime.now());
+    final resposta = await _comRede(
+      () => _rpc('artigos_do_painel', {
+        'p_de': dataIso(i.de),
+        'p_ate': dataIso(i.ate),
+        'p_loja': lojaId ?? filtro.lojaId,
+        'p_categorias': categoriaIds == null || categoriaIds.isEmpty
+            ? null
+            : categoriaIds,
+        'p_sem_categoria': semCategoria,
+      }),
+      semRede: _semRedeDetalhe,
+    );
+    return DetalhePainel.fromJson((resposta as Map).cast<String, dynamic>());
+  }
+
+  Future<T> _comRede<T>(
+    Future<T> Function() f, {
+    String semRede = _semRedeHistorico,
+  }) async {
     try {
       return await comErrosTraduzidos(() => f().timeout(limite));
     } on ErroDados {
       rethrow;
     } catch (_) {
-      throw const ErroDados(_semRedeHistorico);
+      throw ErroDados(semRede);
     }
   }
 }

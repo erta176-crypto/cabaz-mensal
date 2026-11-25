@@ -51,6 +51,15 @@ class _EstatisticasFalsas implements EstatisticasRepository {
 
   @override
   Future<List<LinhaCompra>> linhas(String compraId) async => const [];
+
+  @override
+  Future<DetalhePainel> artigosDoPainel(
+    FiltroCompras filtro, {
+    String? lojaId,
+    List<String>? categoriaIds,
+    bool semCategoria = false,
+    DateTime? hoje,
+  }) => throw UnimplementedError();
 }
 
 void main() {

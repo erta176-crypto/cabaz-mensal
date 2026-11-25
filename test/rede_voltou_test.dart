@@ -43,6 +43,15 @@ class _Estatisticas implements EstatisticasRepository {
     pedidosLinhas++;
     return linhasRespostas.removeAt(0) ?? (throw const ErroDados('Sem rede.'));
   }
+
+  @override
+  Future<DetalhePainel> artigosDoPainel(
+    FiltroCompras filtro, {
+    String? lojaId,
+    List<String>? categoriaIds,
+    bool semCategoria = false,
+    DateTime? hoje,
+  }) => throw UnimplementedError();
 }
 
 void main() {

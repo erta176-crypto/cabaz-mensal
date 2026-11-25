@@ -295,6 +295,17 @@ abstract interface class EstatisticasRepository {
 
   /// Linhas de uma compra (só com rede).
   Future<List<LinhaCompra>> linhas(String compraId);
+
+  /// Artigos de uma barra do Painel, no período do [filtro] (só com rede).
+  /// Loja: [lojaId], ou a do filtro. Categorias: [categoriaIds] e/ou
+  /// [semCategoria]; sem nenhum, todas (barra de uma loja).
+  Future<DetalhePainel> artigosDoPainel(
+    FiltroCompras filtro, {
+    String? lojaId,
+    List<String>? categoriaIds,
+    bool semCategoria = false,
+    DateTime? hoje,
+  });
 }
 
 /// Erro de dados com mensagem pronta a mostrar ao utilizador.

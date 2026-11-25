@@ -280,6 +280,22 @@ final linhasCompraProvider = FutureProvider.autoDispose
       ),
     );
 
+/// Artigos de uma barra do Painel (só com rede; Fase 14).
+final detalhePainelProvider = FutureProvider.autoDispose
+    .family<DetalhePainel, BarraPainel>(
+      (ref, b) => refazerQuandoVoltarARede(
+        ref,
+        ref
+            .watch(estatisticasRepositoryProvider)
+            .artigosDoPainel(
+              b.filtro,
+              lojaId: b.lojaId,
+              categoriaIds: b.categoriaIds,
+              semCategoria: b.semCategoria,
+            ),
+      ),
+    );
+
 final orcamentosProvider = StreamProvider<List<Orcamento>>(
   (ref) => ref.watch(orcamentosRepositoryProvider).observar(),
 );

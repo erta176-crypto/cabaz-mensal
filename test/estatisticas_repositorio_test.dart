@@ -212,6 +212,103 @@ void main() {
     });
   });
 
+  group('artigosDoPainel', () {
+    const resposta = {
+      'artigos': [
+        {
+          'artigo_id': 'a1',
+          'total_cent': 700,
+          'quantidade': 1,
+          'peso_g': 0,
+          'n_compras': 1,
+        },
+      ],
+      'sem_artigo_cent': 0,
+      'diferenca_cent': 0,
+    };
+
+    Future<Map<String, dynamic>> params(
+      Future<DetalhePainel> Function() chamar,
+    ) async {
+      comRede = (nome, params) async {
+        chamadas.add((nome, params));
+        return resposta;
+      };
+      final d = await chamar();
+      expect(d.totalCent, 700);
+      expect(chamadas.single.$1, 'artigos_do_painel');
+      return chamadas.single.$2;
+    }
+
+    final hoje = DateTime(2026, 10, 25);
+
+    test('loja tocada: essa loja, todas as categorias', () async {
+      expect(
+        await params(
+          () => repo.artigosDoPainel(_filtro, lojaId: 'l1', hoje: hoje),
+        ),
+        {
+          'p_de': '2026-10-01',
+          'p_ate': '2026-10-25',
+          'p_loja': 'l1',
+          'p_categorias': null,
+          'p_sem_categoria': false,
+        },
+      );
+    });
+
+    test('categoria tocada com a loja do filtro', () async {
+      expect(
+        await params(
+          () => repo.artigosDoPainel(
+            (periodo: Periodo.esteMes, lojaId: 'l2'),
+            categoriaIds: ['c1'],
+            hoje: hoje,
+          ),
+        ),
+        containsPair('p_loja', 'l2'),
+      );
+      expect(chamadas.single.$2['p_categorias'], ['c1']);
+      expect(chamadas.single.$2['p_sem_categoria'], isFalse);
+    });
+
+    test('"Sem categoria"', () async {
+      final p = await params(
+        () => repo.artigosDoPainel(_filtro, semCategoria: true, hoje: hoje),
+      );
+      expect(p['p_categorias'], isNull);
+      expect(p['p_sem_categoria'], isTrue);
+      expect(p['p_loja'], isNull);
+    });
+
+    test('"Outras": várias categorias, com "Sem categoria"', () async {
+      final p = await params(
+        () => repo.artigosDoPainel(
+          _filtro,
+          categoriaIds: ['c8', 'c9'],
+          semCategoria: true,
+          hoje: hoje,
+        ),
+      );
+      expect(p['p_categorias'], ['c8', 'c9']);
+      expect(p['p_sem_categoria'], isTrue);
+    });
+
+    test('sem rede: ErroDados com a mensagem da folha', () async {
+      comRede = (_, _) async => throw const SocketException('sem rede');
+      expect(
+        repo.artigosDoPainel(_filtro, lojaId: 'l1', hoje: hoje),
+        throwsA(
+          isA<ErroDados>().having(
+            (e) => e.mensagem,
+            'mensagem',
+            'Sem rede: liga-te para ver os artigos.',
+          ),
+        ),
+      );
+    });
+  });
+
   group('linhas', () {
     test('lê as linhas da compra', () async {
       final r = SupabaseEstatisticasRepository(

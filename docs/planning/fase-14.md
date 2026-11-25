@@ -1,6 +1,6 @@
 # Fase 14 · Painel: tocar numa loja ou categoria mostra os artigos
 
-**Estado:** aprovado (2026-11-25); T1 feita. Uma migração (função SQL nova, só leitura, sem tabelas nem índices novos); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
+**Estado:** aprovado (2026-11-25); T1 e T2 feitas. Uma migração (função SQL nova, só leitura, sem tabelas nem índices novos); sem pacotes novos. Depois de aprovado, as tarefas avançam sem pedir aprovação (decisão 0005).
 
 **Objetivo:** no Painel, tocar numa barra de "Por loja" ou "Por categoria" (incluindo "Sem categoria" e "Outras") abre a lista dos artigos que dão esse valor, com o mesmo período e a mesma loja do Painel. A soma da lista é sempre igual ao valor da barra.
 
@@ -32,7 +32,9 @@ Origem: prompt do utilizador de 2026-11-25 (o seu "P3"). Eliminar talão fica pa
 - Antes de aplicar: correr o corpo da função como consulta de leitura com a sessão do utilizador (`set_config('request.jwt.claims', …, true)` numa transação) e comparar com o `painel`. Depois de aplicar: o mesmo, chamando as duas RPCs. Casos: 2 lojas e 2 categorias reais, "Sem categoria", "Outras", períodos "Este mês" e "Tudo", com e sem loja no filtro. Mostrar só totais e contagens (sem nomes de artigos).
 - O SQL de verificação fica em `supabase/verificacao/fase14.sql` (só leitura), para voltar a correr na Fase 15.
 
-## T2 · Modelo, repositório e provider [ ]
+## T2 · Modelo, repositório e provider [x] (2026-11-25)
+- Feito: `ArtigoDetalhe`, `DetalhePainel` e `BarraPainel` (chave do provider, com igualdade por valor: um record com `List` compararia a lista pela identidade e o provider voltaria a pedir em cada reconstrução) em `domain/estatisticas.dart`; `artigosDoPainel` na interface e em `supabase_estatisticas.dart` (mensagem de D6 sem rede); `detalhePainelProvider`. Esboços nas 5 classes falsas de teste.
+- Testes: `test/detalhe_painel_test.dart` (3) e grupo `artigosDoPainel` em `estatisticas_repositorio_test.dart` (5).
 - Primeiro os testes: `DetalhePainel.fromJson`; `totalCent` = artigos + sem artigo + diferença; ordem pelo total; quantidade em un e em kg; parâmetros enviados à RPC para loja, categoria, "Sem categoria" e "Outras".
 - `DetalhePainel` (`domain/estatisticas.dart`), `EstatisticasRepository.artigosDoPainel` (`repositorios.dart`, `supabase_estatisticas.dart`), `detalhePainelProvider` (`providers.dart`, com `refazerQuandoVoltarARede`). Ficheiros partilhados: impacto pelo grafo antes de editar.
 
